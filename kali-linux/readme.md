@@ -12,7 +12,7 @@ $ lsb_release -a
 ## Useful Tips
 ### Print Random Line From File
 Using the `shuf` utility, print random lines from a file. 
-Use the `-n` flag to 
+Use the `-n` flag to determine the number of lines to output.
 ```bash
 $ shuf -n 1 <filename>
 ```
