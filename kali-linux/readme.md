@@ -1,6 +1,6 @@
 # Kali Linux Tips & Scripts
 
-Any tips or notes are written in mardown files (`.md` extension) and any executable scripts will be written in shell script files (`.sh`).
+Any tips or notes are written in markdown files (`.md` extension) and any executable scripts will be written in shell script files (`.sh`).
 
 Script files will begin with the shebang: `#!/bin/bash`
 
