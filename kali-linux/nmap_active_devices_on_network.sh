@@ -14,7 +14,7 @@ fi
 #    shall be substituted.
 if [ -z ${cidr+x} ]
 then
-    echo "ip address range ($cidr) is unset, exiting.";
+    echo "No IP address range provided, exiting.";
     exit 1;
 else
     echo "performing nmap on $cidr ..."
