@@ -2,6 +2,8 @@
 
 Any tips or notes are written in mardown files (`.md` extension) and any executable scripts will be written in shell script files (`.sh`).
 
+Script files will begin with the shebang: `#!/bin/bash`
+
 
 ## Check Kali Linux Version
 ```bash
