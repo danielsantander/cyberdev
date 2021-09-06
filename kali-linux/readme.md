@@ -5,13 +5,13 @@ Any tips or notes are written in markdown files (`.md` extension) and any execut
 Script files will begin with the shebang: `#!/bin/bash`
 
 
-## Check Kali Linux Version
+## Useful Tips
+
+### Check Kali Linux Version
 ```bash
 $ lsb_release -a
 ```
 
-
-## Useful Tips
 ### Print Random Line From File
 Using the `shuf` utility, print random lines from a file. 
 Use the `-n` flag to determine the number of lines to output.
