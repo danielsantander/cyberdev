@@ -27,8 +27,7 @@ root@kali:~# dhclient wlan0
 root@kali:~# RTNETLINK answers: File exists
 ```
 
-*Fix*
-Found from [serverfault.com](https://serverfault.com/questions/601450/dhclient-what-does-rtnetlink-answers-file-exists-mean)
+*Fix found from [serverfault.com](https://serverfault.com/questions/601450/dhclient-what-does-rtnetlink-answers-file-exists-mean)*
 
 Suggested by user "Dennis Nolte":
 
