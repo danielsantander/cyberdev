@@ -27,20 +27,15 @@ root@kali:~# dhclient wlan0
 root@kali:~# RTNETLINK answers: File exists
 ```
 
-*Fix found from [serverfault.com](https://serverfault.com/questions/601450/dhclient-what-does-rtnetlink-answers-file-exists-mean)*
+*Fix found from [serverfault.com](https://serverfault.com/questions/601450/dhclient-what-does-rtnetlink-answers-file-exists-mean)* - (suggested by user Dennis Nolte)
 
-Suggested by user "Dennis Nolte":
-
-You 
-For having the lease renewed do
-```
+Release  the  current  lease  and  stop the running DHCP client as previously recorded in the PID file.
+```shell
 dhclient -r
 ```
 
-If thats not enough you can remove all leases by removing the file and getting a new lease
+Another solution would be to remove all leases by removing the file and getting a new lease.
+```shell
+root@kali:~# sudo rm /var/lib/dhcp/dhclient.leases
+root@kali:~# sudo dhclient eth0
 ```
-sudo rm /var/lib/dhcp/dhclient.leases; sudo dhclient eth0
-```
-Depending on your exact setup this might be an issue with having to type your password twice, so watch out for that.
-
-
