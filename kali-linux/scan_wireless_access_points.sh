@@ -1,2 +1,2 @@
 #!/bin/bash
-sudo iwlist wlan0 scanning | egrep 'Cell |Encryption|Quality|Last beacon|ESSID'
+scan iwlist wlan0 scanning | egrep -c 'Cell |Encryption|Quality|Last beacon|ESSID'
