@@ -60,12 +60,12 @@ root@kali:~/code/scripts# cat .git/config
 ```
 
 Update the remote url with the following command:
-```
+```shell
 root@kali:~/code/scripts# git remote set-url origin git@github.com:danielsantander/scripts.git
 ```
 
 Now we can see it is updated:
-```
+```shell
 root@kali:~/code/scripts# cat .git/config 
 ...
 [remote "origin"]
