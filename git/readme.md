@@ -44,7 +44,7 @@ Within the git project directory, update the remote url with the following comma
 
 We view the config file to see what the remote url is set to:
 ```shell
-root@kali:~/scripts# cat .git/config 
+root@kali:~/project_directory# cat .git/config 
 ...
 [remote "origin"]
         url = https://github.com/<username>/<repository>.git
@@ -54,12 +54,12 @@ root@kali:~/scripts# cat .git/config
 
 Update the remote url with the following command:
 ```shell
-root@kali:~/scripts# git remote set-url origin git@github.com:<username>/<repository>.git
+root@kali:~/project_directory# git remote set-url origin git@github.com:<username>/<repository>.git
 ```
 
 Now we can see it is updated:
 ```shell
-root@kali:~/scripts# cat .git/config 
+root@kali:~/project_directory# cat .git/config 
 ...
 [remote "origin"]
         url = git@github.com:<username>/<repository>.git
