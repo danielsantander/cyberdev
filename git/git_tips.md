@@ -1,6 +1,6 @@
 # Git Tips
 
-## `git pull`
+## pull
 The `git pull` command is used to fetch and download content from a remote repository and immediately update the local repository to match that content. The `git pull` command is a combination of `git fetch` & `git merge`.
 
 - `git fetch` will download the content from the remote repository.
@@ -10,7 +10,7 @@ The `git pull` command is used to fetch and download content from a remote repos
 $ git pull 
 ```
 
-## `git pull origin master`
+## pull origin master
 Fetches a copy of the master branch from the original repository, and merges it with the current branch that you have checked out.
 ```shell
 $ git pull origin master
