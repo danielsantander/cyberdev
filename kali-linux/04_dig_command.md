@@ -72,8 +72,7 @@ The last section of the output includes statistics about the query:
 ```
 Exclude this statistic section fromt he output with the `+nostats` option.
 
-
-## Print Answers
+<hr>
 
 ## Get Short Answer
 Get a short version of the answers from the `dig` query by using the `+short` option.
@@ -160,7 +159,7 @@ linux.org.              300     IN      A       172.67.176.128
 	google.com.             600     IN      MX      50 alt4.aspmx.l.google.com.
 	google.com.             600     IN      MX      40 alt3.aspmx.l.google.com.
 	```
-5. Query **NS** records = find the authoritative name servers for specific domain, use the `ns` option:
+5. Query **NS** records - find the authoritative name servers for specific domain, use the `ns` option:
 	```shell
 	$ dig +nocmd google.com ns +noall +answer
 	google.com.             342334  IN      NS      ns1.google.com.
