@@ -4,7 +4,7 @@
 
 
 ```shell
-find . -name "pattern" -print
+$ find . -name "pattern" -print
 ```
 
 ## Options
@@ -43,7 +43,7 @@ Here is an example of using the `grep` command with regular expressions to searc
 $ find . -type f -exec grep "\w*[T|t]able[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 
 # Anywhere there is "OrderingFilter" that does not beging with a period
-find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
+$ find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 ```
 
 #### Sources & References
