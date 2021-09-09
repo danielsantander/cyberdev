@@ -9,12 +9,12 @@ root@kali:~# dhclient <interface>
 
 **eth0 example**
 ```bash
-root@kali:~# ifconfig dhclient eth0
+root@kali:~# dhclient eth0
 ```
 
 **wlan0 example**
 ```bash
-root@kali:~# ifconfig dhclient wlan0
+root@kali:~# dhclient wlan0
 ```
 
 <br>
