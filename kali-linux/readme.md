@@ -18,3 +18,16 @@ Use the `-n` flag to determine the number of lines to output.
 ```bash
 $ shuf -n 1 <filename>
 ```
+
+
+### Check Wireless Network Devices
+Utilize the `iwconfig` command to gather information such as the wireless adapter's IP addres, MAC address, what mode it is in, and much more.
+
+```shell
+$ iwconfig
+wlan0 IEE 802.11bg SSID:off/any
+Mode:Managed Access Point: Not Associated Tx-Power-20 dBm
+--snip--
+lo      no wireless connection
+eth0    no wireless connection
+```
