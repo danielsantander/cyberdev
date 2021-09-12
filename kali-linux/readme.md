@@ -12,14 +12,6 @@ Script files will begin with the shebang: `#!/bin/bash`
 $ lsb_release -a
 ```
 
-### Print Random Line From File
-Using the `shuf` utility, print random lines from a file. 
-Use the `-n` flag to determine the number of lines to output.
-```bash
-$ shuf -n 1 <filename>
-```
-
-
 ### Check Wireless Network Devices
 Utilize the `iwconfig` command to gather information such as the wireless adapter's IP addres, MAC address, what mode it is in, and much more.
 
@@ -30,4 +22,11 @@ Mode:Managed Access Point: Not Associated Tx-Power-20 dBm
 --snip--
 lo      no wireless connection
 eth0    no wireless connection
+```
+
+### Print Random Line From File
+Using the `shuf` utility, print random lines from a file. 
+Use the `-n` flag to determine the number of lines to output.
+```bash
+$ shuf -n 1 <filename>
 ```
