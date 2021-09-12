@@ -1,5 +1,14 @@
 # Git Tips
 
+View global configurations:
+
+
+```shell
+$ git config --list --global
+user.name=<user_username>
+user.email=<user_email>
+```
+
 ## pull
 The `git pull` command is used to fetch and download content from a remote repository and immediately update the local repository to match that content. The `git pull` command is a combination of `git fetch` & `git merge`.
 
