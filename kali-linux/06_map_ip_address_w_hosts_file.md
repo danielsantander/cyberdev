@@ -21,7 +21,7 @@ ff02::2 ip6-allrouters
 Add any IP address mapped to any domain.
 
 Example, map *linux.org* to a local address at `191.168.181.100`
-```
+```shell
 root@kali:~# cat /etc/hosts
 127.0.0.1       localhost
 127.0.1.1       kali
