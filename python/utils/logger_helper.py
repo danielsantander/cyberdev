@@ -6,8 +6,8 @@ import os
 from typing import Optional
 from settings import DEBUG_MODE
 
-CUR_DIR = os.path.abspath(os.path.dirname(__file__))        # redditapi/api/
-LOG_DIR = os.path.join(CUR_DIR, "logs", "")                 # redditapi/api/logs/
+CUR_DIR = os.path.abspath(os.path.dirname(__file__))        # python/utils/
+LOG_DIR = os.path.join(CUR_DIR, "logs", "")                 # python/utils/logs/
 LOG_LEVEL = logging.DEBUG if DEBUG_MODE else logging.INFO
 LOG_FORMAT = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 
@@ -33,8 +33,7 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:str=LOG_DIR, max_size:i
             name (str):         name of logger
             level (bool):       log level value
             max_size (int):     max number of bytes bytes for log file before file rotation begins (Default ~10mb)
-            backup_count (int): number of backup files to keep in rotation. (Default 5)
-        
+            backup_count (int): number of backup files to keep in rotation. (Default 5) 
         OUTPUT: returns RotatingFileHandler logger.
     """
     logger = logging.getLogger(name)
@@ -82,4 +81,4 @@ if __name__ == '__main__':
 
     logger2 = create_logger("test_logger2", level=logging.DEBUG)
     logger2.info("This is a test2.")
-    logger2.debug("This is a debugging test2 -- all loggers should see this.")    
+    logger2.debug("This is a debugging test2 -- all loggers should see this.")
