@@ -1,14 +1,44 @@
-# Git Tips
+# git tips
+Tips for everything git
 
-View global configurations:
 
+# Configuration
 
+## View all settings
+```shell
+$ git config --list --show-origin
+```
+
+## View global configurations:
 ```shell
 $ git config --list --global
 user.name=<user_username>
 user.email=<user_email>
 ```
 
+## Set Username and Email
+```shell
+$ git config -global user.name "<ENTER_USERNAME_HERE>"
+$ git config -global user.email <ENTER_USER_EMAIL_HERE>
+
+# EXAMPLE:
+# git config -global user.name "Bruce Wayne"
+# git config -global user.name BruceWaynen@wayne.ent
+```
+
+## Set Text Editor
+```shell
+$ git config --global core.editor <EDITOR_NAME>
+
+# EXAMPLE:
+# git config --global core.editor emacs
+```
+> Note on Windows systems, you need to specify the full path to its executable file.
+> If you are on a 32-bit Windows system, or you have a 64-bit editor on a 64-bit system, you might try the following command:
+>
+>   `git config --global core.editor "'C:/Program Files/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin"`
+
+# Git Commands
 ## pull
 The `git pull` command is used to fetch and download content from a remote repository and immediately update the local repository to match that content. The `git pull` command is a combination of `git fetch` & `git merge`.
 

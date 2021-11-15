@@ -3,8 +3,7 @@
 Notes and tips will be written in markdown files (`.md` extension) while scripts will be written in shell scripts (`.sh` extension).
 
 
-**View All GIT Settings**
-
+## View GIT Settings
 ```shell
 $ git config --list --show-origin
 ```
