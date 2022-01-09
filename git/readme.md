@@ -26,6 +26,10 @@ Cache credentials for 3 hours (10800 seconds)
 $ git config --global credentials.helper 'cache --timeout=10800'
 ```
 
+### Delete Cached Record
+$ git config --global --unset credential.helper
+$ git config --system --unset credential.helper
+
 ### Store Creds
 ```shell
 $ git config --global credentials.helper store

@@ -23,7 +23,7 @@ $ git config -global user.email <ENTER_USER_EMAIL_HERE>
 
 # EXAMPLE:
 # git config -global user.name "Bruce Wayne"
-# git config -global user.name BruceWaynen@wayne.ent
+# git config -global user.name Bruce@wayne.ent
 ```
 
 ## Set Text Editor
