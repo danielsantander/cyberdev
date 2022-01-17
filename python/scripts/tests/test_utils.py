@@ -20,8 +20,119 @@ from utils.custom_exceptions import InvalidDirectory, InvalidBoolValue
 from utils.custom_logging import create_console_logger, create_logger
 from utils.date_helper import timestamp_to_date_string, current_iso_time
 from utils.file_helper import write_json_to_file, open_json_from_file
+from utils.image_helper import jpg_to_gif
 from utils.navigation import make_directory, clean_directory, get_filenames
 from utils.str2bool import str2bool
+
+class TestLoggerHelper(unittest.TestCase):
+    def setUp(self)->None:
+        self.cur_dir_path = CURRENT_DIR_PATH
+        self.log_dir = self.cur_dir_path / 'test_logs'
+        self.log_level = logging.DEBUG
+        self.cl = create_console_logger(level=self.log_level)
+        self.logger = create_logger(name="TestLogger", level=self.log_level, log_dir=self.log_dir)
+
+    def test_console_ogger(self):
+        self.assertEqual(isinstance(self.cl, logging.Logger), True)
+        self.assertEqual(self.cl.level, self.log_level)
+
+    def test_logger_has_handlers(self):
+        self.assertTrue(self.cl.hasHandlers())
+
+    def test_create_logger(self):
+        master_log_file = self.log_dir / 'master_logger.log'
+        self.assertEqual(isinstance(self.logger, logging.Logger), True)
+        self.assertEqual(self.logger.level, self.log_level)
+        self.assertTrue(self.logger.hasHandlers())
+        self.assertTrue(self.log_dir.exists())
+        self.assertTrue(self.log_dir.is_dir())
+        self.assertTrue(master_log_file.exists())
+        self.assertTrue(master_log_file.is_file())
+    
+    def tearDown(self)->None:
+        if self.log_dir.exists():
+            clean_directory(self.log_dir, remove_directory=True)
+
+class TestDateHelper(unittest.TestCase):
+    def setUp(self) -> None:
+        self.now = datetime.datetime.utcnow()
+        self.now_timestamp = self.now.timestamp()
+        self.str_format = '%Y%m%d%H%M%S'
+        self.now_str = self.now.strftime(self.str_format)
+
+    def test_timestamp_to_str(self):
+        results = timestamp_to_date_string(self.now_timestamp)  # 20220117041520
+        format_regex = re.compile(r'^\d{4}\d{2}\d{2}\d{2}\d{2}\d{2}$') # YYYYMMDDHHMMSS
+        self.assertTrue(isinstance(results, str))
+        self.assertEqual(results, self.now_str)
+        self.assertTrue(format_regex.match(results) is not None)
+
+    def test_iso_time(self):
+        results = current_iso_time()    # 2022-01-17T04:15:20.696565+00:00
+        self.assertTrue(isinstance(results, str))
+        format_regex = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d*\+\d{2}:\d{2}$')
+        self.assertTrue(format_regex.match(results) is not None)
+
+class TestFileHelper(unittest.TestCase):
+    def setUp(self)->None:
+        self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDictory'
+        self.test_filename = self.test_dir / 'test.json'
+        self.test_json:dict = {'text':'hello world'}
+
+    def test_write_json(self):
+        self.assertFalse(self.test_filename.exists())
+        write_json_to_file(self.test_filename, self.test_json)
+        self.assertTrue(self.test_filename.exists())
+    
+    def test_open_json_from_file(self):
+        write_json_to_file(self.test_filename, self.test_json)
+        self.assertTrue(self.test_filename.exists())
+        uploaded_json = open_json_from_file(self.test_filename)
+        self.assertEqual(uploaded_json.get('text', True), self.test_json.get('text', False))
+        self.assertTrue(isinstance(uploaded_json, dict))
+        self.assertEqual(uploaded_json, self.test_json)
+    
+    def tearDown(self) -> None:
+        if self.test_filename.exists() and self.test_filename.is_file(): self.test_filename.unlink()
+        if self.test_dir.exists() and self.test_dir.is_dir(): self.test_dir.rmdir()
+
+class TestJpgToGif(unittest.TestCase):
+    def setUp(self) -> None:
+        self.image_dir = CURRENT_DIR_PATH / 'sample_data' / '20210314_NASA_EPIC'
+        self.gif_name = 'test.gif'
+        self.gif_dir = self.image_dir.parent / 'GIFs'
+    
+    def test_default(self):
+        self.assertFalse(self.gif_dir.is_dir())
+        self.assertFalse(self.gif_dir.exists())
+        self.gif_dir.mkdir()
+        self.assertTrue(self.gif_dir.exists())
+        self.assertTrue(self.gif_dir.is_dir())
+        self.assertTrue(self.image_dir.exists())
+        self.assertTrue(self.image_dir.is_dir())
+        self.assertTrue(self.gif_name.endswith('.gif'))
+        jpg_to_gif(self.image_dir, self.gif_dir, gif_name=self.gif_name)
+        gif_path = self.gif_dir / str(self.gif_name)
+        self.assertTrue(gif_path.exists())
+        self.assertTrue(gif_path.is_file())
+        self.assertTrue(gif_path.name.endswith('.gif'))
+    
+    def test_invalid_directory_exception_raised(self):
+        # self.gif_name = self.gif_name.split('.')[0] # remove file extension
+        self.assertRaises(InvalidDirectory, jpg_to_gif, self.image_dir, self.gif_dir, self.gif_name)
+
+    def test_no_name_given(self):
+        if self.gif_dir.exists() is False: self.gif_dir.mkdir()
+        jpg_to_gif(self.image_dir, self.gif_dir)
+        self.assertTrue(any(self.gif_dir.iterdir()))
+        gif_path = [x for x in self.gif_dir.iterdir() if x.is_file()][0]
+        self.assertTrue(gif_path.exists())
+        name_regex = re.compile(r'^\d{4}\d{2}\d{2}\d{2}\d{2}\d{2}\.gif$') #YYYYMMDDHHMMSS
+        self.assertTrue(name_regex.match(gif_path.name) is not None)
+    
+    def tearDown(self):
+        if self.gif_dir.is_dir(): [x.unlink() for x in self.gif_dir.iterdir() if x.is_file()]
+        if self.gif_dir.exists() and self.gif_dir.is_dir(): self.gif_dir.rmdir()
 
 class TestNavigation(unittest.TestCase):
     def setUp(self)->None:
@@ -98,79 +209,7 @@ class TestNavigation(unittest.TestCase):
         if self.test_dir.exists() and self.test_dir.is_dir():
             [x.unlink() for x in self.test_dir.iterdir() if x.is_file()]
             self.test_dir.rmdir()
-       
-class TestLoggerHelper(unittest.TestCase):
-    def setUp(self)->None:
-        self.cur_dir_path = CURRENT_DIR_PATH
-        self.log_dir = self.cur_dir_path / 'test_logs'
-        self.log_level = logging.DEBUG
-        self.cl = create_console_logger(level=self.log_level)
-        self.logger = create_logger(name="TestLogger", level=self.log_level, log_dir=self.log_dir)
 
-    def test_console_ogger(self):
-        self.assertEqual(isinstance(self.cl, logging.Logger), True)
-        self.assertEqual(self.cl.level, self.log_level)
-
-    def test_logger_has_handlers(self):
-        self.assertTrue(self.cl.hasHandlers())
-
-    def test_create_logger(self):
-        master_log_file = self.log_dir / 'master_logger.log'
-        self.assertEqual(isinstance(self.logger, logging.Logger), True)
-        self.assertEqual(self.logger.level, self.log_level)
-        self.assertTrue(self.logger.hasHandlers())
-        self.assertTrue(self.log_dir.exists())
-        self.assertTrue(self.log_dir.is_dir())
-        self.assertTrue(master_log_file.exists())
-        self.assertTrue(master_log_file.is_file())
-    
-    def tearDown(self)->None:
-        if self.log_dir.exists():
-            clean_directory(self.log_dir, remove_directory=True)
-
-class TestDateHelper(unittest.TestCase):
-    def setUp(self) -> None:
-        self.now = datetime.datetime.utcnow()
-        self.now_timestamp = self.now.timestamp()
-        self.str_format = '%Y%m%d%H%M%S'
-        self.now_str = self.now.strftime(self.str_format)
-
-    def test_timestamp_to_str(self):
-        results = timestamp_to_date_string(self.now_timestamp)  # 20220117041520
-        format_regex = re.compile(r'^\d{4}\d{2}\d{2}\d{2}\d{2}\d{2}$') # YYYYMMDDHHMMSS
-        self.assertTrue(isinstance(results, str))
-        self.assertEqual(results, self.now_str)
-        self.assertTrue(format_regex.match(results) is not None)
-
-    def test_iso_time(self):
-        results = current_iso_time()    # 2022-01-17T04:15:20.696565+00:00
-        self.assertTrue(isinstance(results, str))
-        format_regex = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d*\+\d{2}:\d{2}$')
-        self.assertTrue(format_regex.match(results) is not None)
-
-class TestFileHelper(unittest.TestCase):
-    def setUp(self)->None:
-        self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDictory'
-        self.test_filename = self.test_dir / 'test.json'
-        self.test_json:dict = {'text':'hello world'}
-
-    def test_write_json(self):
-        self.assertFalse(self.test_filename.exists())
-        write_json_to_file(self.test_filename, self.test_json)
-        self.assertTrue(self.test_filename.exists())
-    
-    def test_open_json_from_file(self):
-        write_json_to_file(self.test_filename, self.test_json)
-        self.assertTrue(self.test_filename.exists())
-        uploaded_json = open_json_from_file(self.test_filename)
-        self.assertEqual(uploaded_json.get('text', True), self.test_json.get('text', False))
-        self.assertTrue(isinstance(uploaded_json, dict))
-        self.assertEqual(uploaded_json, self.test_json)
-    
-    def tearDown(self) -> None:
-        if self.test_filename.exists() and self.test_filename.is_file(): self.test_filename.unlink()
-        if self.test_dir.exists() and self.test_dir.is_dir(): self.test_dir.rmdir()
-        
 class TestString2Bool(unittest.TestCase):
     def test_string_values(self):
         self.assertTrue(str2bool('yes'))
