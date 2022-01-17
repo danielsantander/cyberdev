@@ -1,21 +1,27 @@
-
+#!/usr/bin/python3
+'''
+Create custom console and rotating file handler loggers.
+'''
 import errno
 import logging
 import logging.handlers
 import os
-from typing import Optional
-from settings import DEBUG_MODE
+from typing import Optional, Union
+from pathlib import Path
+from utils import navigation
 
-CUR_DIR = os.path.abspath(os.path.dirname(__file__))        # python/utils/
-LOG_DIR = os.path.join(CUR_DIR, "logs", "")                 # python/utils/logs/
-LOG_LEVEL = logging.DEBUG if DEBUG_MODE else logging.INFO
+DEBUG_MODE: bool = True
+CUR_DIR = os.path.abspath(os.path.dirname(__file__)) # utils/
+# LOG_DIR = os.path.join(CUR_DIR, "logs", "") # utils/logs/
+LOG_DIR = Path(CUR_DIR) / 'logs'    # utils/logs
+LOG_LEVEL: int = logging.DEBUG if DEBUG_MODE else logging.INFO
 LOG_FORMAT = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 
 
 def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL) -> logging.Logger:
-    """
+    '''
     Create and return a custom console handler logger.
-    """
+    '''
     logger = logging.getLogger(name)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
@@ -24,10 +30,9 @@ def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL) -> loggi
     logger.setLevel(level)
     return logger
 
-
-def create_logger(name:str, level:int=LOG_LEVEL, log_dir:str=LOG_DIR, max_size:int=10*1024*1024, backup_count:int=5):
-    """
-    Create and return a logger with a StreamHandler and a RotatingFileHandler added.
+def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=LOG_DIR, max_size:int=10*1024*1024, backup_count:int=5):
+    '''
+    Create and return a logger with both StreamHandler and RotatingFileHandler added to the logger.
     Creates log directory if one does not exist, and intializes a "master_logger" log file.
         INPUTS:
             name (str):         name of logger
@@ -35,13 +40,15 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:str=LOG_DIR, max_size:i
             max_size (int):     max number of bytes bytes for log file before file rotation begins (Default ~10mb)
             backup_count (int): number of backup files to keep in rotation. (Default 5) 
         OUTPUT: returns RotatingFileHandler logger.
-    """
+    '''
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
-    create_dir(LOG_DIR)
+    log_dir = log_dir if isinstance(log_dir, Path) else Path(log_dir)
+    # create_dir(log_dir)
+    log_dir = navigation.make_directory(log_dir)
 
     # Master logger (holds all logs)
-    master_location = os.path.join(LOG_DIR, "master_logger.log")
+    master_location = os.path.join(log_dir, "master_logger.log")
     #max_size_50 = 50*1024*1024 # ~52mb
     master_file_handler = logging.handlers.RotatingFileHandler(master_location, maxBytes=max_size, backupCount=backup_count)
     master_file_handler.setLevel(logging.DEBUG)
@@ -59,9 +66,9 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:str=LOG_DIR, max_size:i
 
 
 def create_dir(dir_path:str):
-    """
+    '''
     Create a directory if one does not exist for the given directory path.
-    """
+    '''
     try:
         os.makedirs(dir_path)
     except OSError as err:
@@ -72,6 +79,7 @@ def create_dir(dir_path:str):
     return
 
 
+# Testing purposes:
 if __name__ == '__main__':
 
     # Test Logger:
