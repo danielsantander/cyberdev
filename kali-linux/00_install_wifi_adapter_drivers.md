@@ -7,12 +7,12 @@ This is the process in which to install the ALFA AWUS036ACS drivera on Kali Linu
 
 The Driver is preinstalled with the Kali Linux Kernel, so there is not much to do, so first, you will need to uninstall and purge wifi drivers and then reinstall it using the following commands below.
 
-```bash
-apt-get remove realtek-rtl88xxau-dkms
-apt-get purge realtek-rtl88xxau-dkms
+```shell
+$ apt-get remove realtek-rtl88xxau-dkms
+$ apt-get purge realtek-rtl88xxau-dkms
 ```
 ## Re-install
 
-```bash
-apt-get install realtek-rtl88xxau-dkms
+```shell
+$ apt-get install realtek-rtl88xxau-dkms
 ```
