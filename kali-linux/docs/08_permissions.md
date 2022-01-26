@@ -39,7 +39,7 @@ Use the change owner (`chown`) command to move ownership of a file to a differen
 
 *Example*: grant user "john" ownership of "scriptfile"
 ```bash
- chown <user_to_give_ownership_to> <filename_location>
+# chown <user_to_give_ownership_to> <filename_location>
 $ chown john /tmp/scriptfile
 ```
 
@@ -48,7 +48,7 @@ Utilize the change group (`chgrp`) command to transfer ownership from one group 
 
 Eample: change ownership of "newProgram" to the "blueTeam" group
 ```bash
- chgrp <group_name> <filename_location>
+# chgrp <group_name> <filename_location>
 $ chgrp blueTeam newProgram
 ```
 
@@ -120,17 +120,16 @@ Utilze the `chmod` command to change permissions for that directory/file for eac
 
 *Example*:
 ```bash
-
- before changing permissions
+# before changing permissions
 $ ls -l
 -rwxr-xr-x 1 kali kali 752 Sep  5 04:56 script.sh
 
- allow file ower, groups, and users ALL permissions for this file
+# allow file ower, groups, and users ALL permissions for this file
 $ chmod 777 script.sh
 $ ls -l
 -rwxr-xr-x 1 kali kali 752 Sep  5 04:56 script.sh
 
- after changing permissions
+# after changing permissions
 $ ls -l
 -rwxrwxrwx 1 kali kali 752 Sep  5 04:56 script.sh
 ```
@@ -158,11 +157,11 @@ After the operator symbol, list the permissions you would like to add/remove.
 
 *Example*: grant the file owner executable permissions for `script.sh` file.
 ```bash
- note no executable permissions for file owner, only read and write permissions allowed:
+# note no executable permissions for file owner, only read and write permissions allowed:
 $ ls -l
 -rw-rw-r--1 kali kali 752 Sep  5 04:56 script.sh
 
- give executable permissions to file owner for script.sh.
+# give executable permissions to file owner for script.sh.
 $ chmod +x script.sh
 
 $ ls -l
@@ -184,14 +183,14 @@ o symoblizes "Others"
 
 *Example*: Remove the write permissions from the user that file `script.sh` belogs to.
 ```bash
- note file owner has write permissions for file:
+# note file owner has write permissions for file:
 $ ls -l
 -rwxrwxr-x 1 kali kali 752 Sep  5 04:56 script.sh
 
- remove write permissions from the user the file belongs to
+# remove write permissions from the user the file belongs to
 $ chmod u-w
 
- write permissions is now removed for user
+# write permissions is now removed for user
 $ ls -l
 -r-xrwxr-x 1 kali kali 752 Sep  5 04:56 script.sh
 ```
@@ -200,20 +199,18 @@ It is possible to change multiple permissions with one command. Just use a comma
 
 
 # Grant User Execute Permissions
-Linux by default will set grant new directories and files permissions `777` and `666`, repectively. Meaning that these permissions do not include execute permissions. In order to be able to execute the new tool or program, give yourself root and execute permissions using the change mode command `chmod`.
+Linux, by default, will set new directories and files permissions `777` and `666`, repectively. Therefore, these permissions do not include execute permissions. In order to be able to execute a new tool or program, give yourself root and execute permissions by utilizing the "change mode" command (`chmod`).
 
-*Example*: Give use execute permissions for a newly downloaded security tool.
-
+*Example*: Give user execute permissions for a newly downloaded security tool.
 ```bash
-
- new tool located in root directory (/) with no execute permissions for anyone
+# new tool located in root directory (/) with no execute permissions for anyone
 kali >ls -l
 -rw-r--r-- 1 root root 1072 Sep  5 05:10 securitytool
  
- grant execute permission for user
+# grant execute permission for user
 kali >chmod 766 securitytool
 
- execute permissions granted
+# execute permissions granted
 kali >ls -l
 -rwxrw-rw- 1 root root 1072 Sep  5 05:10 securitytool
 ```
@@ -230,12 +227,12 @@ Unmask:
 
 *Example*: If the default permissions for a new file is `666`, and the default permissions for a new directories are `777`, with `unmask` set to `022`, the new permissions for a new file will be `644` (022 subtracted from 666), and the new permissions for a new directory will be `755` (022 subtracted from 777).
 ```bash
- note the umask value for this user
+# note the umask value for this user
 $ umask
 022
 
- edit the user profile file
- set umask to `007` - only user & members of the user's group will have permissions
+# edit the user ".profile" file
+# set umask to `007` - only user & members of the user's group will have permissions
 $ vi /home/kali/.profile
 umask 007
 ```
@@ -281,7 +278,7 @@ Gaining root or sysadmin privileges.
 ## Find Files Owned By Root
 *Example*: Find files owned by root user with SUID bit permission set.
 ```bash
- find at top of system (/) for files owned by user (root) and have a SUID permission bit set (-perm -4000)
+# find at top of system (/) for files owned by user (root) and have a SUID permission bit set (-perm -4000)
 $ find / -user root -perm -4000
 ...snip...
 /usr/bin/sudo
