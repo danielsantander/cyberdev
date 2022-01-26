@@ -94,9 +94,9 @@ Where:
 Use the change mode (`chmod`) command to change permissions (can only be done by root user or file owner)
 
 ## Decimal Notation
-Refer to permissions by using a single number to reporesent one 'rxw' set of permissions.
+Represent a single set of permissions by using a numerical value.
 
-`rwx` values can be represented as binary numbers, where `111` in binary represents all permissions `rwx` granted. The `rwx` permission set can be represented as an octal number by converting it.
+`rwx` values can be represented as binary numbers, where `111` in binary represents all permissions granted and `000` represent none granted. The `rwx` permission set can be represented as an octal number by converting it form binary.
 
 | Binary | Octal | rwx |
 |--------|-------|-----|
@@ -108,17 +108,17 @@ Refer to permissions by using a single number to reporesent one 'rxw' set of per
 | 101    |   5   | r-x |
 | 110    |   6   | rw- |
 | 111    |   7   | rwx |
-|        |       |     |
 
-> To calculate the read & execute permission values (`r-x`), the binary representation would be `101`, and converted into octal would be `5`.
+To calculate the ocatal value of read & execute permissions `r-x`, calculate the binary representation and then convert into octal.
+```
+r-x -> convert into binary -> b'101 -> convert into octal -> 5
+```
 
-> To represent only read permissions (`r--`) the binary value would be `100` and the octal value would be `5`
+To represent only the read permissions `r--` the binary value would be `100` and the octal value would be `4`.
 
 To represent *all permissions* for the file owner, the group, and all users, we would use the same octal value for all three groups: `7 7 7`
 
-Utilze the `chmod` command to change permissions for that directory/file for each of the three groups.
-
-*Example*:
+*Example*: Utilze the "change mode" command (`chmod`) to change the directory/file permissions for each of the three groups.
 ```bash
 # before changing permissions
 $ ls -l
@@ -135,27 +135,29 @@ $ ls -l
 ```
 
 ## UGO Symbolic Method
-Change permission with UGO (symbolic mothod). UGO stand for "user" (file owner), "group", and "others" (u, g o).
-Using the 'rwx' notation, utilze the `chmod` command. 
+Change permission with the symbolic method (UGO). UGO stand for "user" (file owner), "group", and "others" (u, g o).
 
-> Note the `+-=` operator symbols are used to denote modifying permissions.
+Utlize the change mode command (`chmod`) along with an operator symbol and the `rwx` notation to modify permissions.
+
+Operator symobls are used to modify permissions:
 ```
 + Adds permission(s)
 - Removes permission(s)
 = Sets permission(s)
 ```
+
 After the operator symbol, list the permissions you would like to add/remove.
 
-`$ chmod +rwx filename` to add read, write, and execute permissions for the file owner.
+`$ chmod +rwx filename` to give file owner read, write, and execute permissions for the file.
 
 `$ chmod -rwx directoryname` to remove all permissions of the given directory for the file owner
 
-`$ chmod +x filename` to give fileowner executable permissions on file.
+`$ chmod +x filename` to give file owner executable permissions for the file.
 
-`$ chmod -wx filename` to remove write and execute permissions of file for the file owner.
+`$ chmod -wx filename` to remove file owner write and execute permissions for the file.
 
 
-*Example*: grant the file owner executable permissions for `script.sh` file.
+*Example*: Grant the file owner executable permissions for `script.sh` file.
 ```bash
 # note no executable permissions for file owner, only read and write permissions allowed:
 $ ls -l
@@ -168,17 +170,15 @@ $ ls -l
 -rwxrwxr-x 1 kali kali 752 Sep  5 04:56 script.sh
 ```
 
-Pass in an argument to the `chmod` command, just before the operator symbol to specify which user(s) to change permissions for.
+Pass in an argument to the `chmod` command, just before the operator symbol, to specify which user(s) to change permissions for.
 
 **UGO Syntax:**
 ```bash
 $ chmod <ugo_value> <operator_value> <permissions_to_add_or_remove>
-```
-Where UGO values are either "u", "g", or "o".
-```
-u symbolizes "User" (file owner)
-g symbolizes "Group"
-o symoblizes "Others"
+# Where UGO values are either "u", "g", or "o".
+# u symbolizes "User" (file owner)
+# g symbolizes "Group"
+# o symoblizes "Others"
 ```
 
 *Example*: Remove the write permissions from the user that file `script.sh` belogs to.
@@ -195,7 +195,11 @@ $ ls -l
 -r-xrwxr-x 1 kali kali 752 Sep  5 04:56 script.sh
 ```
 
-It is possible to change multiple permissions with one command. Just use a comma to delimit each permission change. Such as `chmod u-w, o+x script.sh`, which will both remove write permissions for the user (file owner) and grant others executable permissions for script.sh file.
+Change multiple permissions with one command by using a comma to delimit each permission change. 
+```bash
+$ chmod u-w, o+x script.sh
+```
+Which will both remove write permissions for the user (file owner) and grant others executable permissions for script.sh file.
 
 
 # Grant User Execute Permissions
