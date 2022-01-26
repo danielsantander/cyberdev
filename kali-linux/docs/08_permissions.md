@@ -85,13 +85,13 @@ Where:
 4. Owner of file
 5. File size (bytes)
 6. Date created or last modified
-7. Directory/file  name
+7. Directory/file name
 ```
 
 <hr>
 
 # Change Permissions
-Use the change mode (`chmod`) command to change permissions (can only be done by root user or file owner)
+Use the change mode (`chmod`) command to change permissions (can only be done by root or file owner)
 
 ## Decimal Notation
 Represent a single set of permissions by using a numerical value.
@@ -229,7 +229,7 @@ Unmask:
 -  value is not universal to all users on the system, each user can set a personal default `umask` value for the files and directories in their personal `.profile` file.
 -  change the `umask` value, edit the `/home/<username>/.profile` file.
 
-*Example*: If the default permissions for a new file is `666`, and the default permissions for a new directories are `777`, with `unmask` set to `022`, the new permissions for a new file will be `644` (022 subtracted from 666), and the new permissions for a new directory will be `755` (022 subtracted from 777).
+*Example*: If the default permissions for a new files are `666`, and the default permissions for new directories are `777`, with `unmask` set to `022`, the new permissions for files will be `644` (022 subtracted from 666), and the new permissions for directories will be `755` (022 subtracted from 777).
 ```bash
 # note the umask value for this user
 $ umask
@@ -253,9 +253,9 @@ Special permissions include:
 
 **SUID** bit value dictates if user can execute the file with the permissions of the owner. However, those permissions do not extend beyond the use of that file.
 
-> use case: temporary grant owner's privileges to execute /etc/shadow file that holds the user's passwords, by setting the SUID bit on the program.
+> use case: Set the SUID bit on the `/etc/shadow` (file that holds user's passwords) to temporary grant file owner privileges, allowing the user to execute the program, modifying their password.
 
-Set the SUID bit by entering a `4` before the regular permissions, so a file with a new permission of `644` (unmassked from `666`) is represented as `4644` when the `SUID` bit is set.
+Set the SUID bit by entering a `4` before the regular permissions. For example, a file with a new permission of `644` (unmassked from `666`) is represented as `4644` when the `SUID` bit is set.
 
 *Example*: Utilze the `chmod` command to change the SUID bit.
 ```bash
