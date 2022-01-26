@@ -91,7 +91,7 @@ Where:
 <hr>
 
 # Change Permissions
-Use the change mode (`chmod`) command to change permissions (can only be done by root user or file owner>)
+Use the change mode (`chmod`) command to change permissions (can only be done by root user or file owner)
 
 ## Decimal Notation
 Refer to permissions by using a single number to reporesent one 'rxw' set of permissions.
