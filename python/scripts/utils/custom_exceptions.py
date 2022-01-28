@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 '''
-Custome exceptions.
+Custom exceptions.
 '''
 from typing import Union, Any
 from pathlib import Path
