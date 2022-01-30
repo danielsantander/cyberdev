@@ -22,7 +22,7 @@ from utils.date_helper import timestamp_to_date_string, current_iso_time
 from utils.file_helper import write_json_to_file, open_json_from_file
 from utils.image_helper import jpg_to_gif
 from utils.navigation import make_directory, clean_directory, get_filenames
-from utils.str2bool import str2bool
+from utils.validation import str2bool
 
 class TestLoggerHelper(unittest.TestCase):
     def setUp(self)->None:
@@ -134,6 +134,10 @@ class TestJpgToGif(unittest.TestCase):
         if self.gif_dir.is_dir(): [x.unlink() for x in self.gif_dir.iterdir() if x.is_file()]
         if self.gif_dir.exists() and self.gif_dir.is_dir(): self.gif_dir.rmdir()
 
+class TestPdf2(unittest.TestCase):
+    def setUp(self)->None:
+        pass
+
 class TestNavigation(unittest.TestCase):
     def setUp(self)->None:
         self.cur_dir_path = CURRENT_DIR_PATH
@@ -165,7 +169,7 @@ class TestNavigation(unittest.TestCase):
         self.assertEqual(filename_list[0], new_file.name)
 
         # test get_filenames as list of paths
-        filepath_list = get_filenames(self.test_dir, return_as_path_obj=True)
+        filepath_list = get_filenames(self.test_dir, return_as_path=True)
         self.assertEqual(isinstance(filepath_list[0], Path), True)
         self.assertEqual(filepath_list[0].name, new_file.name)
         

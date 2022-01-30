@@ -1,12 +1,11 @@
 #!/usr/bin/python3
-'''
-Custom exceptions.
-'''
+
+""" Custom exceptions. """
 from typing import Union, Any
 from pathlib import Path
 
 class InvalidDirectory(Exception):
-    ''' Invalid path given. Directory does not exist. '''
+    """ Invalid path given. Directory does not exist. """
     def __init__(self, directory:Union[str, Path]=None):
         self.dir = directory
     def __str__(self):
@@ -15,7 +14,7 @@ class InvalidDirectory(Exception):
         return err_msg_dir if self.dir is not None else err_msg
 
 class InvalidBoolValue(Exception):
-    ''' Invalid boolean value given. '''
+    """ Invalid boolean value given. """
     def __init__(self, v:Any):
         self.v = v
     def __str__(self):
