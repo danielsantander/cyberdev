@@ -33,4 +33,5 @@ def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
             p.parent.mkdir()
             p.touch()
     with open(p.absolute(), "w") as f:
-        f.write(json.dumps(dic_obj, indent=4))
+        # json.dump(dict, f, indent=2)
+        f.write(json.dumps(dic_obj, indent=2))

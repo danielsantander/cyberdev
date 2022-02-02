@@ -83,7 +83,7 @@ class TestFileHelper(unittest.TestCase):
         self.assertFalse(self.test_filename.exists())
         write_json_to_file(self.test_filename, self.test_json)
         self.assertTrue(self.test_filename.exists())
-    
+
     def test_open_json_from_file(self):
         write_json_to_file(self.test_filename, self.test_json)
         self.assertTrue(self.test_filename.exists())
@@ -91,7 +91,7 @@ class TestFileHelper(unittest.TestCase):
         self.assertEqual(uploaded_json.get('text', True), self.test_json.get('text', False))
         self.assertTrue(isinstance(uploaded_json, dict))
         self.assertEqual(uploaded_json, self.test_json)
-    
+
     def tearDown(self) -> None:
         if self.test_filename.exists() and self.test_filename.is_file(): self.test_filename.unlink()
         if self.test_dir.exists() and self.test_dir.is_dir(): self.test_dir.rmdir()
@@ -136,6 +136,7 @@ class TestJpgToGif(unittest.TestCase):
 
 class TestPdf2(unittest.TestCase):
     def setUp(self)->None:
+        # TODO: continue here
         pass
 
 class TestNavigation(unittest.TestCase):

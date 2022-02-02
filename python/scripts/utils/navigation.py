@@ -21,19 +21,26 @@ def get_filenames(directory_path: Union[str,Path], return_as_path:bool=False) ->
     filenames_list = [(x if return_as_path else x.name) for x in p.iterdir() if x.is_file()]
     return filenames_list
 
-def make_directory(dir_path: Union[str, Path]) -> Path:
-    '''
-    Returns the newly created directory (as type pathlib.Path)
-    '''
-    p = dir_path if isinstance(dir_path, Path) else Path(dir_path)
+def make_directory(directory_path: Union[str, Path]) -> Path:
+    """
+    Returns the new directory as type pathlib.Path
+
+    Keyword arguments:
+    directory_path -- path of directory to create
+    """
+    p = directory_path if isinstance(directory_path, Path) else Path(directory_path)
     if not p.exists(): p.mkdir(parents=True, exist_ok=True)
     return p
 
 def clean_directory(directory_path: Union[str, Path], remove_directory: bool=False) -> Path:
-    '''
+    """
     Returns pathlib.Path object of directory with all files removed.
-    If 'remove_directory' flag set to True, then the directory itself will be removed as well.
-    '''
+    If 'remove_directory' flag set to True, then the directory itself will be removed.
+
+    Keyword arguments:
+    directory_path -- path of directory to purge
+    remove_directory -- True to remove contents and directory, False to just remove contents of directory (default False)
+    """
     p = directory_path if isinstance(directory_path, Path) else Path(directory_path)
     [x.unlink() for x in p.iterdir() if x.is_file()]
     assert(any(p.iterdir()) is False)
