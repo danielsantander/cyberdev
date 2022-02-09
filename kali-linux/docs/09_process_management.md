@@ -276,7 +276,8 @@ Use the `update-rc.d` command to add or remove services to the `rc.d` script tha
 # Killing System Processes (kill)
 Use the `kill` command to stop a process.
 
-> syntax: `$ kill -<signal> PID` where the signal flag is optional, and if not provided will use the default kill signal **SIGTERM** (15).
+> syntax: `$ kill -<signal> PID`
+> where the signal flag is optional, and if not provided will use the default kill signal **SIGTERM** (15).
 
 | signal  | number |                           about                              |
 |---------|--------|--------------------------------------------------------------|
