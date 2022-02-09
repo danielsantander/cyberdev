@@ -52,7 +52,7 @@ Output columns for command `ps aux`:
 
 ## Filter By Name
 Use the `ps` command to list running processes and pipe it with the `grep` command to filter processes by name.
-> `$ ps aux | grep <process_name>`
+> syntax: `$ ps aux | grep <process_name>`
 
 **Example**: Filter running processes to find the Metasploit process.
 ```shell
@@ -60,6 +60,7 @@ $ ps aux | grep msfconsole
 kali        1626 11.4  8.1 732252 164936 pts/0   Sl+  00:35   0:04 ruby /usr/bin/msfconsole
 kali        1654  0.0  0.1   6184  2272 pts/1    S+   00:36   0:00 grep --color=auto msfconsole
 ```
+
 We can see that `msfconsole` is currently using 11.4% of resources (CPU usage) on the system.
 
 ## List Process By Resources Used (top)
@@ -121,6 +122,8 @@ It is possible to renice a processes using the `top` command which outputs the c
 # Run Background Processes
 Start a process and run in the background by appending an ampersand at the end of the command.
 
+> syntax: `$ <process_to_run> &`
+
 ```shell
 $ ./myscript &
 ```
@@ -128,7 +131,8 @@ $ ./myscript &
 # Foreground Processes
 Move a process from the background to the foreground, use the `fg` command.
 
-> syntax: `fg <PID>` where PID is the process' id number.
+> syntax: `fg <PID>` 
+> where PID is the process' id number.
 
 **Example**: Move the process with PID 6789 running in the background into the foreground. 
 ```shell
