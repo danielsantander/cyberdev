@@ -271,6 +271,12 @@ Use the `update-rc.d` command to add or remove services to the `rc.d` script tha
 
 > syntax: `update-rc.d <script_or_service_name> <remove|defaults|disable|enable>
 
+**Example**: Set up PostgreSQL to startup at system boot. This is ideal for avid users of Metasploit framework to store data. Use the `update-rc.d` command to add the line to the `rc.d` script.
+```shell
+$ update-rc.d postgresql defaults
+```
+This command will add a line to the `rc.d` script to start PostgreSQL on system boot
+
 <hr>
 
 # Killing System Processes (kill)
