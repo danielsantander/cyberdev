@@ -16,7 +16,6 @@ A *process* is a program being executed by one or more threads.
 - [Schedule Processes (at, cron, rc)](#schedule-processes-at-cron-rc)
   - [at](#at)
   - [cron](#cron)
-    - [Example Scheduling Tasks With Cron](#example-scheduling-tasks-with-cron)
   - [rc](#rc)
 - [Killing System Processes (kill)](#killing-system-processes-kill)
 
@@ -243,8 +242,6 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 52 6    1 * *   root    test -x /usr/sbin/anacron || ( cd / && run-parts --report /etc/cron.monthly )
 #                                                           
 ```
-
-### Example Scheduling Tasks With Cron
 
 **Example**: Create a cron task to run a backup script (`/bin/backup.sh`) every Sunday morning at 1:00AM, specify that the user to run the script is "backup".
 ```shell
