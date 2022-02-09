@@ -14,10 +14,10 @@ A *process* is a program being executed by one or more threads.
 - [Run Background Processes](#run-background-processes)
 - [Foreground Processes](#foreground-processes)
 - [Schedule Processes (at, cron, rc)](#schedule-processes-at-cron-rc)
-  - [at command](#at-command)
+  - [at](#at)
   - [cron](#cron)
     - [Example Scheduling Tasks With Cron](#example-scheduling-tasks-with-cron)
-  - [rc Scripts](#rc-scripts)
+  - [rc](#rc)
 - [Killing System Processes (kill)](#killing-system-processes-kill)
 
 <hr>
@@ -147,7 +147,7 @@ Schedule commands to execute in the future with the `at` command or the `crond` 
 - Use the `cron` daemon to run recurring executions (daily, weekly, monthly, etc).
 - Use `rc` scripts to run jobs/tasks at startup
 
-## at command
+## at
 `at` is a daemon--a background process--for scheduling an execution of a command(s) to run at a certain point in time. Enter the `at` command followed by the time to execute. You will then be brought into interactive mode and prompted to enter the command to execute the process.
 > syntax: `at <time_to_execute>`
 
@@ -266,7 +266,7 @@ This cron task specifies to run `/bin/backup.sh` with `backup` user at the top o
 00 10 * * 1,2,3,4,5 backup /bin/backup.sh
 ```
 
-## rc Scripts
+## rc
 Use the `update-rc.d` command to add or remove services to the `rc.d` script that will run at startup.
 
 > syntax: `update-rc.d <script_or_service_name> <remove|defaults|disable|enable>
