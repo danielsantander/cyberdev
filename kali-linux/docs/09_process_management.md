@@ -1,8 +1,6 @@
-# Process Management
-A *process* is a program being executed by one or more threads.
+The purpose of this document is to illustrate how to handle and manage processes. A *process* is a program being executed by one or more threads.
 
 **Table of Contents**
-- [Process Management](#process-management)
 - [View Processes (ps)](#view-processes-ps)
   - [Filter By Name](#filter-by-name)
   - [List Process By Resources Used (top)](#list-process-by-resources-used-top)
@@ -22,7 +20,7 @@ A *process* is a program being executed by one or more threads.
 <hr>
 
 # View Processes (ps)
-Each process will be assigned a unique process ID (PID) by the Linux kernel. The PID is assigned sequentially as they are created. View what processes are running on the system by using the `ps` command.
+Each process will be assigned a unique process identification number (PID) by the Linux kernel. The PID is assigned sequentially as they are created. View what processes are running on the system by using the `ps` command.
 
 **Example**: Use the `ps` command without any arguments to view processes invoked by the currently logged in user.
 ```shell
