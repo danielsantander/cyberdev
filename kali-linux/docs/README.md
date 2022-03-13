@@ -13,3 +13,4 @@ Documentation for linux distributions operating with the Linux kernel. For the s
 - [Manage Permissions](./08_permissions.md)
 - [Process Management](./09_process_management.md)
 - [Environment Variables](./10_env_variables.md)
+- [Scripting](./11_scripting.md)
