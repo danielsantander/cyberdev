@@ -1,3 +1,13 @@
+
+
+**Table of Contents**
+- [Environment Variables](#environment-variables)
+- [Manage Environment Variables](#manage-environment-variables)
+  - [Viewing and Filtering Variables](#viewing-and-filtering-variables)
+  - [Change Variables](#change-variables)
+    - [Change variables for current session](#change-variables-for-current-session)
+    - [Change variables permanently (export)](#change-variables-permanently-export)
+
 # Environment Variables
 
 Environment variables: system-wide variables in key-value string pairs, they are inherited by any child shells or system processes.
