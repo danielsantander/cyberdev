@@ -19,7 +19,7 @@ sys.path.insert(0, PARENT_DIR_NAME)
 from utils.custom_exceptions import InvalidDirectory, InvalidBoolValue
 from utils.custom_logging import create_console_logger, create_logger
 from utils.date_helper import timestamp_to_date_string, current_iso_time
-from utils.file_helper import write_json_to_file, open_json_from_file
+from utils.file_helper import write_json_to_file, open_json_from_file, create_pdf, encrypt_pdf
 from utils.image_helper import jpg_to_gif
 from utils.navigation import make_directory, clean_directory, get_filenames
 from utils.validation import str2bool
@@ -32,7 +32,7 @@ class TestLoggerHelper(unittest.TestCase):
         self.cl = create_console_logger(level=self.log_level)
         self.logger = create_logger(name="TestLogger", level=self.log_level, log_dir=self.log_dir)
 
-    def test_console_ogger(self):
+    def test_console_logger(self):
         self.assertEqual(isinstance(self.cl, logging.Logger), True)
         self.assertEqual(self.cl.level, self.log_level)
 
@@ -52,6 +52,7 @@ class TestLoggerHelper(unittest.TestCase):
     def tearDown(self)->None:
         if self.log_dir.exists():
             clean_directory(self.log_dir, remove_directory=True)
+
 
 class TestDateHelper(unittest.TestCase):
     def setUp(self) -> None:
@@ -73,28 +74,50 @@ class TestDateHelper(unittest.TestCase):
         format_regex = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d*\+\d{2}:\d{2}$')
         self.assertTrue(format_regex.match(results) is not None)
 
+
 class TestFileHelper(unittest.TestCase):
     def setUp(self)->None:
-        self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDictory'
-        self.test_filename = self.test_dir / 'test.json'
+        self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDirectory'
+        self.test_json_file:Path = self.test_dir / 'test.json'
+        self.pdf_file_dne:Path = self.test_dir / 'DoesNotExist.pdf'
+        self.invalid_pdf_file = self.test_dir / 'Invalid.pdf'
+        self.encrypted_pdf_file = self.test_dir / 'Encrypted.pdf'
         self.test_json:dict = {'text':'hello world'}
 
     def test_write_json(self):
-        self.assertFalse(self.test_filename.exists())
-        write_json_to_file(self.test_filename, self.test_json)
-        self.assertTrue(self.test_filename.exists())
+        self.assertFalse(self.test_json_file.exists())
+        write_json_to_file(self.test_json_file, self.test_json)
+        self.assertTrue(self.test_json_file.exists())
 
     def test_open_json_from_file(self):
-        write_json_to_file(self.test_filename, self.test_json)
-        self.assertTrue(self.test_filename.exists())
-        uploaded_json = open_json_from_file(self.test_filename)
+        write_json_to_file(self.test_json_file, self.test_json)
+        self.assertTrue(self.test_json_file.exists())
+        uploaded_json = open_json_from_file(self.test_json_file)
         self.assertEqual(uploaded_json.get('text', True), self.test_json.get('text', False))
         self.assertTrue(isinstance(uploaded_json, dict))
         self.assertEqual(uploaded_json, self.test_json)
 
+    def test_encrypt_pdf_FileNotFoundError(self):
+        self.assertRaises(FileNotFoundError, encrypt_pdf, self.pdf_file_dne)
+
+    def test_encrypt_pdf_OSError(self):
+        if not self.test_dir.exists():
+            self.test_dir.mkdir()
+        self.invalid_pdf_file.touch()
+        self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
+    
+    def test_create_pdf(self):
+        if not self.test_dir.exists():
+            self.test_dir.mkdir()
+        self.encrypted_pdf_file.touch()
+        self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
+        # TODO: continue here
+
     def tearDown(self) -> None:
-        if self.test_filename.exists() and self.test_filename.is_file(): self.test_filename.unlink()
-        if self.test_dir.exists() and self.test_dir.is_dir(): self.test_dir.rmdir()
+        # delete (unlink) any test files or directories
+        if self.test_dir.exists() and self.test_dir.is_dir():
+            [x.unlink() for x in self.test_dir.iterdir() if x.is_file()]
+            self.test_dir.rmdir()
 
 class TestJpgToGif(unittest.TestCase):
     def setUp(self) -> None:

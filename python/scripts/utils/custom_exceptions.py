@@ -18,4 +18,12 @@ class InvalidBoolValue(Exception):
     def __init__(self, v:Any):
         self.v = v
     def __str__(self):
-        return f'Unknown boolean value.t: {self.v}'
+        return f'Unknown boolean value: {self.v}'
+
+class InvalidFile(Exception):
+    """ Invalid file given. File either does not exist or is invalid. """
+    def __init__(self, err:Union[str, Path]=None):
+        self.exception = err
+    def __str__(self):
+        err_msg = f'Invalid file.'
+        return self.exception if self.exception else err_msg
