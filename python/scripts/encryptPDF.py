@@ -9,7 +9,7 @@ from utils.file_helper import create_pdf, encrypt_pdf
 if __name__ == '__main__':
     # outpath defaults to where the PDF being encrypted is located
     usage = './encrypt.py [PDF file] [output path]'
-    
+
     file = 'default.pdf'
     if (len(sys.argv) < 2):
         sys.exit(f"Unknown operation, USAGE:\t{usage}\n")
@@ -22,5 +22,5 @@ if __name__ == '__main__':
     except FileNotFoundError:
         sys.exit('File to encrypt not found. Check file name/path.')
     except Exception as e:
-        raise e
+        #raise e
         sys.exit('Invalid PDF file.')
