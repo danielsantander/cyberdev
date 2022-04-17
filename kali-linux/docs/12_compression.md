@@ -1,10 +1,8 @@
 
 **Table of Contents**
-- [Compression](#compression)
-  - [Tar](#tar)
-    - [Archiving Files](#archiving-files)
-    - [View Archived File Contents](#view-archived-file-contents)
-    - [Extract Archive File Contents](#extract-archive-file-contents)
+- [Archiving Files](#archiving-files)
+- [View Archived File Contents](#view-archived-file-contents)
+- [Extract Archive File Contents](#extract-archive-file-contents)
 - [Compressing Files](#compressing-files)
   - [gzip (GNU zip)](#gzip-gnu-zip)
   - [gunzip (GNU unzip)](#gunzip-gnu-unzip)
@@ -15,13 +13,11 @@
 - [dd command](#dd-command)
 <hr>
 
-# Compression
-
-## Tar
-Utilize the `tar` command to compress files together and combine them into an archive (create a single file from many files).
+# Archiving Files
+Creating a single file from many.
+Utilize the `tar` command to compress files together and combine them into an archive.
 > tar is short for tape archive
 
-### Archiving Files
 *Example*: Combine a pair of scripts into one single archive.
 ```shell
 $ ls -lh
@@ -46,17 +42,17 @@ The flags used:
 
 > note: Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
 
-### View Archived File Contents
+# View Archived File Contents
 Display files from the tarbell without extracting them.
 
-*Example*: Display the files within the archived file `scriptArchive.tar` without extracting the file.
+*Example*: Display the files within the archived file `scriptArchive.tar` without extracting the file using the `t` option.
 ```shell
 $ tar -tvf scriptArchive.tar                        
 -rwxr-xr-x kali/kali        55 2022-04-06 20:40 HelloWorld
 -rwxr-xr-x kali/kali      1094 2022-04-06 20:33 MySQLScan.sh
 ```
 
-### Extract Archive File Contents
+# Extract Archive File Contents
 Extract files from the tarball using the `tar` command with the `-x` switch.
 
 *Example*: Extract the files from `scriptArchive.tar` into the current directory.

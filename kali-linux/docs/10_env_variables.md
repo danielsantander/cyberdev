@@ -1,25 +1,17 @@
-
-
 **Table of Contents**
-- [Environment Variables](#environment-variables)
 - [Manage Environment Variables](#manage-environment-variables)
   - [Viewing and Filtering Variables](#viewing-and-filtering-variables)
   - [Change Variables](#change-variables)
     - [Change variables for current session](#change-variables-for-current-session)
     - [Change variables permanently (export)](#change-variables-permanently-export)
 
-# Environment Variables
-
-Environment variables: system-wide variables in key-value string pairs, they are inherited by any child shells or system processes.
-
-> Shell variables - different from Environment variables in that they are only valid within shell they are created in
-
 # Manage Environment Variables
+**Environment variables**: system-wide variables in key-value string pairs, they are inherited by any child shells or system processes.
+
+**Shell variables**: different from Environment variables in that they are only valid within shell they are created in.
 
 ## Viewing and Filtering Variables
 View default environment variables on the system by entering the `env` command.
-> syntax: `$ env`
-
 ```shell
 $ env
 HOME=/home/kali
@@ -31,10 +23,7 @@ USER=kali
 ```
 
 View all environment variables (local, shell) or any environment shell functions, use the `set` command.
-
-> syntax: `$ set `
- 
-Pipe the `set` command with `more` to iterate through the variables line by line by pressing the return key (press `q` to quit).
+> Pipe with `more` to iterate through the variables line by line by pressing the return key (press `q` to quit).
 
 ```shell
 $ set | more
@@ -48,7 +37,7 @@ USER=kali
 ```
 
 
-**Example** Filter through the list of environment variables to view the `HISTSIZE` value. (HISTSIZE value is the maximum number of commands the command history file will store.)
+**Example** Filter through the list of environment variables to view the `HISTSIZE` value (the maximum number of commands the command history file will store).
 ```shell
 $ set | grep HISTSIZE
 HISTSIZE=1000
@@ -58,11 +47,12 @@ HISTSIZE=1000
 
 ### Change variables for current session
 
-> syntax for single value: `KEY=value`
+single value usage: `KEY=value`
 
-> syntax for mutli values: `KEY=value0;value1;value3;` (multi values are common for setting the PATH variable)
+multi value usage: `KEY=value0;value1;value3;`
+>(multi values are common for setting the PATH variable)
 
-**Example**: Change the `HISTSIZE` value so the system will not save past commands for the current session.
+**Example** Change the `HISTSIZE` value so the system will not save past commands for the current session.
 ```shell
 $ HISTSIZE=0
 ```
@@ -71,7 +61,7 @@ $ HISTSIZE=0
 
 Use the `export` command to permanently export the new environment variable from current shell environment to the whole system.
 
-> syntax: `$ export <variable_name>`
+Usage: `export <variable_name>`
 
 Note that if you are planning on chaning environment variables permanently, it might be a good idea to save the current variable values in a text document.
 ```shell
@@ -82,7 +72,7 @@ $ echo set > ~/ValuesOfAllVariables.txt
 $ echo $HISTSIZE > ValueOfHISTSIZE.txt
 ```
 
-**Example**: Use the `export` command to permanently change the `HISTSIZE` value.
+**Example** Use the `export` command to permanently change the `HISTSIZE` value.
 ```shell
 $ echo $HISTSIZE
 1000
@@ -99,7 +89,7 @@ $ echo $HISTSIZE
 1000
 ```
 
-**Example**: Change the shell prompt by updating the primary prompt environmnent variable `PS1`. The default prompt for kali is `username@hostname:current_directory`.
+**Example** Change the shell prompt by updating the primary prompt environmnent variable `PS1`. The default prompt for kali is `username@hostname:current_directory`.
 
 ```shell
 
@@ -111,7 +101,7 @@ H@CK3R: $
 H@CK3R: $ export PS1
 ```
 
-**Example**: Update the `PATH` environment variable to include a new tool directory `/root/tools/MyNewTool`. To add a new variable to our PATH, we append the new path. `MyNewTool` can now be executed anywhere on the system.
+**Example** Update the `PATH` environment variable to include a new tool directory `/root/tools/MyNewTool`. To add a new variable to our PATH, we append the new path. `MyNewTool` can now be executed anywhere on the system.
 
 > `PATH` controls where the shell will look for commands you enter (`pwd`, `cd`, `ls`, etc). The default PATH value is usually pointing to the `sbin` or `bin` directories (`/usr/local/sbin:/usr/local/bin`). Each directory value is separated by a colon (:).
 
@@ -130,7 +120,7 @@ $ echo $PATH
 
 > It's important to remember that you want to *append* to the `PATH`, *not* replace it's whole value.
 
-**Example**: Create and remove a custom environment variable named ``
+**Example** Create and remove a custom environment variable named ``
 > Create a custom variable by assigning a value to a new variable. Remove the new variable by using the `unset` command.
 
 ```shell
@@ -145,4 +135,3 @@ $ unset NEWVARIABLE
 $ echo NEWVARIABLE
 > 
 ```
-

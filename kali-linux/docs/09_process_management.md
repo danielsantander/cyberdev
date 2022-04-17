@@ -22,7 +22,7 @@ The purpose of this document is to illustrate how to handle and manage processes
 # View Processes (ps)
 Each process will be assigned a unique process identification number (PID) by the Linux kernel. The PID is assigned sequentially as they are created. View what processes are running on the system by using the `ps` command.
 
-**Example**: Use the `ps` command without any arguments to view processes invoked by the currently logged in user.
+**Example** Use the `ps` command without any arguments to view processes invoked by the currently logged in user.
 ```shell
 $ ps        
  PID TTY          TIME CMD
@@ -30,7 +30,7 @@ $ ps
  1109 pts/0    00:00:00 ps                             
 ```
 
-**Example**: Run the `ps` command with the `aux` option to view processes running on the system for all users.
+**Example** Run the `ps` command with the `aux` option to view processes running on the system for all users.
 ```shell
 $ ps aux
 USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
@@ -49,9 +49,10 @@ Output columns for command `ps aux`:
 
 ## Filter By Name
 Use the `ps` command to list running processes and pipe it with the `grep` command to filter processes by name.
-> syntax: `$ ps aux | grep <process_name>`
 
-**Example**: Filter running processes to find the Metasploit process.
+Usage: `ps aux | grep <process_name>`
+
+**Example** Filter running processes to find the Metasploit process.
 ```shell
 $ ps aux | grep msfconsole
 kali        1626 11.4  8.1 732252 164936 pts/0   Sl+  00:35   0:04 ruby /usr/bin/msfconsole
@@ -90,9 +91,9 @@ The owner of a process can only lower the priority, NOT increase the priority. H
 
 ### Set priority when starting process (nice)
 
-> syntax: `$ nice -n <niceness integer> <process to run>`
+Usage: `nice -n <nice_value> <process_to_run>`
 
-**Example**: Assuming we have a process `/usr/bin/myprocess`, start it with the `nice` command and increment the *nice value* by -10 (increasing the priority and allocating more resources to speed up it's  completion).
+**Example** Assuming we have a process `/usr/bin/myprocess`, start it with the `nice` command and increment the *nice value* by -10 (increasing the priority and allocating more resources to speed up it's  completion).
 ```shell
 $ nice -n -10 /usr/bin/myprocess
 ```
@@ -100,13 +101,13 @@ $ nice -n -10 /usr/bin/myprocess
 ### Change priority of running process (renice)
 Only the root user can `renice` a system process to a negative value (giving it a higher priority).
 
-> syntax: `$ renice <nice_value> <PID>`
+Usage: `renice <nice_value> <PID>`
 
 The `renice` command takes two arguments:
 1. an absolute value between -20 to 19 to set the priority
 2. the process' PID number
 
-**Example**: Give `myprocess` (with a PID value of 6789) a lower priority allocating more resource to other processes.
+**Example** Give `myprocess` (with a PID value of 6789) a lower priority allocating more resource to other processes.
 ```shell
 $ renice 20 6789
 ```
@@ -117,9 +118,9 @@ It is possible to renice a processes using the `top` command which outputs the c
 <hr>
 
 # Run Background Processes
-Start a process and run in the background by appending an ampersand at the end of the command.
+Start a process and run in the background by appending an ampersand (`&`) at the end of the command.
 
-> syntax: `$ <process_to_run> &`
+Usage `$ <process_to_run> &`
 
 ```shell
 $ ./myscript &
@@ -128,10 +129,10 @@ $ ./myscript &
 # Foreground Processes
 Move a process from the background to the foreground, use the `fg` command.
 
-> syntax: `fg <PID>` 
-> where PID is the process' id number.
+Usage: `fg <PID>`
+- where PID is the process' id number.
 
-**Example**: Move the process with PID 6789 running in the background into the foreground. 
+**Example** Move the process with PID 6789 running in the background into the foreground. 
 ```shell
 $ fg 6789
 ```
@@ -146,7 +147,8 @@ Schedule commands to execute in the future with the `at` command or the `crond` 
 
 ## at
 `at` is a daemon--a background process--for scheduling an execution of a command(s) to run at a certain point in time. Enter the `at` command followed by the time to execute. You will then be brought into interactive mode and prompted to enter the command to execute the process.
-> syntax: `at <time_to_execute>`
+
+Usage: `at <time_to_execute>`
 
 | Time Format          | Schedule                                |
 |----------------------|-----------------------------------------|
@@ -160,7 +162,7 @@ Schedule commands to execute in the future with the `at` command or the `crond` 
 | at now + 3 days      | run in 3 days from the current time     |
 | at now + 2 weeks     | run in 2 weeks from the current time    |
 
-**Example**: Schedule `myscript` to execute today at 8:00PM. 
+**Example** Schedule `myscript` to execute today at 8:00PM. 
 ```shell
 $ at 8:00pm
 at > /root/home/myscript
@@ -171,7 +173,7 @@ at > /root/home/myscript
 ## cron
 Utilize the cron daemon (crond) and the cron table (cront) for scheduling recurring tasks to execute. The cron table is used to to schedule tasks/jobs, located at `/etc/contab`. The cron daemon checks the cron table for which commands to run at the specified times. Edit the cron table with the `cront` command followed by the `-e` argument (edit), you will then be prompted to edit the crontable: 
 
-> syntax: `$ crontab -e`
+Usage: `crontab -e`
 
 Cron table input is represented as 7 fields: 
 
@@ -211,7 +213,7 @@ $ crontab -e
 # 
 # For more information see the manual pages of crontab(5) and cron(8)
 # 
-# m h  dom mon dow   comman
+# m h  dom mon dow   command
 ```
 
 You can view or edit the crontab file directly:
@@ -241,7 +243,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 #                                                           
 ```
 
-**Example**: Create a cron task to run a backup script (`/bin/backup.sh`) every Sunday morning at 1:00AM, specify that the user to run the script is "backup".
+**Example** Create a cron task to run a backup script (`/bin/backup.sh`) every Sunday morning at 1:00AM, specify that the user to run the script is "backup".
 ```shell
 # run every Sunday of every month at 1AM:
 00 1 * * 0 backup /bin/backup.sh
@@ -249,7 +251,7 @@ PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 
 This cron task specifies to run `/bin/backup.sh` with `backup` user at the top of the hour (`00`) of the first hour (`1`), of any day of the month (`*`), of any month of the year (`*`), and on Sunday (`0`). Thus, the cron daemon will execute the backup script every Sunday morning at 1:00AM of every month.
 
-**Example**: some more examples
+**Example** some more examples
 ```shell
 # This will run only twice every month, on the 15th & 30th (regardless of what day), and at 1:00AM.
 00 1 15,30 * * backup /bin/backup.sh
@@ -264,9 +266,9 @@ This cron task specifies to run `/bin/backup.sh` with `backup` user at the top o
 ## rc
 Use the `update-rc.d` command to add or remove services to the `rc.d` script that will run at startup.
 
-> syntax: `update-rc.d <script_or_service_name> <remove|defaults|disable|enable>
+Usage: `update-rc.d <script_or_service_name> <remove|defaults|disable|enable>`
 
-**Example**: Set up PostgreSQL to startup at system boot. This is ideal for avid users of Metasploit framework to store data. Use the `update-rc.d` command to add the line to the `rc.d` script.
+**Example** Set up PostgreSQL to startup at system boot. This is ideal for avid users of Metasploit framework to store data. Use the `update-rc.d` command to add the line to the `rc.d` script.
 ```shell
 $ update-rc.d postgresql defaults
 ```
@@ -277,8 +279,8 @@ This command will add a line to the `rc.d` script to start PostgreSQL on system 
 # Killing System Processes (kill)
 Use the `kill` command to stop a process.
 
-> syntax: `$ kill -<signal> PID`
-> where the signal flag is optional, and if not provided will use the default kill signal **SIGTERM** (15).
+Usage: `kill -<signal_value> PID`
+- where the signal value is optional, and if not provided will use the default kill signal **SIGTERM** (15).
 
 | signal  | number |                           about                              |
 |---------|--------|--------------------------------------------------------------|
@@ -287,19 +289,19 @@ Use the `kill` command to stop a process.
 | SIGTERM | 15     | Termination signal (TERM): default kill signal               |
 
 
-**Example**: Kill a process with PID 6789.
+**Example** Kill a process with PID 6789.
 ```shell
 $ kill -9 6789
 ```
 
-**Example**: Restart the process using the Hangup (HUP) signal.
+**Example** Restart the process using the Hangup (HUP) signal.
 ```shell
 $ kill -1 6789
 ```
 
 If the `PID` is unknown use the `killall` command which takes the name of the process instead of the process id number.
 
-> syntax: `$ killall -<signal> <process_name>`
+Usage: `killall -<signal> <process_name>`
 
 ```shell
 $ killall -9 myprocessname
