@@ -14,3 +14,6 @@ Documentation for linux distributions operating with the Linux kernel. For the s
 - [Process Management](./09_process_management.md)
 - [Environment Variables](./10_env_variables.md)
 - [Scripting](./11_scripting.md)
+- [Compression](./12_compression.md)
+- [Filesystem](./13_filesystem.md)
+- [Logging](./14_logging.md)
