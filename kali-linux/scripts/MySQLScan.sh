@@ -1,9 +1,9 @@
 #! /bin/bash
 
-# script to find hosts with MySQL installed (open port 3306) and output to file
-# perform TCP scan on the local area network (LAN) with open port 3306
-# for stealth, send output to /dev/null
-# send "grepable output" (-oG) to a file named ResultsMySQLScan
+# Find hosts with MySQL installed (open port 3306) and output to file.
+# Perform TCP scan on the local area network (LAN) with open port 3306
+# For stealth, send output to /dev/null
+# Send "grepable output" (-oG) to a file named ResultsMySQLScan
     # Grepable output consists of comments (lines starting with a pound (#)) and target lines. 
     # A target line includes a combination of six labeled fields, separated by tabs and followed with a colon.
     # The fields are Host, Ports, Protocols, Ignored State, OS, Seq Index, IP ID, and Status.
