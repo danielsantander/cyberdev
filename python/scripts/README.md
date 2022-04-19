@@ -1,22 +1,23 @@
-# Python Scripts
+*Python Scripts Table of Contents*
+- [encryptPDF.py](#encryptpdfpy)
 
-Directory to hold python script files.
-
-## encryptPDF
-Script to encrypt PDF files.
+# encryptPDF.py
+Python script for encrypting PDF files.
 
 Usage: `./encryptPDF [PDF file] [output location]`
 
-The following will encrypt `tests/sample_data/HelloWorld.pdf` and output the encrypted file in the same directory and the given input (default).
+> Password defaults to 'fairbanks' if not given when prompted.
+
+**Example**: Encrypt `tests/sample_data/pdfs/HelloWorld.pdf` and output the encrypted file in the same directory as the file to encrypt.
+There should then be an encrypted PDF file located at `tests/sample_data/pdfs/HelloWorldENCRYPTED.pdf`.
 ```shell
-$ ./encryptPDF.py tests/sample_data/HelloWorld.pdf
+$ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf
 Password: 
 ```
 
-> note: password defaults to 'fairbanks' if none is given when prompted.
-
-Encrypt the same PDF file, but output it in the same directory:
+**Example**: Encrypt the same PDF file, but output it in the current directory.
+There should then be an encrypted PDF file located in the current directory named `HelloWorldENCRYPTED.pdf`.
 ```shell
-$ ./encryptPDF.py tests/sample_data/HelloWorld.pdf .
+$ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf .
 Password:
 ```

@@ -124,8 +124,7 @@ def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None):
             for page_num in range(pdf_reader.numPages):
                 pdf_writer.addPage(pdf_reader.getPage(page_num))
             pdf_writer.encrypt(pw)
-
-            encrypt_file = outpath / f'{file.name[:-4]}encrypted.pdf'
+            encrypt_file = outpath / f'{file.name[:-4]}ENCRYPTED.pdf'
             encrypted_pdf = open(encrypt_file.absolute(), 'wb')
             pdf_writer.write(encrypted_pdf)
             encrypted_pdf.close()
