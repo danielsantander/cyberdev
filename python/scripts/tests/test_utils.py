@@ -13,13 +13,13 @@ from pathlib import Path
 CURRENT_DIR_NAME = os.path.dirname(os.path.realpath(__file__))
 CURRENT_DIR_PATH = Path(CURRENT_DIR_NAME)
 PARENT_DIR_NAME = os.path.dirname(CURRENT_DIR_NAME)
-UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
+# UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
 
 sys.path.insert(0, PARENT_DIR_NAME)
 from utils.custom_exceptions import InvalidDirectory, InvalidBoolValue
 from utils.custom_logging import create_console_logger, create_logger
 from utils.date_helper import timestamp_to_date_string, current_iso_time
-from utils.file_helper import write_json_to_file, open_json_from_file, create_pdf, encrypt_pdf
+from utils.file_helper import write_json_to_file, open_json_from_file, combine_pdfs ,create_pdf, encrypt_pdf
 from utils.image_helper import jpg_to_gif
 from utils.navigation import make_directory, clean_directory, get_filenames
 from utils.validation import str2bool
@@ -53,7 +53,6 @@ class TestLoggerHelper(unittest.TestCase):
         if self.log_dir.exists():
             clean_directory(self.log_dir, remove_directory=True)
 
-
 class TestDateHelper(unittest.TestCase):
     def setUp(self) -> None:
         self.now = datetime.datetime.utcnow()
@@ -74,16 +73,19 @@ class TestDateHelper(unittest.TestCase):
         format_regex = re.compile(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d*\+\d{2}:\d{2}$')
         self.assertTrue(format_regex.match(results) is not None)
 
-
 class TestFileHelper(unittest.TestCase):
     def setUp(self)->None:
         self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDirectory'
-        self.test_json_file:Path = self.test_dir / 'test.json'
-        self.pdf_file_dne:Path = self.test_dir / 'DoesNotExist.pdf'
+        if not self.test_dir.exists():
+            self.test_dir.mkdir()
+
+        self.test_json_file = self.test_dir / 'test.json'
+        self.pdf_file_dne = self.test_dir / 'DoesNotExist.pdf'
         self.invalid_pdf_file = self.test_dir / 'Invalid.pdf'
         self.encrypted_pdf_file = self.test_dir / 'Encrypted.pdf'
         self.test_json:dict = {'text':'hello world'}
 
+    # JSONs
     def test_write_json(self):
         self.assertFalse(self.test_json_file.exists())
         write_json_to_file(self.test_json_file, self.test_json)
@@ -97,6 +99,50 @@ class TestFileHelper(unittest.TestCase):
         self.assertTrue(isinstance(uploaded_json, dict))
         self.assertEqual(uploaded_json, self.test_json)
 
+    # PDFs
+    def test_combine_pdfs(self):
+        
+        pdfDir = self.test_dir / 'pdfs'
+        self.assertRaises(InvalidDirectory, combine_pdfs, pdfDir)
+
+        if not pdfDir.exists():
+            pdfDir.mkdir()
+
+        pdfA = pdfDir / 'FileA.pdf'
+        pdfB = pdfDir / 'FileB.pdf'
+        pdfC = pdfDir / 'FileC.pdf'
+        pdfCombined = pdfDir / 'Combined.pdf'
+
+        # generate pdf files to combine
+        pdfList = [pdfA, pdfB, pdfC]
+        for pdf in pdfList:
+            self.assertFalse(pdf.exists())
+            self.assertFalse(pdf.is_file())
+            create_pdf(
+                name=pdf,
+                input_text=pdf.name[:5],
+                font_size=22)
+            self.assertTrue(pdf.exists())
+            self.assertTrue(pdf.is_file())
+        
+        self.assertFalse(pdfCombined.exists())
+        self.assertFalse(pdfCombined.is_file())
+        combine_pdfs(inputDir=pdfDir)
+        self.assertTrue(pdfCombined.exists())
+        self.assertTrue(pdfCombined.is_file())
+        # TODO: check pdfCombined object to see if the three files are present
+
+    def test_create_pdf(self):
+        self.encrypted_pdf_file.touch()
+        self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
+        new_pdf_file = self.test_dir / 'new.pdf';
+        self.assertFalse(new_pdf_file.exists())
+        create_pdf(
+            name=new_pdf_file,
+            input_text='Testing Purposes Only',
+            font_size=12);
+        self.assertTrue(new_pdf_file.exists())
+
     def test_encrypt_pdf_FileNotFoundError(self):
         self.assertRaises(FileNotFoundError, encrypt_pdf, self.pdf_file_dne)
 
@@ -105,16 +151,13 @@ class TestFileHelper(unittest.TestCase):
             self.test_dir.mkdir()
         self.invalid_pdf_file.touch()
         self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
-    
-    def test_create_pdf(self):
-        if not self.test_dir.exists():
-            self.test_dir.mkdir()
-        self.encrypted_pdf_file.touch()
-        self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
-        # TODO: continue here
 
     def tearDown(self) -> None:
         # delete (unlink) any test files or directories
+        pdfDir = self.test_dir / 'pdfs'
+        if pdfDir.exists() & pdfDir.is_dir():
+            [x.unlink() for x in pdfDir.iterdir() if x.is_file()]
+            pdfDir.rmdir()
         if self.test_dir.exists() and self.test_dir.is_dir():
             [x.unlink() for x in self.test_dir.iterdir() if x.is_file()]
             self.test_dir.rmdir()
@@ -156,11 +199,6 @@ class TestJpgToGif(unittest.TestCase):
     def tearDown(self):
         if self.gif_dir.is_dir(): [x.unlink() for x in self.gif_dir.iterdir() if x.is_file()]
         if self.gif_dir.exists() and self.gif_dir.is_dir(): self.gif_dir.rmdir()
-
-class TestPdf2(unittest.TestCase):
-    def setUp(self)->None:
-        # TODO: continue here
-        pass
 
 class TestNavigation(unittest.TestCase):
     def setUp(self)->None:
