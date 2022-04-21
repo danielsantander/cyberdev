@@ -44,13 +44,13 @@ $ git checkout localBranch .
 git checkout develop
 
 #Step 2: Make sure you have copied the required commit hash.
-git checkout <commit_hash> <path\to\file>
+git checkout <commit_hash> <path_to_file>
 
 # TIP: or if you want to copy ALL changed files FROM THAT CHANGESET:
 git checkout <commit_hash> .
 
 #Step 3: You now have the changes of the required file on your desired branch. You just need to add and commit them.
-git add <path\to\file>
+git add <path_to_file>
 git commit -m "Your commit message"
 ```
 
