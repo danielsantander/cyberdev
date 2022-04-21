@@ -14,3 +14,8 @@ Usage: `git diff --name-status`
 ```shell
 git diff --name-status <branch_name>
 ```
+
+*Example*: use the same command but pipe with grep go search for changed files named "testFiles"
+```shell
+git diff --name-status <branch_name> | grep "testFile[s]"
+```
