@@ -21,7 +21,7 @@ Apply the latest stashed changes into the working directory, and remove them fro
 
 Usage: `git stash pop`
 
-Usage for specific stash: `git stash pop <stash_name>
+Usage for specific stash: `git stash pop <stash_name>`
 
 
 ## apply
