@@ -1,42 +1,10 @@
-# git tips
-Tips for everything git
-
-
-# Configuration
-
-## View all settings
-```shell
-$ git config --list --show-origin
-```
-
-## View global configurations:
-```shell
-$ git config --list --global
-user.name=<user_username>
-user.email=<user_email>
-```
-
-## Set Username and Email
-```shell
-$ git config -global user.name "<ENTER_USERNAME_HERE>"
-$ git config -global user.email <ENTER_USER_EMAIL_HERE>
-
-# EXAMPLE:
-# git config -global user.name "Bruce Wayne"
-# git config -global user.name Bruce@wayne.ent
-```
-
-## Set Text Editor
-```shell
-$ git config --global core.editor <EDITOR_NAME>
-
-# EXAMPLE:
-# git config --global core.editor emacs
-```
-> Note on Windows systems, you need to specify the full path to its executable file.
-> If you are on a 32-bit Windows system, or you have a 64-bit editor on a 64-bit system, you might try the following command:
->
->   `git config --global core.editor "'C:/Program Files/Notepad++/notepad++.exe' -multiInst -notabbar -nosession -noPlugin"`
+- [Git Commands](#git-commands)
+  - [pull](#pull)
+  - [pull origin master](#pull-origin-master)
+  - [status](#status)
+  - [diff](#diff)
+  - [List Branches by order](#list-branches-by-order)
+  - [Update](#update)
 
 # Git Commands
 ## pull
