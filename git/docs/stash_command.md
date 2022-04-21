@@ -2,6 +2,8 @@ Stash changes made to the working copy while having the ability to come back to 
 
 Usage: `git stash`
 
+`stash` will not stash new files in working copy that have not been staged, or files that have been ignored.
+
 # Stash options
 
 ## save
