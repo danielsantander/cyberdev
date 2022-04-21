@@ -7,7 +7,7 @@ Usage: `git stash`
 ## save
 Stash changes and save with message.
 
-Usage: `git stash save -m "<message>"
+Usage: `git stash save -m "<message>"`
 
 
 ## list
@@ -17,7 +17,7 @@ Usage: `git stash list`
 
 
 ## pop
-Reapply the latest stashed changes into the working directory, and remove them from the stash list.
+Apply the latest stashed changes into the working directory, and remove them from the stash list.
 
 Usage: `git stash pop`
 
@@ -25,11 +25,11 @@ Usage for specific stash: `git stash pop <stash_name>
 
 
 ## apply
-Reapply the latest stashed changes into the working directory, and keep them in the stash list.
+Apply the latest stashed changes into the working directory, and keep them in the stash list.
 
-Usage: `git stash apply
+Usage: `git stash apply`
 
-Usage for specific stash: `git stash apply <stash_name>
+Usage for specific stash: `git stash apply <stash_name>`
 
 **Example**: apply a specific stash
 ```shell
