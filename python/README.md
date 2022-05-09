@@ -4,7 +4,9 @@
   - [Writing Tests](docs/unittesting.md#writing-tests)
   - [Running Tests](docs/unittesting.md#running-tests)
   - [Code Coverage](docs/unittesting.md#code-coverage)
-
+- [Threading](docs/threding.md)
+  - [Daemon Threads](docs/threding.md#daemon-threads)
+  - [Join Threads](docs/threding.md#joining-threads)
 
 # Python
 Python documentation and scripts.
