@@ -36,7 +36,7 @@ if __name__ == '__main__':
     logging.info('MAIN\t: all done')
 ```
 
-**Output**:
+**Output**: Notice `Thread 1` is running on it's own thread and finishes even after the main program exits. `Thread 1` is not a daemon thread, meaning the main program does not have to wait for it to finish in order for itself to complete.
 ```shell
 15:21:13: MAIN  : before creating thread
 15:21:13: MAIN  : before running thread
@@ -45,8 +45,6 @@ if __name__ == '__main__':
 15:21:13: MAIN  : all done
 15:21:16: Thread 1: finishing
 ```
-
-Notice `Thread 1` is running on it's own thread and finishes even after the main program exits. `Thread 1` is not a daemon thread, meaning the main program does not have to wait for it to finish in order for itself to complete.
 
 ## Daemon Threads
 Daemon threads will shut down immediately when the main program completes. If threads are running that are not daemon, the main program will wait for those threads to complete before exiting. However, uncompleted threads that *are* daemons will be terminated once the main program exits.
