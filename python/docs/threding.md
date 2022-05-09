@@ -6,6 +6,7 @@ Utilize threading in python to run programs concurrently.
 - [Multiple Threads](#multiple-threads)
 
 # Threads
+**Example**: Implement threading within a program.
 ```python
 import logging
 import threading
