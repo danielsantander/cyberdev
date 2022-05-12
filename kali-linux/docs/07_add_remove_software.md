@@ -7,7 +7,7 @@ Advanced Packaging Tool (APT) is the default software manager for debian-based L
 
 ## Searching for package
 
-Before downloading a software packate, check whether the package is available from the repository. 
+Before downloading a software package, check whether the package is available from the repository. 
 ```shell
 $ apt-cache search <keyword>
 ```
