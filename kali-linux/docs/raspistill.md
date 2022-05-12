@@ -1,7 +1,7 @@
 # raspistill
 [doc source](https://www.raspberrypi.com/documentation/accessories/camera.html#raspistill)
 
-`raspistill` is a Camera application that can be used within the command line for capturing still images with the Raspberry Pi and a camera module.
+`raspistill` is a camera application that can be used within the command line for capturing still images with the Raspberry Pi and a camera module.
 
 ## Take Photo Save as JPEG
 
