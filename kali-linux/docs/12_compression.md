@@ -38,7 +38,7 @@ $ ls -lh
 The flags used:
 - `c` option -> create
 - `v` option -> verbose (optional)
-- `f` option -> means to write to the following file (also works for reading files)
+- `f` option -> means to write to or read from the following file
 
 > note: Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
 
