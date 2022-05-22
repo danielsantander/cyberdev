@@ -29,9 +29,9 @@ Rule Format: `facility.priority     action` where:
 - 'facility' references the program nam
 - 'priority' the log level or what kind of messages to log
 - 'action' references the filename and location at which to send the logs
-- `*` an asterisk wildcard may be used to reference either all facilities and/or all priorities.
+> an asterisk (`*`) may be used as a wildcard to reference either all facilities and/or all priorities.
 
-> log are usually sent to `/var/log` with a descriptive filename displaying the facility/ program that generated them
+Logs are usually sent to `/var/log` with a descriptive filename displaying the facility/ program that generated them
 
 ```shell
 $ vi /etc/rsyslog.conf
