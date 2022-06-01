@@ -18,6 +18,8 @@ Creating a single file from many.
 Utilize the `tar` command to compress files together and combine them into an archive.
 > tar is short for tape archive
 
+The command will also compress files and directories recursively.
+
 *Example*: Combine a pair of scripts into one single archive.
 ```shell
 $ ls -lh
@@ -25,7 +27,7 @@ total 24K
 -rwxr-xr-x 1 kali kali   55 Apr  6 20:33 HelloWorld
 -rwxr-xr-x 1 kali kali 1.1K Apr  6 20:33 MySQLScan.sh
 
-$ tar -cvf scriptArchive.tar HelloWorld MySQLScan.sh 
+$ tar -cvf scriptArchive.tar HelloWorld MySQLScan.sh
 HelloWorld
 MySQLScan.sh
 
@@ -35,19 +37,33 @@ $ ls -lh
 -rw-r--r-- 1 kali kali  10K Apr  6 20:41 scriptArchive.tar
 ```
 
-The flags used:
-- `c` option -> create
-- `v` option -> verbose (optional)
-- `f` option -> means to write to or read from the following file
+> Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
 
-> note: Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
+The flags used:
+- `c` option -> create archive
+- `v` option -> verbose
+- `f` option -> specify filename
+
+More flags:
+- `z` option -> compress the archive with "gzip"
+
+*Example*: Compress a directory of stuff into a tar.
+```
+tar -cvf archive.tar stuff
+```
+
+*Example*: Compress a directory of stuff into a gzip.
+```
+tar -czvf archive.tar.gz stuff
+```
+
 
 # View Archived File Contents
 Display files from the tarbell without extracting them.
 
 *Example*: Display the files within the archived file `scriptArchive.tar` without extracting the file using the `t` option.
 ```shell
-$ tar -tvf scriptArchive.tar                        
+$ tar -tvf scriptArchive.tar
 -rwxr-xr-x kali/kali        55 2022-04-06 20:40 HelloWorld
 -rwxr-xr-x kali/kali      1094 2022-04-06 20:33 MySQLScan.sh
 ```
@@ -69,14 +85,14 @@ MySQLScan.sh
 # Compressing Files
 
 ## gzip (GNU zip)
-Utilize the `gzip` command to compress files. Uses extension `.tar.gz` or `.tgz`. 
+Utilize the `gzip` command to compress files. Uses extension `.tar.gz` or `.tgz`.
 
 *Example*: compress the `scriptArchive.tar` file.
 ```shell
 $ ls -lh
 -rw-r--r-- 1 kali kali  10K Apr  6 20:41 scriptArchive.tar
 
-$ gzip scriptArchive.*  
+$ gzip scriptArchive.*
 -rw-r--r-- 1 kali kali  792 Apr  6 20:41 scriptArchive.tar.gz
 
 ```
@@ -99,7 +115,7 @@ Uses extension `.tar.bz2`, usually with better compression ratios than gzip.
 
 *Example*: Use `bzip2` to compress the `scriptArchive.tar` file.
 ```shell
-$ bzip2 scriptArchive.*  
+$ bzip2 scriptArchive.*
 
 $ ls -lh
 -rw-r--r-- 1 kali kali  808 Apr  6 23:35 scriptArchive.tar.bz2
