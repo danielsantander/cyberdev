@@ -1,7 +1,7 @@
 
 - [Caesar Cipher](#caesar-cipher)
-  - [Encrypt](#encrypt)
-  - [Decrypt](#decrypt)
+  - [Encrypt Caesar Cipher](#encrypt-caesar-cipher)
+  - [Decrypt Caesar Cipher](#decrypt-caesar-cipher)
 - [Sources](#sources)
 
 
@@ -10,7 +10,7 @@ A simple cipher that encrypts messages by replacing each letter with a new value
 
 For example, with an offset value of 3 every A would be replaced by the letter D, every B with the letter E, every C with the letter F, and so on...
 
-## Encrypt
+## Encrypt Caesar Cipher
 Using the Caesar cipher to encrypt a message without defining an offset value will default to shifting the message 3 alphabet letters.
 
 For example, encrypting `Hello World` with the Caesar cipher and a default offset value of 3 will output `khoor zruog`.
@@ -31,7 +31,7 @@ caesar.encrypt("Hello World", offset=15)
 >>> 'wtaad ldgas'
 ```
 
-## Decrypt
+## Decrypt Caesar Cipher
 Decrypting a Caesar cipher message requires the known offset value. 
 
 For example, decrypting the message `amkzmb umaaiom` will need an offset value of 8.

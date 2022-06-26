@@ -1,5 +1,10 @@
 
-*Documentation*
+**Table of Contents**
+- [Ciphers](docs/ciphers.md)
+  - [Caesar Cipher](docs/ciphers.md#caesar-cipher)
+    - [Encrypt Caesar Cypher](docs/ciphers.md#encrypt-caesar-cipher)
+    - [Decrypt Caesar Cypher](docs/ciphers.md#decrypt-caesar-cipher)
+- [Docker](docs/docker.md)
 - [Unit Testing](docs/unittesting.md)
   - [Writing Tests](docs/unittesting.md#writing-tests)
   - [Running Tests](docs/unittesting.md#running-tests)
@@ -52,5 +57,8 @@ Python 3.9.2
 ## Make script executable
 Enter the following into the terminal:
 ```shell
-$ chmod +x <python_script>.py
+$ sudo chmod +x <python_file>
+
+# or
+$ sudo chmod 755 <python_file>
 ```
