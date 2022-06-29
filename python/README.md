@@ -1,5 +1,10 @@
 
-*Documentation*
+**Table of Contents**
+- [Ciphers](docs/ciphers.md)
+  - [Caesar Cipher](docs/ciphers.md#caesar-cipher)
+    - [Encrypt Caesar Cypher](docs/ciphers.md#encrypt-caesar-cipher)
+    - [Decrypt Caesar Cypher](docs/ciphers.md#decrypt-caesar-cipher)
+- [Docker](docs/docker.md)
 - [Unit Testing](docs/unittesting.md)
   - [Writing Tests](docs/unittesting.md#writing-tests)
   - [Running Tests](docs/unittesting.md#running-tests)
@@ -11,13 +16,33 @@
 # Python
 Python documentation and scripts.
 
+Contents:
 ```
-python
 ├── README.md
 ├── docs
+│   ├── README.md
+│   ├── ciphers.md
+│   ├── docker.md
+│   ├── threding.md
+│   └── unittesting.md
+├── examples
+│   └── threading/
 └── scripts
-    ├── tests
+    ├── README.md
+    ├── encryptPDF.py
+    ├── tests/
     └── utils
+        ├── __init__.py
+        ├── __pycache__
+        ├── ciphers
+        ├── custom_exceptions.py
+        ├── custom_logging.py
+        ├── date_helper.py
+        ├── file_helper.py
+        ├── image_helper.py
+        ├── logs
+        ├── navigation.py
+        └── validation.py
 ```
 
 Python scripts should contain the following shebang: `#!/usr/bin/python3`
@@ -32,5 +57,8 @@ Python 3.9.2
 ## Make script executable
 Enter the following into the terminal:
 ```shell
-$ chmod +x <python_script>.py
+$ sudo chmod +x <python_file>
+
+# or
+$ sudo chmod 755 <python_file>
 ```

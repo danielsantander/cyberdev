@@ -1,8 +1,8 @@
 # Linux Documentation
 
-Documentation for linux distributions operating with the Linux kernel. For the sake of this documentation we will be referring to the Kali Linux Operation System.
+Documentation for linux distributions operating with the Linux kernel. For demonstration purposes we will be referring to the Kali Linux Operation System.
 
-**Table of Contents**
+## Table of Contents
 - [Change IP Addresses](./01_change_ip_address.md)
 - [Change MAC Addresses](./02_change_MAC_address.md)
 - [Assign IP Address](./03_assign_ip_address.md)
@@ -17,3 +17,26 @@ Documentation for linux distributions operating with the Linux kernel. For the s
 - [Compression](./12_compression.md)
 - [Filesystem](./13_filesystem.md)
 - [Logging](./14_logging.md)
+  - [Log Configuration](./14_logging.md#log-configuration)
+  - [Log Rotate](./14_logging.md#logrotate)
+  - [Shred files](./14_logging.md#shred-files)
+  - [Disable logging](./14_logging.md#disable-logging)
+
+- [Services](./15_services.md)
+  - [Manage Services](./15_services.md#manage-services)
+  - [Apache Server](./15_services.md#apache-web-server)
+  - [OpenSSH](./15_services.md#openssh)
+  - [MySQL](./15_services.md#mysql)
+  - [PostgreSQL](./15_services.md#postgresql)
+
+### Applications:
+- [Metasploit](Metasploit.md) - Open source software tool for developing and executing exploit code against a targeted machine.
+  - [PostgreSQL](Metasploit.md#postgresql-postgres)
+  - [Start Metasploit](Metasploit.md#start-metasploit)
+- [MySQL](MySQL.md)
+  - [Login](MySQL.md#login)
+  - [Databases](MySQL.md#databases)
+  - [Tables](MySQL.md#tables)
+  - [Table Columns](MySQL.md#table-columns)
+  - [Command](MySQL.md#commands)
+- [raspistill](raspistill.md) - (Raspberry Pi application)

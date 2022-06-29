@@ -1,23 +1,19 @@
 - [Documentation](docs/README.md)
 - [Scripts](scripts/README.md)
 
-
 # Kali Linux Tips & Scripts
-
 Any tips or notes are written in markdown files (`.md` extension) and any executable scripts will be written in shell script files (`.sh`).
 
 Script files will begin with the shebang: `#!/bin/bash`
 
 
-## Useful Tips
-
-### Check Kali Linux Version
+## Check Kali Linux Version
 ```bash
 $ lsb_release -a
 ```
 
-### Check Wireless Network Devices
-Utilize the `iwconfig` command to gather information such as the wireless adapter's IP addres, MAC address, what mode it is in, and much more.
+## Check Wireless Network Devices
+Utilize the `iwconfig` command to gather information such as the wireless adapter's IP address, MAC address, what mode it is in, and much more.
 
 ```shell
 $ iwconfig
@@ -28,11 +24,28 @@ lo      no wireless connection
 eth0    no wireless connection
 ```
 
-### Print Random Line From File
+## Print Random Line From File
 Using the `shuf` utility, print random lines from a file. 
 Use the `-n` flag to determine the number of lines to output.
 ```bash
 $ shuf -n 1 <filename>
 ```
+
+# Applications and Services
+
+## Apache2
+[Documentation](docs/15_services.md#apache-web-server)
+
+## OpenSSH
+[Documentation](docs/15_services.md#openssh)
+
+## MySQL
+[Documentation](docs/MySQL.md)
+
+## Metasploit
+[Documentation](docs/Metasploit.md)
+
+### PostgreSQL
+[Documentation](docs/Metasploit.md#postgresql-postgres)
 
 

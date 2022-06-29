@@ -19,7 +19,7 @@ sys.path.insert(0, PARENT_DIR_NAME)
 from utils.custom_exceptions import InvalidDirectory, InvalidBoolValue
 from utils.custom_logging import create_console_logger, create_logger
 from utils.date_helper import timestamp_to_date_string, current_iso_time
-from utils.file_helper import write_json_to_file, open_json_from_file, combine_pdfs ,create_pdf, encrypt_pdf
+from utils.file_helper import write_json_to_file, open_json_from_file, combine_pdfs, create_pdf, encrypt_pdf, rename_path
 from utils.image_helper import jpg_to_gif
 from utils.navigation import make_directory, clean_directory, get_filenames
 from utils.validation import str2bool
@@ -78,7 +78,6 @@ class TestFileHelper(unittest.TestCase):
         self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDirectory'
         if not self.test_dir.exists():
             self.test_dir.mkdir()
-
         self.test_json_file = self.test_dir / 'test.json'
         self.pdf_file_dne = self.test_dir / 'DoesNotExist.pdf'
         self.invalid_pdf_file = self.test_dir / 'Invalid.pdf'
@@ -151,6 +150,72 @@ class TestFileHelper(unittest.TestCase):
             self.test_dir.mkdir()
         self.invalid_pdf_file.touch()
         self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
+
+    # File manipulation
+    def test_rename_path(self):
+
+        # test success rename file
+        original_filename = 'test_rename_file.txt'
+        rename_filename = 'filename_has_been_changed.txt'
+        test_file = self.test_dir / original_filename
+        test_file_stream = open(test_file.absolute(), 'w')
+        test_file_stream.write('Hello World!\n')
+        test_file_stream.close()
+        self.assertTrue(test_file.exists())
+        self.assertEqual(test_file.name, original_filename)
+        results = rename_path(test_file, rename_filename)
+        self.assertTrue(results.exists())
+        self.assertEqual(results.name, rename_filename)
+        results.unlink()
+        self.assertFalse(results.exists())
+        
+        # test FileNotFoundError
+        original_filename = 'test_FileNotFoundError.txt'
+        test_file = self.test_dir / original_filename
+        self.assertRaises(FileNotFoundError, rename_path, test_file, rename_filename)
+
+        # test FileExistsError
+        original_filename_a = 'test_FileExistsError_A.txt'
+        test_file_a = self.test_dir / original_filename_a
+        test_file_a_contents = 'Test File A'
+        test_file_a_stream = open(test_file_a.absolute(), 'w')
+        test_file_a_stream.write(test_file_a_contents)
+        test_file_a_stream.close()
+
+        original_filename_b = 'test_FileExistsError_B.txt'
+        test_file_b = self.test_dir / original_filename_b
+        test_file_b_contents = 'Test File B'
+        test_file_b_stream = open(test_file_b.absolute(), 'w') 
+        test_file_b_stream.write(test_file_b_contents)
+        test_file_b_stream.close()
+
+        self.assertTrue(test_file_a.exists())
+        self.assertTrue(test_file_b.exists())
+        self.assertRaises(FileExistsError, rename_path, test_file_a, test_file_b.name)
+
+        # test overwrite existing file
+        results = rename_path(test_file_a, test_file_b.name, overwrite=True)
+        result_stream = open(results.absolute(), 'r')
+        file_contents = result_stream.readline().strip()
+        result_stream.close()
+        self.assertFalse((self.test_dir / original_filename_a).exists())
+        self.assertTrue(results.exists())
+        self.assertEqual(results.name, test_file_b.name)
+        self.assertEqual(file_contents, test_file_a_contents)
+        results.unlink()
+
+        # test cannot rename a directory given a file path as new_name (NotADirectoryError)
+        new_dir = self.test_dir / 'new_dir'
+        new_dir.mkdir()
+        test_file = self.test_dir / 'test_file.txt'
+        test_file_stream = open(test_file.absolute(), 'w')
+        test_file_stream.write('Hello World!\n')
+        test_file_stream.close()
+        self.assertTrue(new_dir.exists() and new_dir.is_dir())
+        self.assertTrue(test_file.exists())
+        self.assertRaises(NotADirectoryError, rename_path, new_dir, test_file, overwrite=True)
+        new_dir.rmdir()
+        test_file.unlink()
 
     def tearDown(self) -> None:
         # delete (unlink) any test files or directories
