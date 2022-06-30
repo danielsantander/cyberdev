@@ -44,7 +44,7 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
     """ Combines all PDFs in the given directory into a single PDF document.
 
     Keyword arguments:
-    inputDir -- path of direcotry holding the PDFs to combine
+    inputDir -- path of directory holding the PDFs to combine
     outputDir -- path to output the combined PDF [defaults to the given inputDir]
     """
     inputDir = inputDir if isinstance(inputDir, Path) else Path(inputDir)
@@ -140,7 +140,7 @@ def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None):
 def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool=False)->Path:
     """Renames (moves) a directory or file path given a new name.
     If renaming a directory, new_name must be a directory Path object or a string name else NotADirectoryError is raised.
-    
+
     Keyword arguments:
     path -- path of an existing directory or file to rename
     new_name -- new name to replace current directory/filename.
@@ -149,6 +149,7 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
     path = path if isinstance(path, Path) else Path(path)
     try:
         if (overwrite is False and (path.parent / new_name).exists()): raise FileExistsError(f'File {new_name} already exists.')
+
         path = path.rename(new_name)
 
     # path file does not exist, file path not found.
@@ -158,7 +159,7 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
     # On Windows, if target exists, FileExistsError will be raised.
     except FileExistsError as err:
         raise err
-    
+
     # cannot rename a directory given a file path as new_name
     except NotADirectoryError as err:
         raise err
