@@ -24,11 +24,11 @@ class TestCaseNameHere(unittest.TestCase):
     def setUp(self):
         # method called for every single test defined
         self.isWorking = true
-    
+
     def test_toggle(self)
         # test toggling the boolean value
         self.assertNotEqual(isWorking, false);
-    
+
     def tearDown(self):
         # tidies up code after each test is run
         # useful for removing any data created during tests
@@ -114,7 +114,7 @@ $ python -m unittest discover
 # Code Coverage
 Code coverage is the degree to which the source code of a program is executed (covered) by automated tests.
 
-Measured by a percentage, where higher percentage of coverage has more of its source doe executed during testing. 
+Measured by a percentage, where higher percentage of coverage has more of its source doe executed during testing.
 
 Code coverage determines which statements in a body of code have been executed through a test run, anc which statements have not.
 
@@ -143,6 +143,9 @@ $ coverage annotate
 
 # generate coverage text annotation files in a certain directory
 $ coverage annotate -d coverage_files/
+
+# run code coverage while running unittesting in discovery mode:
+$ python -m coverage run -m unittest discover <test_directory>
 
 ```
 
