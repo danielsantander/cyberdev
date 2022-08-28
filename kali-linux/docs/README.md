@@ -1,8 +1,6 @@
-# Linux Documentation
+Documentation for linux distributions operating with the Linux kernel. For demonstration purposes I will be referring to the Kali Linux Operation System.
 
-Documentation for linux distributions operating with the Linux kernel. For demonstration purposes we will be referring to the Kali Linux Operation System.
-
-## Table of Contents
+**Table of Contents**
 - [Change IP Addresses](./01_change_ip_address.md)
 - [Change MAC Addresses](./02_change_MAC_address.md)
 - [Assign IP Address](./03_assign_ip_address.md)
@@ -29,7 +27,7 @@ Documentation for linux distributions operating with the Linux kernel. For demon
   - [MySQL](./15_services.md#mysql)
   - [PostgreSQL](./15_services.md#postgresql)
 
-### Applications:
+## Applications:
 - [Metasploit](Metasploit.md) - Open source software tool for developing and executing exploit code against a targeted machine.
   - [PostgreSQL](Metasploit.md#postgresql-postgres)
   - [Start Metasploit](Metasploit.md#start-metasploit)
@@ -40,3 +38,32 @@ Documentation for linux distributions operating with the Linux kernel. For demon
   - [Table Columns](MySQL.md#table-columns)
   - [Command](MySQL.md#commands)
 - [raspistill](raspistill.md) - (Raspberry Pi application)
+
+# Changing Shell
+To change to a specific shell (for example zsh): `chsh -s /bin/zsh`
+
+# Change File Permissions
+`chmod` is the command and system call used to change the access permissions and the special mode flags (the setuid, setgid, and sticky flags) of file system objects (files and directories). Collectively these were originally called its modes, and the name chmod was chosen as an abbreviation of change mode. [wiki source](https://en.wikipedia.org/wiki/Chmod)
+
+**Example**
+Change script into an executable:  `chmod 755 myscript`
+
+The digits (7,5,5) each individually represent the permissions granted for the user, group, and others, in that order. (Each digit is a combination of the numbers 4,2,1,0
+  - 0 is "no permission"
+  - 1 is "execute permissions"
+  - 2 is "write permissions"
+  - 4 is "read permissions"
+
+> The digits `755` represent granting all permissions for the user, and "read/execute permissions" for group & others.
+
+Permission Table Combinations:
+Binary|  Dec  | value       |
+------|-------|-------------|
+0000  |   0   | no permission
+0001  |   1   | execute
+0010  |   2   | write
+0011  |   3   | execute & write
+0100  |   4   | read
+0101  |   5   | execute & read
+0110  |   6   | write & read
+0111  |   7   | execute & write & read
