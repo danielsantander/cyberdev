@@ -1,5 +1,5 @@
 # Assign IP Address From DHCP Server
-The DHCP server assignes IP addresses to all systems on the subnet, with logs of which ip addresses are assigned to which machine.
+The DHCP server assigns IP addresses to all systems on the subnet, with logs of which ip addresses are assigned to which machine.
 
 You can request an IP address from the DHCP by calling the DHCP server with the `dhclient` command followed by the interface you want the address assigned to.
 
