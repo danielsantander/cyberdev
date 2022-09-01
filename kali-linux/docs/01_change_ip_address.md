@@ -10,7 +10,7 @@ ifconfig <interface> <new_ip_address>
 ifconfig eth0 192.168.180.115
 ```
 
-## Change Network Mask and Broadcast
+# Change Network Mask and Broadcast
 
 You can also use the `ifconfig` command to change the network mask (netmask) and broadcast address.
 

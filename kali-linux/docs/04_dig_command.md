@@ -8,8 +8,7 @@ $ dig -v
 DiG 9.11.16-2-Debian
 ```
 
-Example:
-
+**Example:**
 ```shell
 $ dig linux.org
 
@@ -42,7 +41,7 @@ $ dig linux.org +short
 104.21.31.121
 ```
 
-# Exclude/Include Output
+## Exclude/Include Output
 
 ### Exclude First Two Lines
 First line outputs the version and the queried domain name. -The second line shows the global options.
@@ -94,11 +93,11 @@ linux.org.              300     IN      A       172.67.176.128
 <hr>
 
 ## Query Specific Name Server
-`dig` by default usese the servers listed in `/etc/reolv.conf` file.
+`dig` by default uses the servers listed in `/etc/reolv.conf` file.
 
-Use the `@` symbol folled by the name server ip address or hostname to specify a name server against which the query will be executed.
+Use the `@` symbol followed by the name server ip address or hostname to specify a name server against which the query will be executed.
 
-Example: query the Google name server (8.8.8.8) for the `linux.org` domain.
+**Example:** query the Google name server (8.8.8.8) for the `linux.org` domain.
 ```shell
 $ dig linux.org @8.8.8.8
 
@@ -125,7 +124,7 @@ linux.org.              300     IN      A       172.67.176.128
 
 <hr>
 
-## Query Record Type
+## Query Record Types
 1. Query **A** records - get list of all the address(es) for a domain name, use the `a` option:
     ```shell
     $ dig +nocmd google.com a +noall +answer
@@ -137,7 +136,7 @@ linux.org.              300     IN      A       172.67.176.128
 	mail.google.com.        552614  IN      CNAME   googlemail.l.google.com.
 	```
 3. Query **TXT** records - retrieve all the TXT records for a specific domain
-	```shell	
+	```shell
 	$ dig +nocmd google.com txt +noall +answer
 	google.com.             3600    IN      TXT     "docusign=1b0a6754-49b1-4db5-8540-d2c12664b289"
 	google.com.             3600    IN      TXT     "facebook-domain-verification=22rm551cu4k0ab0bxsw536tlds4h95"
@@ -193,14 +192,9 @@ $ dig -x 208.118.235.148 +noall +answer
 The `.digrc` file is present in the user's home directory, the options specified in it are applied before the command line arguments.
 
 For example, if you want to only display the answer section, update the `~/.digrc` file:
-
-
-`~/.digrc` file:
 ```
 +nocmd +noall +answer
 ```
-
-
 
 ## Refences
 1. https://linuxize.com/post/how-to-use-dig-command-to-query-dns-in-linux/
