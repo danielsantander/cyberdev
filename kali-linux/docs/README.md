@@ -26,6 +26,11 @@ Documentation for linux distributions operating with the Linux kernel. For demon
   - [OpenSSH](./15_services.md#openssh)
   - [MySQL](./15_services.md#mysql)
   - [PostgreSQL](./15_services.md#postgresql)
+- [Anonymity](./16_anonymity.md)
+  - [traceroute command](./16_anonymity.md#traceroute)
+  - [The Onion Router (Tor)](./16_anonymity.md#the-onion-router-tor)
+  - [Proxy Servers](./16_anonymity.md#proxy-servers)
+  - [proxychains configurations](./16_anonymity.md#proxychains-configurations)
 
 ## Applications:
 - [Metasploit](Metasploit.md) - Open source software tool for developing and executing exploit code against a targeted machine.
@@ -39,10 +44,14 @@ Documentation for linux distributions operating with the Linux kernel. For demon
   - [Command](MySQL.md#commands)
 - [raspistill](raspistill.md) - (Raspberry Pi application)
 
-# Changing Shell
+<hr>
+
+# Tips
+
+## Changing Shell
 To change to a specific shell (for example zsh): `chsh -s /bin/zsh`
 
-# Change File Permissions
+## Change File Permissions
 `chmod` is the command and system call used to change the access permissions and the special mode flags (the setuid, setgid, and sticky flags) of file system objects (files and directories). Collectively these were originally called its modes, and the name chmod was chosen as an abbreviation of change mode. [wiki source](https://en.wikipedia.org/wiki/Chmod)
 
 **Example**
