@@ -42,6 +42,11 @@ sudo apt-get update && sudo apt-get upgrade
 # Install Docker
 [Docker Docs Source](https://docs.docker.com/desktop/install/debian/)
 
+**Install**
+```shell
+apt install docker.io docker-compose
+```
+
 **Start Docker Service**
 ```shell
 sudo systemctl enable --now docker
@@ -72,6 +77,7 @@ Aug 26 02:36:09 raspberrypi systemd[1]: Failed to start Docker Application Conta
 systemctl status docker.service
 sudo systemctl stop docker
 sudo reboot
+# sudo systemctl enable docker
 sudo systemctl start docker
 ```
 
