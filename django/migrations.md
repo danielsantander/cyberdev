@@ -44,7 +44,6 @@ Running migrations:
 ```
 
 # Remove Tables/Migrations in PostgreSQL Database
-
 Access database: `psql -U <username> <database>`
 
 List Tables
@@ -68,3 +67,8 @@ Drop A Whole Table:
 DROP TABLE <tablename>;
 ```
 
+# Find Migration Files
+Find and delete migration files for an app that are not named `__init__.py`.
+```shell
+find src/app_directory/migrations -type f -not -name "__init__.py" -delete
+```
