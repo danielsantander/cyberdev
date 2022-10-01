@@ -38,7 +38,7 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=LOG_DIR
     name -- name of logger
     level -- logger level value defaults to logging.DEBUG (default 10)
     max_byte_size  -- max number of bytes for size of log file, defaults to 10 mb (default 10*1024*1024)
-    backup_count -- number of backup files to keep in rotation (default 5) 
+    backup_count -- number of backup files to keep in rotation (default 5)
     """
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
