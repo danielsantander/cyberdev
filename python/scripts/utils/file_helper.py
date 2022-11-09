@@ -13,8 +13,8 @@ from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
 from utils.custom_exceptions import InvalidDirectory
 
 def open_json_from_file(filepath:Union[str,Path]):
-    """ Open JSON from filepath and return as dictionary object. 
-    
+    """ Open JSON from filepath and return as dictionary object.
+
     Keyword arguments:
     filepath -- JSON filepath to open (required)
     """
@@ -25,8 +25,8 @@ def open_json_from_file(filepath:Union[str,Path]):
     return data
 
 def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
-    """ Write dictionary object to file as JSON. 
-    
+    """ Write dictionary object to file as JSON.
+
     Keyword arguments:
     filename -- name or path of file to write json to (required)
     dict_obj -- dictionary object to convert into JSON file (required)
@@ -55,7 +55,7 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
 
     if not inputDir.is_dir(): raise InvalidDirectory()
 
-    # loop through all PDFs to open each pdf, add each pdf, then save.    
+    # loop through all PDFs to open each pdf, add each pdf, then save.
     pdf_writer = PyPDF2.PdfFileWriter()
     for filepath in inputDir.iterdir():
         if not filepath.name.endswith(".pdf"): continue
@@ -67,7 +67,7 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
                 page = pdf_reader.getPage(page_num)
                 pdf_writer.addPage(page)
 
-            # save combined PDF to a file.        
+            # save combined PDF to a file.
             with open(outputPDF.absolute(), 'wb') as pdf_output:
                 pdf_writer.write(pdf_output)
                 pdf_output.close()
@@ -82,32 +82,32 @@ def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_nam
             name = f'{dateformat}.pdf'
         else:
             name = re.sub(r'(?i)\.\w*$', '', name)
-            name += ".pdf" 
+            name += ".pdf"
     name = name if isinstance(name, Path) and name.exists() else Path(name)
     pdf_file_as_posix = name.as_posix()
 
     # create a new Canvas instance
     # canvas = Canvas("font-example.pdf", pagesize=LETTER)
     canvas = Canvas(pdf_file_as_posix)
-    
+
 
     # set the font to Times New Roman with a size of 18 points
     canvas.setFont(font_name, font_size)
 
     # add some text to the PDF
     """
-    The values passed to .drawString() are measured in points. 
+    The values passed to .drawString() are measured in points.
     Since a point equals 1/72 of an inch, .drawString(72, 72, "Hello, World")
     draws the string "Hello, World" one inch from the left and one inch from the bottom of the page.
     """
     canvas.drawString(72, 720, input_text)
-    
+
     # save the PDF to a file
     canvas.save()
 
 def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None):
     """ Encrypt a given PDF file.
-    
+
     Keyword arguments:
     path -- path of the PDF file to encrypt
     pw -- password for the file to encrypt with [defaults to 'fairbanks']
