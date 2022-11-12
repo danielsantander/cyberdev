@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #!/usr/bin/python3
 '''
 Unit testing for cipher library within utils.
