@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #!/usr/bin/python3
 '''
-Unit testing for cipher library within utils.
+Unit testing for custom exception library within utils.
 
 RUN TESTS:
 $ python -m unittest python/scripts/tests/test_exceptions.py
