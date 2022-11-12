@@ -7,7 +7,7 @@ from pathlib import Path
 class InvalidDirectory(Exception):
     """ Invalid path given. Directory does not exist. """
     def __init__(self, directory:Union[str, Path]=None):
-        self.dir = directory
+        self.dir = directory.absolute() if isinstance(directory, Path) else directory
     def __str__(self):
         err_msg = f'Invalid path given. Directory does not exist.'
         err_msg_dir = f'Invalid path given. Directory does not exist: {self.dir}'
@@ -22,8 +22,9 @@ class InvalidBoolValue(Exception):
 
 class InvalidFile(Exception):
     """ Invalid file given. File either does not exist or is invalid. """
-    def __init__(self, err:Union[str, Path]=None):
-        self.exception = err
+    def __init__(self, f:Union[str, Path]=None):
+        self.f = f.absolute().__str__() if isinstance(f, Path) else f
     def __str__(self):
-        err_msg = f'Invalid file.'
-        return self.exception if self.exception else err_msg
+        err_msg = f'Invalid file'
+        err_msg += f' {self.f}' if self.f is not None else err_msg
+        return err_msg
