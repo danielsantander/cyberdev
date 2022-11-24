@@ -62,23 +62,8 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=LOG_DIR
     logger.addHandler(master_file_handler)
     return logger
 
-
-def create_dir(dir_path:str):
-    """
-    Create a directory if one does not exist for the given directory path.
-    """
-    try:
-        os.makedirs(dir_path)
-    except OSError as err:
-        if err.errno == errno.EEXIST and os.path.isdir(dir_path):
-            pass    # Directory still created
-        else:
-            raise   # Error creating directory
-    return
-
-
 # Testing purposes:
-if __name__ == '__main__':
+""" if __name__ == '__main__':
 
     # Test Logger:
     logger = create_logger("test_logger", level=logging.INFO)
@@ -87,4 +72,4 @@ if __name__ == '__main__':
 
     logger2 = create_logger("test_logger2", level=logging.DEBUG)
     logger2.info("This is a test2.")
-    logger2.debug("This is a debugging test2 -- all loggers should see this.")
+    logger2.debug("This is a debugging test2 -- all loggers should see this.") """
