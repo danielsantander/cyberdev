@@ -1,6 +1,14 @@
 #!/usr/bin/python3
 '''
-Unit testing for cipher library within utils.
+Unit testing for cipher library.
+
+RUN TESTS:
+$ python -m unittest python/scripts/tests/test_ciphers.py
+
+RUN TESTS WITH COVERAGE:
+$ python -m coverage run --source="." -m unittest python/scripts/tests/test_exceptions.py --verbose
+$ coverage report
+$ coverage annotate -d coverage_files
 '''
 
 import unittest
@@ -41,5 +49,4 @@ class TestCaesarCipher(unittest.TestCase):
         self.assertRaises(Exception, caesar.decrypt, self.encrypted_msg, -1)
         self.assertRaises(Exception, caesar.decrypt, self.encrypted_msg, 26)
 
-if __name__ == '__main__':
-    unittest.main()
+if __name__ == '__main__': unittest.main()
