@@ -72,7 +72,7 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
                 pdf_writer.write(pdf_output)
                 pdf_output.close()
 
-def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_name:str="Times-Roman", font_size:int=18):
+def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_name:str="Times-Roman", font_size:int=18)->Path:
     if isinstance(name, str):
         if name == '':
             now = datetime.datetime.utcnow()                      # utc time
@@ -104,8 +104,9 @@ def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_nam
 
     # save the PDF to a file
     canvas.save()
+    return name
 
-def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None):
+def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None)->Path:
     """ Encrypt a given PDF file.
 
     Keyword arguments:
@@ -124,10 +125,11 @@ def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None):
             for page_num in range(pdf_reader.numPages):
                 pdf_writer.addPage(pdf_reader.getPage(page_num))
             pdf_writer.encrypt(pw)
-            encrypt_file = outpath / f'{file.name[:-4]}ENCRYPTED.pdf'
-            encrypted_pdf = open(encrypt_file.absolute(), 'wb')
+            encrypt_file_path = outpath / f'{file.name[:-4]}ENCRYPTED.pdf'
+            encrypted_pdf = open(encrypt_file_path.absolute(), 'wb')
             pdf_writer.write(encrypted_pdf)
             encrypted_pdf.close()
+            return encrypt_file_path
 
     # PDF file not found.
     except FileNotFoundError as err:

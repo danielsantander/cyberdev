@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #!/usr/bin/python3
 '''
-Unit testing for custom exception library within utils.
+Unit testing for custom exceptions.
 
 RUN TESTS:
-$ python -m unittest python/scripts/tests/test_exceptions.py
+$ python -m unittest python/scripts/tests/test_custom_exceptions.py --verbose
 
 RUN TESTS WITH COVERAGE:
-$ python -m coverage run -m unittest python/scripts/tests/test_exceptions.py
+$ python -m coverage run --source="." -m unittest python/scripts/tests/test_custom_exceptions.py --verbose
 $ coverage report
 $ coverage annotate -d coverage_files/
 '''
@@ -29,7 +29,6 @@ from utils import custom_exceptions
 class TestInvalidDirectory(unittest.TestCase):
     def setUp(self)->None:
         self.test_dir:Path = CURRENT_DIR_PATH / 'sample_data'
-
 
     def test_valid_directory(self):
         self.assertTrue(self.test_dir.exists() and self.test_dir.is_dir())
@@ -72,3 +71,5 @@ class TestInvalidFile(unittest.TestCase):
             raise_exception()
         self.assertEqual(str(context.exception), f'Invalid file {invalid_file.absolute().__str__()}')
 
+
+if __name__ == '__main__': unittest.main()
