@@ -1,5 +1,3 @@
-
-
 **Table of Contents**
 - [Scripts](#scripts)
 - [Bash Scripting](#bash-scripting)
@@ -10,7 +8,16 @@
 
 
 # Scripts
-*Scripts*
+
+## Exit Status Codes
+[src](https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/#:~:text=For%20the%20bash%20shell's%20purposes,the%20return%20status%20is%20126.)
+
+- Every Linux or Unix command executed by the shell script or user, has an exit status.
+- The exit status is an integer number.
+- For the bash shell’s purposes, a command which exits with a zero (0) exit status has succeeded.
+- A non-zero (1-255) exit status indicates failure.
+- If a command is not found, the child process created to execute it returns a status of 127. If a command is found but is not executable, the return status is 126.
+- All of the Bash builtins return exit status of zero if they succeed and a non-zero status on failure.
 
 
 # Bash Scripting
