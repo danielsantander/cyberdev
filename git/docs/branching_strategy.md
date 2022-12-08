@@ -8,7 +8,7 @@
   - [Release Branches](#release-branches)
 
 # Develop Branch
-The intention of this branch is to have an exact copy oof production in our repository. Consider `origin/develop` to be the main branch for development source code and where `HEAD` reflects the state with the latest development changes for the next release.
+The intention of this branch is to have an exact copy of production in the repository. Consider `origin/develop` to be the main branch for development source code and where `HEAD` reflects the state with the latest development changes for the next release.
 
 # Branch Types
 Different type of branches:
@@ -19,7 +19,7 @@ Different type of branches:
 ## Feature Branches
 Branched from `develop`, merges back into `develop`.
 
-Naming convention: anything other than `develop`,`master`,`ticket-*`, `release-*`
+Naming convention: `develop`,`master`,`ticket-*`, `release-*`
 
 ### Create new feature branch
 Branch off the develop branch to create a feature branch:
