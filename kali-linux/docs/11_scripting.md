@@ -6,7 +6,8 @@
   - [Make Script Executable](#make-script-executable)
 - [Script Variables](#script-variables)
   - [Input Variables with read command](#input-variables-with-read-command)
-- [NMAP Scripts](#nmap-scripts)
+- [NMAP Script Example](#nmap-script-example)
+- [Conditional Statements](#conditional-statements)
 
 
 # Bash Scripting
@@ -62,7 +63,7 @@ read name
 echo "Welcome ${name}!"
 ```
 
-# NMAP Scripts
+# NMAP Script Example
 *nmap* - a network scanning tool used to discover hosts and services on a computer network by sending packets and analyzing the responses. Nmap provides a number of features for probing computer networks, including host discovery and service and operating system detection. [source](https://en.wikipedia.org/wiki/Nmap)
 
 > nmap usage: `nmap <scan_type> <ip_address> <port>`
@@ -86,3 +87,5 @@ nmap -sT $firstIP-$lastOctetIP -p $port > /dev/null -oG ResultsMySQLScan
 cat ResultsMySQLScan | grep open > ResultsOpenMySQLPorts
 cat ResultsOpenMySQLPorts
 ```
+
+# Conditional Statements
