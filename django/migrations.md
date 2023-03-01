@@ -12,12 +12,15 @@ Run `makemigrations` command for Django to write a new set of migrations.
 python3 manage.py makemigrations
 
 # or for specific app:
-python3 manage.py makemigrations your_app_label
+python3 manage.py makemigrations <app_name>
 ```
 
 Apply the newly added migrations with the `migrate` command.
 ```shell
-python3 manage.py migrate'
+python3 manage.py migrate
+
+# or for specific app
+python3 manage.py migrate <app_name> 
 ```
 
 # Reverse Migrations
