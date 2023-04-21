@@ -6,7 +6,7 @@ import json
 import re
 import sys
 from pathlib import Path
-from typing import Union
+from typing import Union, List
 
 import PyPDF2 # python3 -m pip install PyPDF2
 from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
@@ -166,3 +166,21 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
     except NotADirectoryError as err:
         raise err
     return path
+
+def iterate_directory(directory_path:Union[str,Path], excludeHiddenFiles:bool=True, raise_exception:bool=True)->List[Path]:
+    """
+    Iterates through given directory path and returns a list of Paths in directory.
+
+    Keyword arguments:
+    directory_path -- Directory path to iterate.
+    exclude_hidden_files -- If True, skips hidden files. Defaults to True.
+    raise_exception -- If True, raises exception if invalid directory, else returns empty list.
+    """
+    file_path_list:List[Path] = []
+    p = directory_path if isinstance(directory_path, Path) else Path(directory_path)
+    if not p.is_dir() or not p.exists():
+        if raise_exception: raise InvalidDirectory(p)
+        else: return file_path_list
+    if next(p.iterdir(),None) is None: return file_path_list
+    file_path_list = [x for x in p.iterdir() if not x.name.startswith('.')] if excludeHiddenFiles else [x for x in p.iterdir()]
+    return file_path_list
