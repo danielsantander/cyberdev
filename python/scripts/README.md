@@ -1,6 +1,22 @@
 *Python Scripts Table of Contents*
+- [cleanup.py](#cleanuppy)
 - [encryptPDF.py](#encryptpdfpy)
-- [rename_files.py](#rename_filespy)
+- [rename\_files.py](#rename_filespy)
+
+# cleanup.py
+Will iterate through the given source directory to consolidate files into their own sub-directories, such as:
+    - screenshots/
+    - <extension name>
+      - PDFs/
+      - PNG/
+      - JPEG/
+
+Usage: `./cleanup.py <source directory path> <destination directory path [OPTIONAL]>`
+
+Example
+```shell
+./cleanup.py /home/ /home/results/
+```
 
 # encryptPDF.py
 Python script for encrypting PDF files.
