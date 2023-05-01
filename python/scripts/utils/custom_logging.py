@@ -17,14 +17,14 @@ LOG_LEVEL: int = logging.DEBUG if DEBUG_MODE else logging.INFO
 LOG_FORMAT = logging.Formatter('%(asctime)s [%(levelname)s] %(name)s: %(message)s')
 
 
-def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL) -> logging.Logger:
+def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL, format=LOG_FORMAT) -> logging.Logger:
     """
     Return a custom logger with stream (console) handler.
     """
     logger = logging.getLogger(name)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
-    console_handler.setFormatter(LOG_FORMAT)
+    console_handler.setFormatter(format)
     logger.addHandler(console_handler)
     logger.setLevel(level)
     return logger
