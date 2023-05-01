@@ -1,8 +1,9 @@
 from typing import List
 
 DEFAULT_DATETIME_FMT = '%Y%m%d%H%M%S'
-DEFAULT_LOGGING_DATE_FMT = "%Y-%m-%dT%H:%M:%S.%fZ"
-DEFAULT_LOGGING_DATE_FMT = "%Y-%m-%d %I:%M:%S"
+
+# DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%d %I:%M:%S"
 
 IMAGE_EXTENSION_LIST:  List[str]=['png', 'jpg', 'jpeg']
 
