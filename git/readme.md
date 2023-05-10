@@ -1,7 +1,13 @@
 
-*Documentation*
+*Table of Contents*
 - [Configuration](docs/configuration.md)
   - [Set User Info](docs/configuration.md#set-user-info)
+  - [Set Text Editor](docs/configuration.md#set-text-editor)
+  - [Cache User Creds](docs/configuration.md#cache-user-creds)
+  - [Delete Cached Record](docs/configuration.md#delete-cached-record)
+  - [Store Creds](docs/configuration.md#store-creds)
+  - [View Remote URL](docs/configuration.md#view-remote-url)
+  - [Update Remote URL](docs/configuration.md#update-remote-url)
 - [Branching Strategy](docs/branching_strategy.md)
 - [Diff Command](docs/diff_command.md)
 - [Log Command](docs/log_command.md)

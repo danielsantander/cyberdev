@@ -1,6 +1,6 @@
 Documentation for linux distributions operating with the Linux kernel. For demonstration purposes I will be referring to the Kali Linux Operation System.
 
-**Table of Contents**
+*Table of Contents*
 - [Change IP Addresses](./01_change_ip_address.md)
 - [Change MAC Addresses](./02_change_MAC_address.md)
 - [Assign IP Address](./03_assign_ip_address.md)
@@ -12,6 +12,9 @@ Documentation for linux distributions operating with the Linux kernel. For demon
 - [Process Management](./09_process_management.md)
 - [Environment Variables](./10_env_variables.md)
 - [Scripting](./11_scripting.md)
+  - [Script Variables](./11_scripting.md#script-variables)
+  - [NMAP Script Example](11_scripting.md#nmap-script-example)
+  - [Conditional Statements](11_scripting.md#conditional-statements)
 - [Compression](./12_compression.md)
 - [Filesystem](./13_filesystem.md)
 - [Logging](./14_logging.md)

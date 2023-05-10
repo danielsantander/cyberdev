@@ -1,17 +1,26 @@
-
-
 **Table of Contents**
 - [Scripts](#scripts)
+  - [Exit Status Codes](#exit-status-codes)
 - [Bash Scripting](#bash-scripting)
-  - [HelloWorld Script](#helloworld-script)
-  - [Script Variables](#script-variables)
-  - [NMAP Scripts](#nmap-scripts)
-- [Python Scripting](#python-scripting)
+- [HelloWorld Script](#helloworld-script)
+  - [Make Script Executable](#make-script-executable)
+- [Script Variables](#script-variables)
+  - [Input Variables with read command](#input-variables-with-read-command)
+- [NMAP Script Example](#nmap-script-example)
+- [Conditional Statements](#conditional-statements)
 
 
 # Scripts
-*Scripts*
 
+## Exit Status Codes
+[src](https://www.cyberciti.biz/faq/linux-bash-exit-status-set-exit-statusin-bash/#:~:text=For%20the%20bash%20shell's%20purposes,the%20return%20status%20is%20126.)
+
+- Every Linux or Unix command executed by the shell script or user, has an exit status.
+- The exit status is an integer number.
+- For the bash shell’s purposes, a command which exits with a zero (0) exit status has succeeded.
+- A non-zero (1-255) exit status indicates failure.
+- If a command is not found, the child process created to execute it returns a status of 127. If a command is found but is not executable, the return status is 126.
+- All of the Bash builtins return exit status of zero if they succeed and a non-zero status on failure.
 
 # Bash Scripting
 *Shell* - an interface between the user and the operating system.
@@ -23,7 +32,7 @@
 *shebang* - combination of a hash mark and an exclamation mark (`#!`) to communicate with the operating system which interpreter to use for the script.
 
 
-## HelloWorld Script
+# HelloWorld Script
 **Example** HelloWorld script which will return a message when executed. Start by declaring the shebang followed by `/bin/bash` to indicate the operating system should use the bash shell interpreter.
 
 > note: Comments are prepended with the hash symbol (`#`) before each line. Comments are not read or executed by the interpreter.
@@ -37,6 +46,7 @@ HelloWorld script:
 echo "Hello World!"
 ```
 
+## Make Script Executable
 Change the permissions in order to execute the script:
 ```shell
 $ sudo chmod 755 HelloWorld
@@ -48,8 +58,9 @@ Execute the script from the current directory with `./<script_name>`
 $ ./HelloWorld
 ```
 
-## Script Variables
-Utilize the `read` command to retrieve user input.
+# Script Variables
+## Input Variables with read command
+Use the `read` command to retrieve and save user input.
 ```shell
 #! /bin/bash
 
@@ -64,7 +75,7 @@ read name
 echo "Welcome ${name}!"
 ```
 
-## NMAP Scripts
+# NMAP Script Example
 *nmap* - a network scanning tool used to discover hosts and services on a computer network by sending packets and analyzing the responses. Nmap provides a number of features for probing computer networks, including host discovery and service and operating system detection. [source](https://en.wikipedia.org/wiki/Nmap)
 
 > nmap usage: `nmap <scan_type> <ip_address> <port>`
@@ -89,6 +100,4 @@ cat ResultsMySQLScan | grep open > ResultsOpenMySQLPorts
 cat ResultsOpenMySQLPorts
 ```
 
-
-
-# Python Scripting
+# Conditional Statements

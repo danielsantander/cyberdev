@@ -1,13 +1,15 @@
 *Table of Contents*
 - [System Info](#system-info)
+  - [View OS](#view-os)
+  - [View Bit Size](#view-bit-size)
 - [Update and Upgrade System](#update-and-upgrade-system)
 - [Install Docker](#install-docker)
-
+  - [Troubleshoot](#troubleshoot)
 
 # System Info
 Download Raspberry Pi Operating Systems here: https://www.raspberrypi.com/software/operating-systems/
 
-**View OS**
+## View OS
 ```shell
 $ cat /etc/os-release
 
@@ -24,7 +26,7 @@ SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
 BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
 ```
 
-**View Bit Size**
+## View Bit Size
 ```shell
 $ uname -m
 ```
@@ -57,7 +59,7 @@ sudo systemctl enable --now docker
 sudo docker run --rm hello-world
 ```
 
-**Troubleshoot**
+## Troubleshoot
 ```shell
 systemctl status docker.service
 ● docker.service - Docker Application Container Engine
@@ -72,26 +74,13 @@ Aug 26 02:36:09 raspberrypi systemd[1]: Stopped Docker Application Container Eng
 Aug 26 02:36:09 raspberrypi systemd[1]: docker.service: Start request repeated too quickly.
 Aug 26 02:36:09 raspberrypi systemd[1]: docker.service: Failed with result 'exit-code'.
 Aug 26 02:36:09 raspberrypi systemd[1]: Failed to start Docker Application Container Engine.
+```
 
-
+**Reboot Docker Service**
+```shell
 systemctl status docker.service
 sudo systemctl stop docker
 sudo reboot
 # sudo systemctl enable docker
 sudo systemctl start docker
-```
-
-```shell
-$ sudo docker-compose build --no-cache
-ERROR: Version in "./docker-compose.yml" is unsupported. You might be seeing this error because you're using the wrong Compose file version. Either specify a supported version (e.g "2.2" or "3.3") and place your service definitions under the `services` key, or omit the `version` key and place your service definitions at the root of the file to use version 1.
-For more on the Compose file format versions, see https://docs.docker.com/compose/compose-file/
-
-docker-compose --version
-docker-compose version 1.21.0, build unknown
-
-docker-compose version
-docker-compose version 1.21.0, build unknown
-docker-py version: 3.4.1
-CPython version: 3.7.3
-OpenSSL version: OpenSSL 1.1.1n  15 Mar 2022
 ```
