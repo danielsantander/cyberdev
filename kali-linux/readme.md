@@ -4,6 +4,13 @@ Table of Contents
   - [Change Shell](#change-shell)
   - [Script Shebang](#script-shebang)
   - [Print Random Line From File](#print-random-line-from-file)
+- [Permissions](#permissions)
+  - [Change File Ownership](#change-file-ownership)
+  - [Permission Levels](#permission-levels)
+  - [Change Permissions](#change-permissions)
+    - [UGO Symbolic Method](#ugo-symbolic-method)
+  - [Check Permissions](#check-permissions)
+  - [Configure Default Permissions](#configure-default-permissions)
 - [Network](#network)
   - [Check Wireless Network Devices](#check-wireless-network-devices)
   - [Assign IP Address](#assign-ip-address)
@@ -59,6 +66,117 @@ Script files will begin with the shebang: `#!/bin/bash`
 ```shell
 # output "n" number of random lines from file
 $ shuf -n 1 {filename}
+```
+
+# Permissions
+## Change File Ownership
+Use `chown` to change or grant ownership.
+```shell
+chown {user} {file}
+
+# example
+chown john /tmp/scriptfile
+```
+
+Use `chgrp` to grant a group ownership.
+```shell
+chgrp {group_name} {file}
+
+# example
+chgrp blueteam newProgram
+```
+
+## Permission Levels
+Three level of permissions:
+1. `r` : permission to read (open and view a file)
+2. `w` : permission to write (view and edit a file)
+3. `x` : permission to execute (execute a file, but not necessarily view or edit)
+
+Represent a single set of permissions by using a numerical value.
+
+Permissions can be represented as binary numbers, where `111` in binary represents all permissions granted whereas `000` represent none. The `rwx` permission set can be represented as an octal number by converting it form binary.
+
+| rwx | Binary | Octal |
+|-----|--------|-------|
+| --- | 000    |   0   |
+| --x | 001    |   1   |
+| -w- | 010    |   2   |
+| -wx | 011    |   3   |
+| r-- | 100    |   4   |
+| r-x | 101    |   5   |
+| rw- | 110    |   6   |
+| rwx | 111    |   7   |
+
+## Change Permissions
+Use `chmod` to change the directory and/or file permissions.
+
+```shell
+chmod {permission_value} {directory_or_file}
+
+# give all permissions for file owner, group, and users
+chmod 777 script.sh
+
+# give all permissions for file owner,
+# and only read/execute permissions for group and other users
+chmod 755 script.sh
+```
+
+### UGO Symbolic Method
+Change permissions with symbolic method (UGO). UGO stand for "user" (file owner), "group", and "others" (u, g o).
+
+Operator symbols
+```text
++ Adds permission(s)
+- Removes permission(s)
+= Sets permission(s)
+```
+
+```shell
+chmod {UGO value} {operator value} {directory or file}
+
+# example -- remove write perms from the user the file belongs to
+chmod u-w script.sh
+
+# example -- change multiple perms with one command using commas to delimit each
+chmod u-w, o+x, script.sh
+
+```
+
+## Check Permissions
+```shell
+ls -l /home/
+-rwxr-xr-x 1 root root 752 Sep  5 04:56 script.sh
+```
+The output should resemble:
+```txt
+d  rwxr-xr-x   1     root  root  752   Sep 5 04:56  script.sh
+{1}   {2}     {3}    {4}         {5}    {6}         {7}
+
+Where:
+1. File type: first character of the line, 'd' for directory, '-' for file.
+2. Permissions (rwxrwxrwx): in order of file ower, group, and all other users.
+3. Number of links
+4. Owner of file
+5. File size (bytes)
+6. Date created or last modified
+7. Directory/file name
+```
+
+## Configure Default Permissions
+Use `umask` to change default permissions for the user. Umask value is a three-digit decimal number subtracted from the permissions number to give the new permission status. Each user can set their default umask value (not universal) within their `.profile` file.
+
+*Example*: If the default permissions for a new files are `666`, and the default permissions for new directories are `777`, with `unmask` set to `022`, the new permissions for files will be `644` (022 subtracted from 666), and the new permissions for directories will be `755` (022 subtracted from 777).
+
+```shell
+# view value
+umask
+
+# set value
+vi /home/{user}/.profile
+
+# example - set unmask to `007`
+vi /home/root/.profile
+umask 077
 ```
 
 # Network
