@@ -31,6 +31,18 @@ Table of Contents
     - [Upgrade Packages](#upgrade-packages)
     - [Removing Software](#removing-software)
     - [Remove Software and Configurations](#remove-software-and-configurations)
+- [Process Management](#process-management)
+  - [ps](#ps)
+  - [top](#top)
+  - [nice](#nice)
+  - [renice](#renice)
+  - [Run Background Processes](#run-background-processes)
+  - [Foreground Processes](#foreground-processes)
+  - [Schedule Processes](#schedule-processes)
+    - [at](#at)
+    - [cron](#cron)
+    - [rc](#rc)
+  - [kill](#kill)
 - [Commands](#commands)
   - [dig](#dig)
     - [dig options](#dig-options)
@@ -342,6 +354,161 @@ apt-get remove {package-name}
 apt-get purge {package-name}
 ```
 
+# Process Management
+## ps
+View processes and their assigned process identification number (PID).
+```shell
+ps {options}
+
+# example -- view processes running on the system for all users
+ps aux
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+...
+...
+root        1249  0.0  0.1   9708  3372 pts/0    R+   00:11   0:00 ps aux
+...
+```
+
+| OUTPUT   | DESCRIPTION                                |
+|----------|--------------------------------------------|
+| `User`   | the user who invoked the process
+| `PID`    | process identification number
+| `%CPU`   | percent of the CPU the process is using
+| `%MEM`   | percent of memory the process is using
+| `COMMAND`| command name that started this process
+
+> Tip: Use with `grep` to filter by process name `ps aux | grep {process_name}`
+
+## top
+Use `top` command to produce a list of processes ordered by resources used, starting with the largest. The output will refresh dynamically every 10 seconds.
+
+## nice
+Start processes and manipulate their with the `nice` command. Elevate a process to allocate more resources speeding up it's completion.
+
+The "nice" value ranges from -20 to +19 with 0 being the default. Think of nice values as inverted in priority; the high nice value means a low priority, and a low nice value means a high priority.
+
+> The owner of a process can only lower the priority, NOT increase the priority. However, a superuser or root user can arbitrarily set the nice value.
+
+```shell
+nice -n {numerical_value} {process}
+
+# example - start `myprocess` and increment the priority
+nice -n -10 /usr/bin/myprocess
+```
+
+## renice
+Change priority of a running process with `renice` command. Note that only the root user can update a system process to a negative value, giving it a higher priority.
+
+```shell
+renice {nice_value} {PID}
+
+# example -- give a process a lower priority to allocate more resources to other processes
+renice 20 6789
+```
+
+> Renice a process using the `top` command by entering the `R` key, the PID of the process, and then the new nice value.
+
+## Run Background Processes
+Append an ampersand `&` at the end of a command.
+
+```shell
+{command} &
+
+# example
+./myscript.sh &
+```
+
+## Foreground Processes
+Move a process back to the foreground with `fg` command
+```shell
+fg {PID}
+
+# example
+fg 6789
+```
+
+## Schedule Processes
+### at
+A daemon to schedule executions to run once at some point of time.
+
+```shell
+at {time_to_execute}
+
+# example -- schedule script to execute today at 8:00PM
+at 8:00PM
+at > /home/myscript.sh
+```
+
+| Time Format          | Schedule                                |
+|----------------------|-----------------------------------------|
+| at 6:00am            | run at 6:00am on the current day        |
+| at 6:00am April 1    | run at 6:00am on April 1st              |
+| at noon              | run at noon on the current day          |
+| at noon April 1      | run at noon on April 1st                |
+| at 6:00am 02/20/2022 | run at 6:00PM on February 20 20222      |
+| at now + 20 minutes  | run in 20 minutes from the current time |
+| at now + 12 hours    | run in 12 hours from the current time   |
+| at now + 3 days      | run in 3 days from the current time     |
+| at now + 2 weeks     | run in 2 weeks from the current time    |
+
+### cron
+Utilize the cron daemon (crond) and the cron table (cront) for scheduling recurring tasks to execute.
+
+> `/etc/crontab` is the system wide crontab, whereas `crontab -e` is per user. Specify which user with `crontab -e -u <username>`
+
+```shell
+crontab -e
+
+# m h  dom mon dow  command
+*   *   *   *   *   echo 'foo'
+
+# example - run a backup of all your user accounts at 5 a.m every week with:
+# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+```
+
+Cron table input is represented as 7 fields:
+`<MINUTE> <HOUR> <DOM> <MON> <DOW> <user> <COMMAND>`
+
+| FIELD              | Values |
+|--------------------|--------|
+| minute             | 0-59   |
+| hour               | 0-23   |
+| day of month (DOM) | 0-31   |
+| month  (MON)       | 1-12   |
+| day of week (DOW)  | 0-7    |
+'
+
+### rc
+Use `update-rc.d` command to add or remove services to the `rc.d` script that will run at startup.
+
+```shell
+update-rc.d {script_or_service_name} {remove|defaults|disable|enable}
+
+# example -- setup PostgreSQL to startup at system boot (ideal for avid users of Metasploit framework to store data). The following will add a line to rc.d script to start PostgreSQL on system boot.
+update-rc.d postgresql defaults
+```
+
+## kill
+
+Kill system processes.
+```shell
+kill -{signal_value} {PID}
+
+# example -- kill a process
+kill -9 6789
+
+# example -- restart the process using HUP signal
+kill -1 6789
+```
+
+> Tip: use `killall` command to provide the process name instead of the PID. `killall -{signal} {process_name}`
+
+Signal Value Options (optional)
+| signal  | num |                                                              |
+|---------|-----|--------------------------------------------------------------|
+| SIGHUP  | 1   | Hangup signal (HUP): restarts process with same PID          |
+| SIGKILL | 9   | Absolute kill signal, sends process' resources to /dev/null  |
+| SIGTERM | 15  | Termination signal (TERM): default kill signal               |
 
 # Commands
 ## dig
