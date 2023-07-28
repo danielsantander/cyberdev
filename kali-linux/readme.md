@@ -571,7 +571,7 @@ Cron table input is represented as 7 fields:
 | day of month (DOM) | 0-31   |
 | month  (MON)       | 1-12   |
 | day of week (DOW)  | 0-7    |
-'
+
 
 ### rc
 Use `update-rc.d` command to add or remove services to the `rc.d` script that will run at startup.
