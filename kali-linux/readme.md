@@ -771,16 +771,17 @@ find / -user root -perm -4000
 ```
 
 **Options**
-| options                       | description                                        |
-|-------------------------------|----------------------------------------------------|
-| -atime {NUMBER_OF_DAYS}       | file was accessed a given number of days ago       |
-| -mtime {NUMBER_OF_DAYS}       | file was modified a given number of days ago       |
-| -size  {FILE_SIZE_IN_BLOCKS}  | files in a given # of blocks (1 block = 512 bytes) |
-| -type  {FILE_TYPE}            | specify file type (f=plain text, d=directory)      |
-| -exec  {COMMAND}              |
+| options                       | description                                                               |
+|-------------------------------|---------------------------------------------------------------------------|
+| -atime {NUMBER_OF_DAYS}       | file was accessed a given number of days ago                              |
+| -mtime {NUMBER_OF_DAYS}       | file was modified a given number of days ago                              |
+| -size  {FILE_SIZE_IN_BLOCKS}  | files in a given # of blocks (1 block = 512 bytes)                        |
+| -type  {FILE_TYPE}            | specify file type (f=plain text, d=directory)                             |
+| -exec  {UTILITY}              | True if the program named UTILITY returns a zero value as its exit status |
+| -delete                       | Delete found files and/or directories. Always returns True                |
 
 ### Find File Based on Content
-Run `grep` command for every file that satisfies the conditions. Print matches to console.
+Execute `grep` command for every file that satisfies the conditions. Print matches to console.
 ```shell
 find . -type f -exec grep "CONTENT_TO_SEARCH" '{}' \; -print
 ```
