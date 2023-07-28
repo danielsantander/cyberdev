@@ -304,7 +304,7 @@ sudo resolvconf -u
 ### Install resolvconf service
 ```shell
 # install resolvconf
-sudo apt install resolvconf
+sudo apt-get install resolvconf
 
 # enable and then run service
 systemctl enable resolvconf.service
