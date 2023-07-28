@@ -22,7 +22,7 @@ Table of Contents
   - [Change DNS](#change-dns)
     - [Regenerate resolvconf](#regenerate-resolvconf)
     - [Install resolvconf service](#install-resolvconf-service)
-- [Applications and Services](#applications-and-services)
+- [Packages and Services](#packages-and-services)
   - [Manage Services](#manage-services)
   - [Manage Software](#manage-software)
     - [Search for Packages](#search-for-packages)
@@ -31,6 +31,13 @@ Table of Contents
     - [Upgrade Packages](#upgrade-packages)
     - [Removing Software](#removing-software)
     - [Remove Software and Configurations](#remove-software-and-configurations)
+- [Applications](#applications)
+  - [Metasploit](#metasploit)
+    - [PostgreSQL (postgres)](#postgresql-postgres)
+    - [Start Metasploit](#start-metasploit)
+    - [Setup PostgreSQL](#setup-postgresql)
+    - [Connect to Database](#connect-to-database)
+    - [Sources](#sources)
 - [Process Management](#process-management)
   - [ps](#ps)
   - [top](#top)
@@ -53,8 +60,8 @@ More Docs:
     - [Apache2](docs/15_services.md#apache-web-server)
     - [OpenSSH](docs/15_services.md#openssh)
   - [MySQL](docs/MySQL.md)
-  - [Metasploit](docs/Metasploit.md)
-    - [PostgreSQL](docs/Metasploit.md#postgresql-postgres)
+  <!-- - [Metasploit](docs/Metasploit.md)
+    - [PostgreSQL](docs/Metasploit.md#postgresql-postgres) -->
 - [Scripts](scripts/README.md)
 
 ---
@@ -307,7 +314,7 @@ systemctl start resolvconf.service
 systemctl status resolvconf.service
 ```
 
-# Applications and Services
+# Packages and Services
 ## Manage Services
 ```shell
 # Manage Services
@@ -353,6 +360,94 @@ apt-get remove {package-name}
 ```shell
 apt-get purge {package-name}
 ```
+
+# Applications
+## Metasploit
+Steps for exploiting a system:
+1. Check if target system is vulnerable to an exploit
+2. Select & configure an exploit
+3. Select & configure a payload to utilize in the exploit
+4. Select an encoding technique (remove 'bad characters' from the payload, known to cause the exploit to fail)
+5. Execute the exploit
+
+### PostgreSQL (postgres)
+Install and start postgres before launching Metasploit.
+```shell
+# install postgres
+
+apt-get install postgresql
+# or
+apt-get install postgresql-12
+
+# start service
+service postgres start
+
+# check status
+service postgresql --status
+```
+
+### Start Metasploit
+With postgres running, launch Metasploit and enter the msfconsole.
+```shell
+# start metasploit, and enter console
+msfconsole
+```
+
+### Setup PostgreSQL
+Initialize DB
+```shell
+msf6 > sudo msfdb init
+```
+
+Reinitialize
+```shell
+msf6 > sudo msfdb reinit
+```
+
+Create user
+```shell
+# within msfconsole, switch user to obtain root privileges
+msf6 > su postgres
+
+# create metasploit framework user
+postgres@kali:/home/kali$ createuser msf_user -P
+Enter password for new role:
+Enter it again:
+postgres@kali:/home/kali$
+```
+
+Create Database
+```shell
+# create db with msf_user as owner
+postgres@kali:/home/kali$ createdb --owner=msf_user my_hacker_db
+
+# exit postgres
+postgres@kali:/home/kali$ exit
+```
+
+### Connect to Database
+Connect to database for Metasploit framework to store:
+  - modules for fast results
+  - results of system scans
+  - exploits ran
+
+```shell
+# usage
+msf6 > db_connect {USER}:{ENTER_PASSWORD_HERE}@{HOST}/{DATABASE_NAME}
+
+# example (using localhost)
+msf6 > db_connect msf_user:password123@127.0.0.1/my_hacker_db
+
+# check status
+msf6> db_status
+[*] Connected to msf. Connection type: postgresql.
+
+#disconnect database
+msf6> db_disconnect
+```
+
+### Sources
+- [Metasploit Wiki](https://en.wikipedia.org/wiki/Metasploit_Project)
 
 # Process Management
 ## ps
