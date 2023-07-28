@@ -2,7 +2,7 @@
 Documentation for regulating file and directory permissions.
 
 **Table of Contents**
-- [File & Directory Permissions](#file--directory-permissions)
+- [File \& Directory Permissions](#file--directory-permissions)
 - [Users and Groups](#users-and-groups)
   - [Grant User File Ownership](#grant-user-file-ownership)
   - [Grant Group Ownership](#grant-group-ownership)
@@ -21,7 +21,7 @@ Documentation for regulating file and directory permissions.
 - [Privilege Escalation](#privilege-escalation)
   - [Find Files Owned By Root](#find-files-owned-by-root)
 
-<hr> 
+<hr>
 
 # Users and Groups
 Root user is all-powerfull and can do basically anything.
@@ -52,7 +52,7 @@ Eample: change ownership of "newProgram" to the "blueTeam" group
 $ chgrp blueTeam newProgram
 ```
 
-<hr> 
+<hr>
 
 # Permission Levels
 Three level of permissions:
@@ -60,7 +60,7 @@ Three level of permissions:
 2. `w` : permission to write (view and edit a file)
 3. `x` : permission to execute (execute a file, but not necessarily view or edit)
 
-When a file is created, the user who created that file is the file owner, and the owning group is the users' current group. 
+When a file is created, the user who created that file is the file owner, and the owning group is the users' current group.
 
 <hr>
 
@@ -124,7 +124,7 @@ To represent *all permissions* for the file owner, the group, and all users, we 
 $ ls -l
 -rwxr-xr-x 1 kali kali 752 Sep  5 04:56 script.sh
 
-# allow file ower, groups, and users ALL permissions for this file
+# allow file owner, groups, and users ALL permissions for this file
 $ chmod 777 script.sh
 $ ls -l
 -rwxr-xr-x 1 kali kali 752 Sep  5 04:56 script.sh
@@ -195,7 +195,7 @@ $ ls -l
 -r-xrwxr-x 1 kali kali 752 Sep  5 04:56 script.sh
 ```
 
-Change multiple permissions with one command by using a comma to delimit each permission change. 
+Change multiple permissions with one command by using a comma to delimit each permission change.
 ```bash
 $ chmod u-w, o+x script.sh
 ```
@@ -210,7 +210,7 @@ Linux, by default, will set new directories and files permissions `777` and `666
 # new tool located in root directory (/) with no execute permissions for anyone
 kali >ls -l
 -rw-r--r-- 1 root root 1072 Sep  5 05:10 securitytool
- 
+
 # grant execute permission for user
 kali >chmod 766 securitytool
 
@@ -224,7 +224,7 @@ Utilize the unmask (`umask`) method to change the default permissions allocated 
 
 Unmask:
 -  represents the permissions to *remove* from the base permissions on a file/directory.
--  three-digit decimal number corresponding to the three digits represengint a permission set.
+-  three-digit decimal number corresponding to the three digits representing a permission set.
 -  the three-digit value used will be subtracted from the permissions number to give the new permissions status.
 -  value is not universal to all users on the system, each user can set a personal default `umask` value for the files and directories in their personal `.profile` file.
 -  change the `umask` value, edit the `/home/<username>/.profile` file.
@@ -246,18 +246,17 @@ umask 007
 # Special Permissions
 Special permissions include:
 - set user ID (SUID)
-- set gorup ID (SGID)
+- set group ID (SGID)
 - sticky bit
 
 ## Grant Temporary Root Permissions Using SUID
-
 **SUID** bit value dictates if user can execute the file with the permissions of the owner. However, those permissions do not extend beyond the use of that file.
 
 > use case: Set the SUID bit on the `/etc/shadow` (file that holds user's passwords) to temporary grant file owner privileges, allowing the user to execute the program, modifying their password.
 
-Set the SUID bit by entering a `4` before the regular permissions. For example, a file with a new permission of `644` (unmassked from `666`) is represented as `4644` when the `SUID` bit is set.
+Set the SUID bit by entering a `4` before the regular permissions. For example, a file with a new permission of `644` (unmasked from `666`) is represented as `4644` when the `SUID` bit is set.
 
-*Example*: Utilze the `chmod` command to change the SUID bit.
+*Example*: Utilize the `chmod` command to change the SUID bit.
 ```bash
 $ chmod 4644 filename
 ```
