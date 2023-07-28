@@ -377,7 +377,7 @@ root        1249  0.0  0.1   9708  3372 pts/0    R+   00:11   0:00 ps aux
 | `%MEM`   | percent of memory the process is using
 | `COMMAND`| command name that started this process
 
-> Tip: Use with `grep` to filter by process name `ps aux | grep {process_name}`
+> Tip: Combine command with `grep` to filter by process name `ps aux | grep {process_name}`
 
 ## top
 Use `top` command to produce a list of processes ordered by resources used, starting with the largest. The output will refresh dynamically every 10 seconds.
