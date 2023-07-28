@@ -37,7 +37,12 @@ Table of Contents
     - [Start Metasploit](#start-metasploit)
     - [Setup PostgreSQL](#setup-postgresql)
     - [Connect to Database](#connect-to-database)
-    - [Sources](#sources)
+    - [sources](#sources)
+  - [nmap](#nmap)
+    - [Scan Type Options](#scan-type-options)
+    - [Examples](#examples)
+    - [Output Results to File](#output-results-to-file)
+    - [sources](#sources-1)
 - [Process Management](#process-management)
   - [ps](#ps)
   - [top](#top)
@@ -446,8 +451,71 @@ msf6> db_status
 msf6> db_disconnect
 ```
 
-### Sources
+### sources
 - [Metasploit Wiki](https://en.wikipedia.org/wiki/Metasploit_Project)
+
+## nmap
+Network scanning tool. Send packets analyze responses to discover hosts and services on a computer network.
+```shell
+# install
+sudo apt-get install -y nmap
+
+# usage
+nmap {SCAN_TYPE} {IP/CIDR} {PORT}
+```
+
+> TIP: specify the `--packet-trace` option to report what is happening on the packet level.
+
+### Scan Type Options
+| option           |  description                                                  |
+|------------------|---------------------------------------------------------------|
+| -sL              | List Scan - simply list targets to scan                       |
+| -sn              | Ping Scan - disable port scan                                 |
+| -sP              | Ping Scan                                                     |
+| -sS              | TCP SYN (Stealth) Scan -- requires raw-packet privileges      |
+| -sT              | TCP Connect Scan                                              |
+| -sV              | Probe open ports to determine service/version info            |
+| -sO              | IP protocol scan                                              |
+| -O               | Enable OS detection                                           |
+| -n               | Never do DNS resolution                                       |
+| -p {port ranges} | Only scan specified ports                                     |
+|-v                | Increase verbosity level (use -vv or more for greater effect) |
+
+### Examples
+```shell
+# Host Detection -- get live hosts
+nmap -n -sP {IP/CIDR} | grep report | awk '{print $5}'
+
+# TCP scan to check if port 3306 is open (MySQL default port)
+nmap -sT {IP/CIDR} -p 3306
+
+# OS Detection
+nmap -O {IP/CIDR/HOST}
+
+# OS Detection -- add -sV option to enable version detection, interrogating open ports.
+nmap -sV -O -v 129.128.X.XX
+
+```
+
+### Output Results to File
+```shell
+nmap {SCAN_TYPE} {IP/CIDR} {PORT} > /dev/null -oG {OUTPUT_FILE}
+
+# example
+nmap -sT 192.168.x.x/16 -p 3306 > /dev/null -oG ResultsMySQLScan
+
+# read 'open' results
+cat ResultsMySQLScan | grep open > ResultsOpenMySQLPorts
+cat ResultsOpenMySQLPorts
+```
+
+> TIP: `-oG` is deprecated, XML output format is far more powerful: `-oX` filespec (XML output)
+
+### sources
+- [nmap.org](https://nmap.org/)
+  - [Port Scanning Techniques and Algorithms](https://nmap.org/book/scan-methods.html)
+  - [Reference Guide](https://nmap.org/book/man.html)
+- [nmap wiki](https://en.wikipedia.org/wiki/Nmap)
 
 # Process Management
 ## ps

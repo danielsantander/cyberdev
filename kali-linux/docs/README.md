@@ -13,7 +13,6 @@ Documentation for linux distributions operating with the Linux kernel. For demon
 - [Environment Variables](./10_env_variables.md)
 - [Scripting](./11_scripting.md)
   - [Script Variables](./11_scripting.md#script-variables)
-  - [NMAP Script Example](11_scripting.md#nmap-script-example)
   - [Conditional Statements](11_scripting.md#conditional-statements)
 - [Compression](./12_compression.md)
 - [Filesystem](./13_filesystem.md)
@@ -50,9 +49,6 @@ Documentation for linux distributions operating with the Linux kernel. For demon
 <hr>
 
 # Tips
-
-## Changing Shell
-To change to a specific shell (for example zsh): `chsh -s /bin/zsh`
 
 ## Change File Permissions
 `chmod` is the command and system call used to change the access permissions and the special mode flags (the setuid, setgid, and sticky flags) of file system objects (files and directories). Collectively these were originally called its modes, and the name chmod was chosen as an abbreviation of change mode. [wiki source](https://en.wikipedia.org/wiki/Chmod)
