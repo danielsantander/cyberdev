@@ -58,6 +58,9 @@ Table of Contents
 - [Commands](#commands)
   - [dig](#dig)
     - [dig options](#dig-options)
+  - [find](#find)
+    - [Find File Based on Content](#find-file-based-on-content)
+    - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
 
 More Docs:
 - [Documentation](docs/README.md)
@@ -750,4 +753,44 @@ dig {domain} +nostats
 
 # include detailed answer -- turn off all results, then include answer
 dig {domain} +noall +answer
+```
+
+## find
+```shell
+# usage
+find {LOCATION} {OPTIONS} {EXPRESSION}
+
+# example -- find hidden files (files beginning with ".")
+find . -type f -name '.*'
+
+# example -- find log files by extension
+find . -name ".log"
+
+# example -- find files at the top of system owned by root user having a SUID permission bit set (-perm -4000)
+find / -user root -perm -4000
+```
+
+**Options**
+| options                       | description                                        |
+|-------------------------------|----------------------------------------------------|
+| -atime {NUMBER_OF_DAYS}       | file was accessed a given number of days ago       |
+| -mtime {NUMBER_OF_DAYS}       | file was modified a given number of days ago       |
+| -size  {FILE_SIZE_IN_BLOCKS}  | files in a given # of blocks (1 block = 512 bytes) |
+| -type  {FILE_TYPE}            | specify file type (f=plain text, d=directory)      |
+| -exec  {COMMAND}              |
+
+### Find File Based on Content
+Run `grep` command for every file that satisfies the conditions. Print matches to console.
+```shell
+find . -type f -exec grep "CONTENT_TO_SEARCH" '{}' \; -print
+```
+The curly braces (`{}`) are a placeholder for the `find` match results, and are enclosed with single quotes to avoid passing the `grep` command malformed filenames. The `-exec` command is terminated with an escaped semicolon (`\;`) to avoid interpretation  by the shell.
+
+### Search for Content with Regular Expressions
+```shell
+# search current directory for a file containing text "TableOrderingFilter"
+find . -type f -exec grep "\w*[T|t]able[O|o]rdering[F|f]ilter\w*" '{}' \; -print
+
+# search for file containing "OrderingFilter" that does not begin with a period
+find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 ```
