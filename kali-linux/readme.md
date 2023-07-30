@@ -43,6 +43,13 @@ Table of Contents
     - [Examples](#examples)
     - [Output Results to File](#output-results-to-file)
     - [sources](#sources-1)
+  - [PostgreSQL](#postgresql)
+    - [Create Database](#create-database)
+    - [Create User](#create-user)
+    - [Set Password](#set-password)
+    - [Associate User with Database](#associate-user-with-database)
+    - [Drop Tables](#drop-tables)
+    - [Truncate Table](#truncate-table)
 - [Process Management](#process-management)
   - [ps](#ps)
   - [top](#top)
@@ -519,6 +526,66 @@ cat ResultsOpenMySQLPorts
   - [Port Scanning Techniques and Algorithms](https://nmap.org/book/scan-methods.html)
   - [Reference Guide](https://nmap.org/book/man.html)
 - [nmap wiki](https://en.wikipedia.org/wiki/Nmap)
+
+## PostgreSQL
+```shell
+# login
+psql -U {USERNAME} {DATABASE}
+```
+Inside PostgreSQL
+```sql
+-- list user info
+\du
+
+-- deactivate pagination
+\pset pager off
+
+-- list database tables
+\dt
+
+-- list columns in table
+\d {TABLE_NAME}
+```
+
+### Create Database
+```sql
+CREATE DATABASE {DB_NAME};
+```
+
+### Create User
+```shell
+
+# MacOS -- If postgres installed through Homebrew, create user by:
+/usr/local/opt/postgres/bin/createuser -s {USERNAME}
+```
+
+### Set Password
+```sql
+\password {USERNAME}
+```
+
+### Associate User with Database
+Create root user with admin privileges. Login to create a user that will have privileges to create and manage databases within the service.
+```sql
+CREATE ROLE newUser WITH LOGIN PASSWORD 'password';
+ALTER ROLE newUser CREATEDB;
+
+-- grant user access to a database
+GRANT ALL PRIVILEGES {DATABASE_NAME} TO {USERNAME}
+```
+
+### Drop Tables
+```sql
+DROP TABLE {TABLE_NAME}
+```
+
+### Truncate Table
+Truncate/remove data from table(s).
+```sql
+TRUNCATE {TABLE_NAME}, {SECOND_TABLE_NAME}
+```
+
+
 
 # Process Management
 ## ps
