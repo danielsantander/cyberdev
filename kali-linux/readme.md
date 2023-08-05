@@ -32,6 +32,8 @@ Table of Contents
     - [Removing Software](#removing-software)
     - [Remove Software and Configurations](#remove-software-and-configurations)
 - [Applications](#applications)
+  - [Apache Web Server (apache2)](#apache-web-server-apache2)
+    - [Configure Web Server](#configure-web-server)
   - [Metasploit](#metasploit)
     - [PostgreSQL (postgres)](#postgresql-postgres)
     - [Start Metasploit](#start-metasploit)
@@ -339,12 +341,22 @@ systemctl status resolvconf.service
 
 # Packages and Services
 ## Manage Services
+A service is a program or application that runs in the background waiting to be used. Manage these services through the command line.
 ```shell
 # Manage Services
 service {service_name} {start|stop|restart}
 
 # List Services
 service --status-all | grep "+";
+
+# start service
+$ service {service_name} start
+
+# stop service
+$ service {service_name} stop
+
+# restart service to capture any new configuration changes made
+$ service {service_name} restart
 ```
 
 ## Manage Software
@@ -385,6 +397,32 @@ apt-get purge {package-name}
 ```
 
 # Applications
+## Apache Web Server (apache2)
+A free and open-source Web server software created by American software developer Robert McCool. Apache was released in 1995.
+
+> Apache comes already installed on Kali Linux and many other Linux distros.
+
+```shell
+# install
+apt-get install apache2
+
+# start server -- once started, the default web page can be accessed at http://localhost/
+sudo services apache2 start
+```
+### Configure Web Server
+Apache's default index page is located at `/var/www/html/index.html`.
+
+Update index page `/var/www/html/index.html`.
+```html
+<html>
+  <body>
+    <h1>Homepage</h1>
+    <p>This is the new default web page.</p>
+  </body>
+</html>
+```
+> If the page is not updating, try restarting the Apache2 service with `sudo service apache2 restart`
+
 ## Metasploit
 Steps for exploiting a system:
 1. Check if target system is vulnerable to an exploit
