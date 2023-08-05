@@ -1,5 +1,103 @@
 #! /bin/bash
+# Hello World script
 
-# Hello world script
+echo -e "\n------------\nHello World!\n------------\n"
 
-echo "Hello World!"
+# -------------------------------------------
+# dates
+# -------------------------------------------
+NOW=`date`; # or NOW=$(date)
+
+## Time in 12 hr format -- date +'%r' ###
+NOW_TIME_12_HR_FMT=$(date +%r)
+
+## Time in 24 hr format -- date +'%r' ###
+NOW_TIME_24_HR_FMT=$(date +%R)
+
+### mm/dd/yyyy -- date +'%m/%d/%Y' ###
+NOW_FORMATTED=$(date +%m/%d/%Y)
+
+
+# ---------------------------------------------------
+# args -- retrieve or set default script arguments
+# ---------------------------------------------------
+if [ $# -eq 0 ]; then # '$#' will return num of input arguments
+    echo "No arguments supplied"
+fi
+ARG1=${1:-foo}          # default value is 'foo'
+ARG2=${2:-'bar is'}     # default value is 'bar is'
+ARG3=${3:-1}            # default value is '1'
+ARG4=${4:-$NOW}         # default value is current date
+
+# ---------------------------------------------------
+# regular expressions
+# ---------------------------------------------------
+RE_IP_ADDRESS='[0-9]{1,3}.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}'
+RE_STRICT_IP_ADDRESS='^[0-9]{1,3}.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'
+RE_DATE_FORMAT_MMDDYYY='^[0-9]{2}[-/][0-9]{2}[-/][0-9]{4}$'
+
+# ---------------------------------------------------
+# functions
+# ---------------------------------------------------
+main () {
+    if [[ -z $ARG1 ]]; then     # True if zero length (-z means non-defined or empty)
+        arg=""
+    else
+        # use the ${var,,} syntax to convert to lowercase (only in Bash 4.0)
+        # use awk to utilize lowercase -- b=`echo "$a" | awk '{ print toupper($1) }'`
+        arg=`echo "$ARG1" | awk '{print toupper($1) }'`;    # uppercase
+        arg=`echo "$ARG1" | awk '{print tolower($1) }'`;    # lowercase
+    fi
+
+    # return ouput based on arg input
+    if [[ $arg =~ ^dates?$ ]]; then
+        PrintDates
+        # echo "PrintDates exit status: $?"    # return the exit status of last command (0 for Success, 1 for Failure)
+    elif [[ $arg =~ ^arg(ument)?s?$ ]]; then
+        PrintArgs
+        # echo "PrintArgs exit status: $?"    # (0 for Success, 1 for Failure)
+    else
+        PrintIpAddress
+        # echo "PrintIpAddress exit status: $?"    # (0 for Success, 1 for Failure)
+    fi
+
+}
+
+PrintDates () {
+    printf "\nPrinting dates...\n"
+    printf "\tCurrent date and time is: %s\n" "$NOW"
+    printf "\tCurrent date formatted is: %s\n" "$NOW_FORMATTED"
+    printf "\tCurrent time in 12 hour format: %s\n" "$NOW_TIME_12_HR_FMT"
+    printf "\tCurrent time in 24 hour format: %s\n" "$NOW_TIME_24_HR_FMT"
+
+}
+
+PrintArgs () {
+    echo -e "\nPrinting Arguments..."
+    echo -e "\t$ARG1"
+    echo -e "\t$ARG2"
+    echo -e "\t$ARG3"
+    echo -e "\t$ARG4"
+}
+
+PrintIpAddress () {
+    EN0_NETWORK=`ifconfig en0 | grep inet`  # MacOS
+
+    if [[ $EN0_NETWORK =~ $RE_IP_ADDRESS ]]; then
+        echo -e "\nIP Address: $BASH_REMATCH"
+    else
+        echo -e "\nno IP address found"
+    fi
+}
+
+Diablo () {
+    ARG1=${1:-'12-34-5678'}
+    [[ $ARG1 =~ $RE_DATE_FORMAT_MMDDYYY ]] && echo "$ARG1 in format MM/DD/YYY" || echo "no"
+}
+
+
+#----------------
+# MAIN
+#----------------
+main MYFAKEVALUE
+echo ""
