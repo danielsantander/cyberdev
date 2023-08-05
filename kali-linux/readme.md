@@ -63,6 +63,11 @@ Table of Contents
     - [rc](#rc)
   - [kill](#kill)
 - [Commands](#commands)
+  - [curl](#curl)
+    - [GET Request](#get-request)
+    - [POST Request](#post-request)
+    - [PUT Request](#put-request)
+    - [curl sources](#curl-sources)
   - [dig](#dig)
     - [dig options](#dig-options)
   - [find](#find)
@@ -744,6 +749,27 @@ Signal Value Options (optional)
 | SIGTERM | 15  | Termination signal (TERM): default kill signal               |
 
 # Commands
+## curl
+### GET Request
+```shell
+curl -X GET '{url}' --header "key:value ${ENVIRONMENT_VARIABLE}"
+```
+
+### POST Request
+```shell
+curl -X POST '{url}' -H "Content-Type: application/json" -d '{"key1":"value"}'
+```
+
+### PUT Request
+```shell
+curl -X PUT '{url}' -H "Content-Type: application/json" -d '{"key1":"value"}'
+```
+
+### curl sources
+- [Site](https://curl.se/)
+- [GitHub](https://github.com/curl/curl)
+- [wiki](https://en.wikipedia.org/wiki/CURL)
+
 ## dig
 Domain Information Groper (DIG) tool is used for performing DNS querying.
 > By default `dig` uses the servers listed in `/etc/reolv.conf` file.
