@@ -73,6 +73,9 @@ Table of Contents
   - [find](#find)
     - [Find File Based on Content](#find-file-based-on-content)
     - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
+- [Environment Variables](#environment-variables)
+  - [Change variables](#change-variables)
+  - [Update PATH](#update-path)
 
 More Docs:
 - [Documentation](docs/README.md)
@@ -887,4 +890,83 @@ find . -type f -exec grep "\w*[T|t]able[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 
 # search for file containing "OrderingFilter" that does not begin with a period
 find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
+```
+
+# Environment Variables
+Key-value string pairs that are inherited by any child shells or system processes.
+> Shell variables: different from Environment variables in that they are only valid within shell they are created in.
+
+```shell
+# view default environment variables on the system
+env
+
+# view shell-local variables (including shell functions) -- pipe with 'more' to iterate
+set | more
+
+# example -- use `grep` to filter environment variables
+set | grep HISTSIZE
+HISTSIZE=500
+
+# example -- change variable `HISTSIZE` so the system will not save past commands for the current session
+HISTSIZE=0
+```
+
+## Change variables
+Change variables for current session
+```shell
+# single value usage:
+KEY=value
+
+# multi value usage (common for setting PATH)
+KEY=value0;value1;value3;`
+
+# example -- Change shell prompt by updating `PS1`
+# The default prompt for kali is `username@hostname:current_directory`
+kali@kali: ~$ PS1='H@CK3R: $ '
+```
+
+> export variable to make permanent across all sessions: `export PS1`
+
+Change variables system wide with `export` command
+```shell
+export KEY=value
+
+# example -- Change shell prompt by updating `PS1`
+# The default prompt for kali is `username@hostname:current_directory`
+PS1='H@CK3R: $ '
+# export variable to make permanent across all sessions
+export PS1
+
+# example - update HISTSIZE system wide
+export HISTSIZE=100
+echo $HISTSIZE
+100
+```
+
+May be a good idea to save the current variable values in a text document before changing ENV variables system wide.
+```shell
+# make copy all environment variables
+$ echo set > ~/ValuesOfAllVariables.txt
+
+# make copy of just one
+$ echo $ENV_NAME > ValueOf_ENV_NAME.txt
+```
+
+use `unset` command to delete the new variable
+```shell
+$ unset NEWVARIABLE
+$ echo NEWVARIABLE
+```
+
+## Update PATH
+Update `PATH` environment variable to include a new tool directory named `/root/tools/MyNewTool` to allow `MyNewTool` to be executed anywhere on the system.
+
+> It's important to remember that you want to *append* to the `PATH`, *not* replace it's whole value.
+
+```shell
+# view PATH
+echo $PATH
+
+# update PATH
+PATH=$PATH:/root/tools/MyNewTool
 ```
