@@ -45,6 +45,7 @@ Table of Contents
     - [Examples](#examples)
     - [Output Results to File](#output-results-to-file)
     - [sources](#sources-1)
+  - [OpenSSH](#openssh)
   - [PostgreSQL](#postgresql)
     - [Create Database](#create-database)
     - [Create User](#create-user)
@@ -572,6 +573,22 @@ cat ResultsOpenMySQLPorts
   - [Port Scanning Techniques and Algorithms](https://nmap.org/book/scan-methods.html)
   - [Reference Guide](https://nmap.org/book/man.html)
 - [nmap wiki](https://en.wikipedia.org/wiki/Nmap)
+
+## OpenSSH
+Secure shell (SSH) is used to securely connect to a remote system, which enables:
+- creating a  user access list
+- authentication with encrypted passwords
+- communication encryption
+
+Start service
+```shell
+service ssh start
+```
+
+SSH into the remote machine
+```shell
+ssh {user}@{address}
+```
 
 ## PostgreSQL
 ```shell
