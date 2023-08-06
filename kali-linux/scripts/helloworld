@@ -81,7 +81,7 @@ PrintArgs () {
 }
 
 PrintIpAddress () {
-    EN0_NETWORK=`ifconfig en3 | grep inet`  # MacOS
+    EN0_NETWORK=`ifconfig en0 | grep inet`  # MacOS
 
     if [ $? != 0 ]; then
         echo -e "Retrieving IP address failed, miserably.\n"
