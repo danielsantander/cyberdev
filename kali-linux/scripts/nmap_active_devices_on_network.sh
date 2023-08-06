@@ -6,7 +6,7 @@ if [ -z "$1" ]
 else
     cidr=$1;
 fi
-echo""
+echo ""
 
 # Use expansion operator -> ${parameter:+[word]}
 #    Uses Alternative Value.
