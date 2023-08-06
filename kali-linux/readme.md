@@ -40,6 +40,14 @@ Table of Contents
     - [Setup PostgreSQL](#setup-postgresql)
     - [Connect to Database](#connect-to-database)
     - [sources](#sources)
+  - [MySql](#mysql)
+    - [Commands](#commands)
+    - [List Users](#list-users)
+    - [Set Password](#set-password)
+    - [SHOW Data](#show-data)
+    - [SELECT Data](#select-data)
+    - [Filter Data](#filter-data)
+    - [Connect to database](#connect-to-database-1)
   - [nmap](#nmap)
     - [Scan Type Options](#scan-type-options)
     - [Examples](#examples)
@@ -49,7 +57,7 @@ Table of Contents
   - [PostgreSQL](#postgresql)
     - [Create Database](#create-database)
     - [Create User](#create-user)
-    - [Set Password](#set-password)
+    - [Set Password](#set-password-1)
     - [Associate User with Database](#associate-user-with-database)
     - [Drop Tables](#drop-tables)
     - [Truncate Table](#truncate-table)
@@ -65,7 +73,7 @@ Table of Contents
     - [cron](#cron)
     - [rc](#rc)
   - [kill](#kill)
-- [Commands](#commands)
+- [Commands](#commands-1)
   - [curl](#curl)
     - [GET Request](#get-request)
     - [POST Request](#post-request)
@@ -85,7 +93,7 @@ More Docs:
   - [services](docs/15_services.md)
     - [Apache2](docs/15_services.md#apache-web-server)
     - [OpenSSH](docs/15_services.md#openssh)
-  - [MySQL](docs/MySQL.md)
+  <!-- - [MySQL](docs/MySQL.md) -->
   <!-- - [Metasploit](docs/Metasploit.md)
     - [PostgreSQL](docs/Metasploit.md#postgresql-postgres) -->
 - [Scripts](scripts/README.md)
@@ -510,6 +518,109 @@ msf6> db_disconnect
 
 ### sources
 - [Metasploit Wiki](https://en.wikipedia.org/wiki/Metasploit_Project)
+
+## MySql
+```shell
+# start service
+service mysql start
+
+# login
+mysql -u {username} -p
+
+# sudo command to login
+sudo mysql -u {username} -p
+
+# example -- root user's default password configuration is empty, press "ENTER" upon the password prompt
+sudo mysql -u root -p
+```
+
+### Commands
+|  operation  |   description                                       |
+|-------------|-----------------------------------------------------|
+| `SELECT`    | retrieve data                                       |
+| `UNION`     | combine results of two or more `select` operations  |
+| `INSERT`    | add/insert new data                                 |
+| `UPDATE`    | modify/update existing data                         |
+| `DELETE`    | remove/delete data                                  |
+
+The two default admin databases (information_schema, performance_schema) and one non-admin database (mysql):
+```sql
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
++--------------------+
+```
+
+### List Users
+```sql
+-- Retrieve user, host and password fields from `mysql` database and `user` table:
+SELECT user, host, password FROM mysql.user;
+```
+
+### Set Password
+```sql
+-- set password for root user
+UPDATE user SET password = PASSWORD("enter_password_here") where user = 'root';
+```
+
+### SHOW Data
+Show databases.
+```sql
+-- view databases
+SHOW DATABASES;
+
+-- view databases
+SHOW SCHEMAS;
+```
+
+Show tables.
+```sql
+SHOW TABLES FROM {database_name}
+
+-- example show table of mysql
+SHOW TABLES FROM mysql
+```
+
+Show columns.
+```sql
+-- display column field info of a table
+DESCRIBE {database_name.table_name}
+
+-- note: can also use 'DESC'
+DESC {database_name.table_name}
+
+-- note: can also do `SHOW COLUMNS`
+SHOW COLUMNS FROM {table_name}
+
+-- example
+DESCRIBE mysql.user;
+```
+
+### SELECT Data
+Retrieve data from a database table given the column name(s).
+```sql
+-- usage
+SELECT <col1,col2,col3> FROM <table_name>;
+```
+
+### Filter Data
+Use `LIKE` clause to filter the output given a pattern.
+```sql
+SHOW DATABASES LIKE {pattern};
+
+-- example list databases with names that start with 'open'
+SHOW DATABASES LIKE 'open%';
+Empty set (0.000 sec)
+```
+> percent sign (%) is used to express matching zero, one, or multiple characters.
+
+### Connect to database
+```sql
+USE {database_name}
+```
 
 ## nmap
 Network scanning tool. Send packets analyze responses to discover hosts and services on a computer network.
