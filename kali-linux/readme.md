@@ -89,14 +89,11 @@ Table of Contents
   - [Update PATH](#update-path)
 
 More Docs:
+- [scripting](docs/scripting.md)
 - [Documentation](docs/README.md)
   - [services](docs/15_services.md)
     - [Apache2](docs/15_services.md#apache-web-server)
     - [OpenSSH](docs/15_services.md#openssh)
-  <!-- - [MySQL](docs/MySQL.md) -->
-  <!-- - [Metasploit](docs/Metasploit.md)
-    - [PostgreSQL](docs/Metasploit.md#postgresql-postgres) -->
-- [Scripts](scripts/README.md)
 
 ---
 
