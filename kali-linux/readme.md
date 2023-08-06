@@ -84,6 +84,7 @@ Table of Contents
   - [find](#find)
     - [Find File Based on Content](#find-file-based-on-content)
     - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
+  - [hostname](#hostname)
 - [Environment Variables](#environment-variables)
   - [Change variables](#change-variables)
   - [Update PATH](#update-path)
@@ -756,8 +757,6 @@ Truncate/remove data from table(s).
 TRUNCATE {TABLE_NAME}, {SECOND_TABLE_NAME}
 ```
 
-
-
 # Process Management
 ## ps
 View processes and their assigned process identification number (PID).
@@ -1053,6 +1052,15 @@ find . -type f -exec grep "\w*[T|t]able[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 
 # search for file containing "OrderingFilter" that does not begin with a period
 find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
+```
+## hostname
+Get IP Address and hostname information.
+```shell
+# usage
+hostname -[option] [file]
+
+# example -- use `-I` option to get all IP addresses.
+hostname -I
 ```
 
 # Environment Variables

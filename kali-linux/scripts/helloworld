@@ -81,7 +81,9 @@ PrintArgs () {
 }
 
 PrintIpAddress () {
-    EN0_NETWORK=`ifconfig en0 | grep inet`  # MacOS
+    # TODO: determine which command to run based on shell
+    EN0_NETWORK=`hostname -I | awk '{print $1}'   # raspbian
+    EN0_NETWORK=`ifconfig en0 | grep inet`        # MacOS
 
     if [ $? != 0 ]; then
         echo -e "Retrieving IP address failed, miserably.\n"
