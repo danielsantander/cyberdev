@@ -19,8 +19,7 @@ if [ -z ${cidr+x} ]; then
 else
     echo "performing nmap (sP scan) on $cidr ..."
 
-    network=$(nmap -sP $cidr | awk '$NF ~ /[0-9]+(\.[0-9]+){3}/ {print $NF}')
-
+    network=$(nmap -sP $cidr | awk '$NF ~ /[0-9]+(\.[0-9]+)*/ {print $NF}')
     if [[ $? -gt 0 ]]; then
         echo -e "\n\nIP RETRIEVAL FAILED\n"
     elif [[ $? -eq 0 || -z $network ]]; then
