@@ -22,7 +22,7 @@ NOW_FORMATTED=$(date +%m/%d/%Y)
 # args -- retrieve or set default script arguments
 # ---------------------------------------------------
 if [ $# -eq 0 ]; then # '$#' will return num of input arguments
-    echo "No arguments supplied"
+    echo -e "No arguments supplied\n"
 fi
 ARG1=${1:-foo}          # default value is 'foo'
 ARG2=${2:-'bar is'}     # default value is 'bar is'
@@ -81,7 +81,12 @@ PrintArgs () {
 }
 
 PrintIpAddress () {
-    EN0_NETWORK=`ifconfig en0 | grep inet`  # MacOS
+    EN0_NETWORK=`ifconfig en3 | grep inet`  # MacOS
+
+    if [ $? != 0 ]; then
+        echo -e "Retrieving IP address failed, miserably.\n"
+        exit 1
+    fi
 
     if [[ $EN0_NETWORK =~ $RE_IP_ADDRESS ]]; then
         echo -e "\nIP Address: $BASH_REMATCH"
