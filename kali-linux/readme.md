@@ -88,6 +88,16 @@ Table of Contents
 - [Environment Variables](#environment-variables)
   - [Change variables](#change-variables)
   - [Update PATH](#update-path)
+- [Scripting](#scripting)
+  - [Terms](#terms)
+  - [Shebang](#shebang)
+  - [Exit Status Codes](#exit-status-codes)
+  - [Make Script Executable](#make-script-executable)
+  - [Conditions](#conditions)
+    - [Check Number of Input Args](#check-number-of-input-args)
+    - [Check If Variable Is Empty](#check-if-variable-is-empty)
+  - [Useful Commands](#useful-commands)
+    - [read](#read)
 
 More Docs:
 - [scripting](docs/scripting.md)
@@ -1141,4 +1151,75 @@ echo $PATH
 
 # update PATH
 PATH=$PATH:/root/tools/MyNewTool
+```
+
+# Scripting
+## Terms
+*Bash (Bourne-again shell)* - a type of shell available for Linux that can run any system commands, utilities, processes, programs, or applications.
+
+*shell* - an interface between the user and the operating system.
+
+## Shebang
+*shebang* - combination of a hash mark and an exclamation mark (`#!`) to communicate with the operating system which interpreter to use for the script.
+
+Bash
+```bash
+#!/bin/bash
+```
+
+Python
+```python
+#!/usr/bin/env python
+#!/usr/bin/python3
+```
+
+## Exit Status Codes
+Every command executed by the shell script or user, has an exit status integer number.
+
+| exit status       | value    |
+|-------------------|--------- |
+| 0                 | success  |
+| non-zero (1-255)  | failure  |
+
+> If a command is not found, the child process created to execute it returns a status of 127.
+> If a command is found but is not executable, the return status is 126.
+
+
+## Make Script Executable
+Change the permissions of script file to execute. Give all perms for file owner and read/execute perms for group and other users.
+```shell
+sudo chmod 755 {SCRIPT}
+```
+
+## Conditions
+### Check Number of Input Args
+Use `$#` to return the number of arguments.
+
+Compare if number of args is equal to zero (`-eq 0`) to assert no arguments were supplied.
+```shell
+if [ $# -eq 0 ]; then
+    echo "No arguments supplied"
+fi
+```
+
+### Check If Variable Is Empty
+Check if variable is non-defined/empty. Use `-z {string}` to return True if the length of string is zero.
+```shell
+# True if argument ($1) has zero length
+if [[ -z $1 ]]; then
+  do something
+fi
+```
+
+## Useful Commands
+### read
+Use the `read` command to retrieve and save user input.
+```shell
+#! /bin/bash
+echo 'What is your name?'
+
+# save input into variable
+read name
+
+echo "Welcome ${name}!"
 ```
