@@ -1028,6 +1028,9 @@ dig {domain} +noall +answer
 # usage
 find {LOCATION} {OPTIONS} {EXPRESSION}
 
+# example
+find . -name "pattern" -print
+
 # example -- find hidden files (files beginning with ".")
 find . -type f -name '.*'
 
@@ -1051,7 +1054,7 @@ find / -user root -perm -4000
 ### Find File Based on Content
 Execute `grep` command for every file that satisfies the conditions. Print matches to console.
 ```shell
-find . -type f -exec grep "CONTENT_TO_SEARCH" '{}' \; -print
+find . -type f -exec grep "EXAMPLE_TEXT_TO_SEARCH" '{}' \; -print
 ```
 The curly braces (`{}`) are a placeholder for the `find` match results, and are enclosed with single quotes to avoid passing the `grep` command malformed filenames. The `-exec` command is terminated with an escaped semicolon (`\;`) to avoid interpretation  by the shell.
 
