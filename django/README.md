@@ -6,6 +6,7 @@
 - [Migrations](#migrations)
   - [Create Empty Migration](#create-empty-migration)
   - [Run Migrations](#run-migrations)
+  - [Reverse All Migrations For An App](#reverse-all-migrations-for-an-app)
 - [Install Apps](#install-apps)
 - [Manage Commands](#manage-commands)
   - [flush](#flush)
@@ -69,10 +70,15 @@ python3 manage.py makemigrations {APP_NAME} --name {MIGRATION_FILENAME} --empty
 ```
 
 ## Run Migrations
-Run Migrate
+Create migrations.
 ```shell
 python3 manage.py makemigrations
 python3 manage.py migrate
+```
+
+## Reverse All Migrations For An App
+```shell
+python3 manage.py migrate {APP_NAME} zero
 ```
 
 # Install Apps
