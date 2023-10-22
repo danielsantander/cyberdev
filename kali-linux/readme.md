@@ -85,6 +85,7 @@ Table of Contents
     - [Find File Based on Content](#find-file-based-on-content)
     - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
   - [hostname](#hostname)
+  - [netcat](#netcat)
 - [Environment Variables](#environment-variables)
   - [Change variables](#change-variables)
   - [Update PATH](#update-path)
@@ -1076,6 +1077,22 @@ hostname -[option] [file]
 # example -- use `-I` option to get all IP addresses.
 hostname -I
 ```
+
+## netcat
+Allows users to read & write data over a network connection.
+
+Usage, where host is either a numeric IP address or s symbolic hostname, and port is either a numeric port a service name
+
+```shell
+nc [<options>] <host> <port>
+```
+
+Command Options
+| option    | type     | description        |
+|-----------|----------|--------------------|
+| -4        | protocol | Use IPv4 only      |
+| -6        | protocol | Use IPv6 only      |
+| -u, --udp | protocol | Use UDP connection |
 
 # Environment Variables
 Key-value string pairs that are inherited by any child shells or system processes.
