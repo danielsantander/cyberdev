@@ -16,7 +16,7 @@ LOGGER_NAME = 'ImageHelper'
 LOGGER_LEVEL = logging.DEBUG
 LOGGER = create_logger(name=LOGGER_NAME, level=LOGGER_LEVEL)
 
-def jpg_to_gif(img_dir:Union[str, Path], gif_dir:Union[str, Path]=None, gif_name:str=None, duration:float=0.5) -> None:
+def jpg_to_gif(img_dir:Union[str, Path, list[Path]], gif_dir:Union[str, Path]=None, gif_name:str=None, duration:float=None, do_sort:bool=True) -> None:
     """Combines a set of images from directory into a single gif image.
 
     Keyword arguments:
@@ -24,9 +24,18 @@ def jpg_to_gif(img_dir:Union[str, Path], gif_dir:Union[str, Path]=None, gif_name
     gif_dir -- directory path to save the converted gif image, defaults to img_dir if not provided. (default img_dir)
     duration -- gif time duration (default 0.5)
     """
-    # ensure input directories are pathlib.Path objects
-    img_dir = img_dir if isinstance(img_dir, Path) else Path(img_dir)
-    if gif_dir == None: gif_dir = img_dir
+    duration:float = 0.5 if duration is None else duration
+    img_path_list = []
+    if isinstance(img_dir, list):
+        img_path_list = img_dir
+    elif isinstance(img_dir, str):
+        img_dir=Path(img_dir)
+
+    if isinstance(img_dir, Path):
+        assert img_dir.exists() and img_dir.is_dir() #and any(img_dir.iterdir())
+        img_path_list = [x for x in img_dir.iterdir() if x.is_file()]
+
+    if gif_dir is None: gif_dir = img_dir
     else: gif_dir = gif_dir if isinstance(gif_dir, Path) else Path(gif_dir)
 
     # construct gif image name, defaults to current datetime value
@@ -40,7 +49,8 @@ def jpg_to_gif(img_dir:Union[str, Path], gif_dir:Union[str, Path]=None, gif_name
     else: raise InvalidDirectory
 
     # gif conversion
-    images = [imageio.imread(x.resolve()) for x in img_dir.iterdir() if x.is_file()]
+    img_path_list = sorted(img_path_list, key=lambda i: i.name) if do_sort else img_path_list
+    images = [imageio.imread(x.resolve()) for x in img_path_list if x.is_file()]
     imageio.mimsave(gif_path, images, 'GIF', duration=duration)
     return gif_path
 
