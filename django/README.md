@@ -13,6 +13,8 @@
   - [test](#test)
 - [Django Shell](#django-shell)
   - [Get Django User Model](#get-django-user-model)
+- [Django Sessions](#django-sessions)
+  - [Session settings](#session-settings)
 - [Integrate Redis into Project](#integrate-redis-into-project)
 
 ---
@@ -114,6 +116,8 @@ Args:
 Run tests for installed apps.
 ```shell
 django-admin test [test_label [test_label ...]]
+# or
+python3 manange.py test [test_label [test_label ...]]
 ```
 
 #  Django Shell
@@ -125,8 +129,39 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 ```
 
-# Integrate Redis into Project
+ # Django Sessions
+The Django session framework supports anonymous and user sessions, which allows storage of arbitrary data for each visitor. Session data is stored on  the server side, and cookies contain the session ID unless the cookie-based session engine is used.
 
+To use sessions, ensure that the `MIDDLEWARE` settings contains:
+```python
+'django.contrib.sessions.middleware.SessionMiddleware'
+```
+> it is added by default when creating a new project using the `startproject` command.
+
+Access the current session from the request object using `request.session`
+```python
+# set a variable in the session
+request.session['foo'] =  'bar'
+
+# retrieve a session key
+request.session.get('foo')
+
+# delete a key previously stored in sessino
+del request.session['foo']
+```
+
+## Session settings
+Customize sessions with specific settings such as:
+- `SESSION_COOKIE_AGE`: The duration of session cookies in seconds. The default value is 1209600 (two weeks)
+- `SESSION_COOKIE_DOMAIN`: The domain used for session cookies. Set this to mydomain.com to enable cross-domain cookies or use None for standard domain cookies.
+- `SESSION_COOKIE_SECURE`: A boolean indicating that the cookie should only be sent if the connection is an HTTPS connection
+- `SESSSION_EXPIRE_AT_BROWSER_CLOSE`: A boolean indicating that the session has to expire when the browser is closed. This is set to False by default, forcing the session duration to the valued stored in the "SESSION_COOKIE_AGE".
+- `SESSSION_SAVE_EVERY_REQUEST`: A Boolean that, if True, will save the session to the database on every request. The session exipiration is also updated each time it's saved.
+
+> Use `request.session.set_expiry()` method to overwrite the duration of the current session.
+
+
+# Integrate Redis into Project
 Update settings.py file:
 ```python
 ```
