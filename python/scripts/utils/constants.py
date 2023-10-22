@@ -1,6 +1,9 @@
 from typing import List
 
-DEFAULT_DATETIME_FMT = '%Y%m%d%H%M%S'
+DEFAULT_DATETIME_FMT_SHORT = '%Y%m%d'
+DEFAULT_DATETIME_FMT_LONG = '%Y%m%d%H%M%S'
+
+DEFAULT_LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 
 # DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%d %I:%M:%S"
@@ -26,3 +29,6 @@ RE_SCAN_FILE = r'scan_(?P<date>\d{4}\d{2}\d{2})(?P<time>\d{2}\d{2}\d{2})\.(?P<ex
 RE_POSIX_TIME = r'.*(?P<date>\d{10}).*$'
 
 RE_FILE_EXTENSION = r'\.(?P<extension>\w+$)'
+
+# YYYY-MM-DD HH:MM:SS w/ grouping of: year month, date
+RE_NASA_IMG_DATES = "^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<date>\d{1,2}).*$"
