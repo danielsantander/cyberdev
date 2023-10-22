@@ -35,6 +35,7 @@ def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
     if not p.exists():
         if not p.parent.exists(): p.parent.mkdir()
         p.touch()
+    p = p if str(p.name).endswith('.json') else p.parent/f"{p.name}.json"
 
     with open(p.absolute(), "w") as f:
         # json.dump(dict, f, indent=2)  # should work as well
