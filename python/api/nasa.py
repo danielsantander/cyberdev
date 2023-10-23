@@ -20,15 +20,10 @@ API_DIR = os.path.dirname(os.path.abspath(__file__)) # ./python/api
 PY_DIR = os.path.dirname(API_DIR)                    # ./python
 SCRIPTS_DIR = os.path.abspath(f"{PY_DIR}/scripts")   # ./python/scripts
 sys.path.insert(0, SCRIPTS_DIR)
-from utils import constants, custom_exceptions, custom_logging, file_helper, image_helper, navigation, validation
+from utils import constants, custom_exceptions, custom_logging, file_helper, image_helper, navigation, script_helper, validation
 
 def get_args():
-    parser = argparse.ArgumentParser(description="NASA API")
-    parser.add_argument('-d','--debug',
-        dest='debug',
-        action='store_true',
-        default=DEBUG_MODE,
-        help=f'Debug mode. [{DEBUG_MODE}]')
+    parser = script_helper.get_args(description="NASA API", debug_mode=DEBUG_MODE)
     parser.add_argument('--noinput',
                         dest='noinput',
                         action='store_true',
