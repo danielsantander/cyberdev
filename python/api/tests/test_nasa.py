@@ -28,7 +28,7 @@ class TestNASA(unittest.TestCase):
     def tearDown(self) -> None:
         if self.test_dir.exists() and self.test_dir.is_dir(): clean_dir(self.test_dir)
 
-    def test_get_image_data(self):
+    def test_get_epic_images(self):
         self.nasa.get_epic_images()
         nasa_dir: Path = self.test_dir / 'nasa'
         gif_dir: Path = nasa_dir / 'gifs'
