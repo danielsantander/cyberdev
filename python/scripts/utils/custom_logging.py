@@ -18,11 +18,11 @@ LOG_FORMAT_STR = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 LOG_FORMAT = logging.Formatter(LOG_FORMAT_STR)
 
 
-def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL, format:str=None) -> logging.Logger:
+def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL, format:Union[str, logging.Formatter]=LOG_FORMAT) -> logging.Logger:
     """
     Return a custom logger with stream (console) handler.
     """
-    log_format = logging.Formatter(format) if format is not None else LOG_FORMAT
+    log_format = logging.Formatter(format) if isinstance(format, str) else format
     logger = logging.getLogger(name)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(level)
@@ -31,7 +31,7 @@ def create_console_logger(name:Optional[str]=None, level:int=LOG_LEVEL, format:s
     logger.setLevel(level)
     return logger
 
-def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=LOG_DIR, max_byte_size:int=10*1024*1024, backup_count:int=5, format:str=None) -> logging.Logger:
+def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=LOG_DIR, max_byte_size:int=10*1024*1024, backup_count:int=5, format:Union[str, logging.Formatter]=LOG_FORMAT) -> logging.Logger:
     """
     Return logger with Stream and RotatingFile handlers.
     Creates log directory if one does not exist, and initializes a master_logger file.
@@ -47,7 +47,7 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=LOG_DIR
     logger.setLevel(logging.DEBUG)
     log_dir = log_dir if isinstance(log_dir, Path) else Path(log_dir)
     log_dir = navigation.make_directory(log_dir)
-    log_format = logging.Formatter(format) if format is not None else LOG_FORMAT
+    log_format = logging.Formatter(format) if isinstance(format, str) else format
 
     # Master logger (holds all logs)
     master_location = os.path.join(log_dir, "master_logger.log")
