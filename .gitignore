@@ -25,6 +25,4 @@ venv.bak/
 notes.md
 
 # NASA media files
-python/api/nasa/gifs/
-python/api/nasa/images/
-python/api/nasa/data/
+python/api/nasa/
