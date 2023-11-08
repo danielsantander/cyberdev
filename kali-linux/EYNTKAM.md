@@ -1,3 +1,4 @@
+EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
 Table of Contents
 - [Tips](#tips)
   - [Check Kali Linux Version](#check-kali-linux-version)
