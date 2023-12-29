@@ -1,7 +1,13 @@
 EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
+---
 Table of Contents
 - [Tips](#tips)
+  - [Install](#install)
+    - [Kali for Rasberry Pi 4](#kali-for-rasberry-pi-4)
   - [Check Kali Linux Version](#check-kali-linux-version)
+  - [View Bit Size](#view-bit-size)
+  - [Determine revision of current firmware](#determine-revision-of-current-firmware)
+  - [Update and Upgrade System](#update-and-upgrade-system)
   - [Change Shell](#change-shell)
   - [Script Shebang](#script-shebang)
   - [Print Random Line From File](#print-random-line-from-file)
@@ -32,9 +38,15 @@ Table of Contents
     - [Upgrade Packages](#upgrade-packages)
     - [Removing Software](#removing-software)
     - [Remove Software and Configurations](#remove-software-and-configurations)
+    - [Repository Source List File](#repository-source-list-file)
 - [Applications](#applications)
   - [Apache Web Server (apache2)](#apache-web-server-apache2)
     - [Configure Web Server](#configure-web-server)
+  - [Docker](#docker)
+    - [Check Storage](#check-storage)
+    - [System Prune](#system-prune)
+    - [Delete](#delete)
+    - [Reboot Docker Services](#reboot-docker-services)
   - [Metasploit](#metasploit)
     - [PostgreSQL (postgres)](#postgresql-postgres)
     - [Start Metasploit](#start-metasploit)
@@ -43,12 +55,12 @@ Table of Contents
     - [sources](#sources)
   - [MySql](#mysql)
     - [Commands](#commands)
+    - [Connect to database](#connect-to-database-1)
     - [List Users](#list-users)
     - [Set Password](#set-password)
     - [SHOW Data](#show-data)
     - [SELECT Data](#select-data)
     - [Filter Data](#filter-data)
-    - [Connect to database](#connect-to-database-1)
   - [nmap](#nmap)
     - [Scan Type Options](#scan-type-options)
     - [Examples](#examples)
@@ -75,18 +87,31 @@ Table of Contents
     - [rc](#rc)
   - [kill](#kill)
 - [Commands](#commands-1)
+  - [bzip2 (compress)](#bzip2-compress)
+  - [bunzip](#bunzip)
+  - [compress](#compress)
   - [curl](#curl)
     - [GET Request](#get-request)
     - [POST Request](#post-request)
     - [PUT Request](#put-request)
     - [curl sources](#curl-sources)
+  - [dd](#dd)
+  - [df](#df)
   - [dig](#dig)
     - [dig options](#dig-options)
   - [find](#find)
     - [Find File Based on Content](#find-file-based-on-content)
     - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
+  - [Filesystem Checks (fsck)](#filesystem-checks-fsck)
+  - [gzip](#gzip)
+    - [Compress gzip (GNU zip)](#compress-gzip-gnu-zip)
+    - [Decompress gunzip (GNU unzip)](#decompress-gunzip-gnu-unzip)
   - [hostname](#hostname)
   - [netcat](#netcat)
+  - [tar](#tar)
+    - [Compress](#compress-1)
+    - [View Archived File Contents](#view-archived-file-contents)
+    - [Extract Archive File Contents](#extract-archive-file-contents)
 - [Environment Variables](#environment-variables)
   - [Change variables](#change-variables)
   - [Update PATH](#update-path)
@@ -100,6 +125,13 @@ Table of Contents
     - [Check If Variable Is Empty](#check-if-variable-is-empty)
   - [Useful Commands](#useful-commands)
     - [read](#read)
+- [Filesystem Management](#filesystem-management)
+  - [Device Directory (/dev/)](#device-directory-dev)
+  - [Partitions](#partitions)
+  - [List Block Devices (lsblk)](#list-block-devices-lsblk)
+  - [Mounting Devices (mount)](#mounting-devices-mount)
+  - [Unmounting Devices (unmount)](#unmounting-devices-unmount)
+  - [Filesystem Checks](#filesystem-checks)
 
 More Docs:
 - [scripting](docs/scripting.md)
@@ -111,9 +143,38 @@ More Docs:
 ---
 
 # Tips
+## Install
+### Kali for Rasberry Pi 4
+[src](https://www.kali.org/docs/arm/raspberry-pi-4/)
+
+**Prereq**
+> We recommend using the 32-bit image on Raspberry Pi devices as that gets far more testing, and a lot of documentation out there expects you to be running RaspberryPi OS which is 32-bit.
+
 ## Check Kali Linux Version
 ```bash
-$ lsb_release -a
+lsb_release -a
+```
+
+## View Bit Size
+```shell
+uname -m
+# Output Expected:
+# - aarch64 (for 64 bit)
+# - armv7l (for 32 bit)
+```
+
+## Determine revision of current firmware
+```shell
+uname -a
+# Linux kermit 3.12.26+ #707 PREEMPT Sat Aug 30 17:39:19 BST 2014 armv6l GNU/Linux
+#                         /
+#                        /
+#   firmware revision --+
+```
+
+## Update and Upgrade System
+```shell
+sudo apt-get update && sudo apt-get upgrade
 ```
 
 ## Change Shell
@@ -148,6 +209,7 @@ chgrp {group_name} {file}
 # example
 chgrp blueteam newProgram
 ```
+> **Group inheritance**: `root user` is part of `root group` by default. Each new user will need to be added to a group in order to inherit the permissions of that group.
 
 ## Permission Levels
 Three level of permissions:
@@ -195,6 +257,7 @@ Operator symbols
 ```
 
 ```shell
+# usage
 chmod {UGO value} {operator value} {directory or file}
 
 # example -- remove write perms from the user the file belongs to
@@ -217,7 +280,7 @@ d  rwxr-xr-x   1     root  root  752   Sep 5 04:56  script.sh
 
 Where:
 1. File type: first character of the line, 'd' for directory, '-' for file.
-2. Permissions (rwxrwxrwx): in order of file ower, group, and all other users.
+2. Permissions (rwxrwxrwx): in order of file owner, group, and all other users.
 3. Number of links
 4. Owner of file
 5. File size (bytes)
@@ -241,6 +304,7 @@ vi /home/{user}/.profile
 vi /home/root/.profile
 umask 077
 ```
+
 
 # Network
 ## Check Wireless Network Devices
@@ -273,7 +337,9 @@ sudo dhclient eth0
 ```
 
 ## Change IP Address
+
 ```shell
+# usage:
 ifconfig {interface} {new_ip_address}
 
 # Example
@@ -298,6 +364,7 @@ ff02::2 ip6-allrouters
 ```
 
 ## Change Network Mask and Broadcast
+Use `ifconfig` command to change the network mask (netmask) and broadcast address.
 ```shell
 ifconfig eth0 192.168.180.115 netmask 255.255.0.0 broadcast 192.168.1.255
 ```
@@ -339,6 +406,7 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 cat /etc/resolv.conf
 nameserver 8.8.8.8
 ```
+> The machine will now go out to Google's DNS server rather than the initial local DNS server to resolve the domain names into IP addresses.
 
 ### Regenerate resolvconf
 ```shell
@@ -382,6 +450,7 @@ $ service {service_name} restart
 Advanced Packaging Tool (apt) is the default software manager for debian-based Linux distributions. Usage: `apt-get`
 
 ### Search for Packages
+Before downloading a software package, check whether the package is available from the repository.
 ```shell
 # search for software packages before downloading
 apt-cache search {keyword}
@@ -403,6 +472,7 @@ Actually upgrade the packages to the latest version
 ```shell
 apt-get upgrade
 ```
+> `apt-get update` updates the list of available packages and their versions, but does not install or upgrade any packages. Whereas `apt-get upgrade` actually installs newer versions of the packages.
 
 ### Removing Software
 ```shell
@@ -413,6 +483,15 @@ apt-get remove {package-name}
 ### Remove Software and Configurations
 ```shell
 apt-get purge {package-name}
+```
+
+### Repository Source List File
+The `source.list` file contains repositories the system will search for software. Update this file to define which repositories to download software.
+
+To add a repository, add the name of the repository to the list and then save the file.
+
+```shell
+vi /etc/apt/sources.list
 ```
 
 # Applications
@@ -441,6 +520,59 @@ Update index page `/var/www/html/index.html`.
 </html>
 ```
 > If the page is not updating, try restarting the Apache2 service with `sudo service apache2 restart`
+
+## Docker
+
+Check status
+```shell
+systemctl status docker.service
+```
+
+Start Container
+```shell
+docker start -i {container_id}
+```
+
+### Check Storage
+Check Available Storage
+```shell
+docker system df
+```
+
+### System Prune
+Use prune to do some clean up and remove unused data. (view more info: `docker system prune --help`)
+```shell
+docker system prune --all --force
+
+# volumes are not pruned by default, must include `--volume`
+docker system prune -a --volumes
+```
+
+Remove all unused local volumes.
+```shell
+docker volume prune
+```
+
+### Delete
+Delete Untagged Images
+```shell
+docker rmi -f $(docker image ls -a | grep "<none>" | awk "{print \$3}")
+```
+
+### Reboot Docker Services
+```shell
+# check status
+systemctl status docker.service
+
+# stop docker
+sudo systemctl stop docker
+
+# reboot -- CAREFUL
+sudo reboot
+
+# sudo systemctl enable docker
+sudo systemctl start docker
+```
 
 ## Metasploit
 Steps for exploiting a system:
@@ -564,6 +696,11 @@ The two default admin databases (information_schema, performance_schema) and one
 +--------------------+
 ```
 
+### Connect to database
+```sql
+USE {database_name}
+```
+
 ### List Users
 ```sql
 -- Retrieve user, host and password fields from `mysql` database and `user` table:
@@ -626,11 +763,6 @@ SHOW DATABASES LIKE 'open%';
 Empty set (0.000 sec)
 ```
 > percent sign (%) is used to express matching zero, one, or multiple characters.
-
-### Connect to database
-```sql
-USE {database_name}
-```
 
 ## nmap
 Network scanning tool. Send packets analyze responses to discover hosts and services on a computer network.
@@ -771,8 +903,9 @@ TRUNCATE {TABLE_NAME}, {SECOND_TABLE_NAME}
 
 # Process Management
 ## ps
-View processes and their assigned process identification number (PID).
+View processes and their assigned unique process identification number (PID).
 ```shell
+# usage
 ps {options}
 
 # example -- view processes running on the system for all users
@@ -798,7 +931,7 @@ root        1249  0.0  0.1   9708  3372 pts/0    R+   00:11   0:00 ps aux
 Use `top` command to produce a list of processes ordered by resources used, starting with the largest. The output will refresh dynamically every 10 seconds.
 
 ## nice
-Start processes and manipulate their with the `nice` command. Elevate a process to allocate more resources speeding up it's completion.
+Start processes and manipulate their priority with the `nice` command. Elevate a process to allocate more resources speeding up it's completion.
 
 The "nice" value ranges from -20 to +19 with 0 being the default. Think of nice values as inverted in priority; the high nice value means a low priority, and a low nice value means a high priority.
 
@@ -824,9 +957,10 @@ renice 20 6789
 > Renice a process using the `top` command by entering the `R` key, the PID of the process, and then the new nice value.
 
 ## Run Background Processes
-Append an ampersand `&` at the end of a command.
+Start a process and run in the background by adding append an ampersand `&` at the end of a command.
 
 ```shell
+# usage
 {command} &
 
 # example
@@ -836,6 +970,7 @@ Append an ampersand `&` at the end of a command.
 ## Foreground Processes
 Move a process back to the foreground with `fg` command
 ```shell
+# usage
 fg {PID}
 
 # example
@@ -844,7 +979,7 @@ fg 6789
 
 ## Schedule Processes
 ### at
-A daemon to schedule executions to run once at some point of time.
+A daemon to schedule executions to run once at some point of time. Enter the `at` command followed by the time to execute, then an interactive shell prompt will be available to enter the command to execute.
 
 ```shell
 at {time_to_execute}
@@ -867,7 +1002,7 @@ at > /home/myscript.sh
 | at now + 2 weeks     | run in 2 weeks from the current time    |
 
 ### cron
-Utilize the cron daemon (crond) and the cron table (cront) for scheduling recurring tasks to execute.
+Utilize the cron daemon (crond) and the cron table (cront) for scheduling recurring tasks to execute. The cron table is used to to schedule tasks/jobs, located at `/etc/contab`. The cron daemon checks the cron table for which commands to run at the specified times. Edit the cron table with the `cront` command followed by the `-e` argument (edit), you will then be prompted to edit the crontable.
 
 > `/etc/crontab` is the system wide crontab, whereas `crontab -e` is per user. Specify which user with `crontab -e -u <username>`
 
@@ -878,7 +1013,13 @@ crontab -e
 *   *   *   *   *   echo 'foo'
 
 # example - run a backup of all your user accounts at 5 a.m every week with:
-# 0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+0 5 * * 1 tar -zcf /var/backups/home.tgz /home/
+
+# This will run every weekday at 10:00PM
+00 10 * * 1-5 backup /bin/backup.sh
+
+# This will run every weekday at 10:00PM
+00 10 * * 1-5 backup /bin/backup.sh
 ```
 
 Cron table input is represented as 7 fields:
@@ -899,12 +1040,12 @@ Use `update-rc.d` command to add or remove services to the `rc.d` script that wi
 ```shell
 update-rc.d {script_or_service_name} {remove|defaults|disable|enable}
 
-# example -- setup PostgreSQL to startup at system boot (ideal for avid users of Metasploit framework to store data). The following will add a line to rc.d script to start PostgreSQL on system boot.
+# example -- setup PostgreSQL to startup at system boot (ideal for avid users of Metasploit framework to store data).
+# The following will add a line to rc.d script to start PostgreSQL on system boot.
 update-rc.d postgresql defaults
 ```
 
 ## kill
-
 Kill system processes.
 ```shell
 kill -{signal_value} {PID}
@@ -916,7 +1057,7 @@ kill -9 6789
 kill -1 6789
 ```
 
-> Tip: use `killall` command to provide the process name instead of the PID. `killall -{signal} {process_name}`
+> Tip: use `killall` command to provide the process name instead of the PID. `killall -{signal} {process_name}` -> example: `killall -9 myprocessname`
 
 Signal Value Options (optional)
 | signal  | num |                                                              |
@@ -926,6 +1067,43 @@ Signal Value Options (optional)
 | SIGTERM | 15  | Termination signal (TERM): default kill signal               |
 
 # Commands
+## bzip2 (compress)
+Use `bzip2` to compress files (usually with better compression ratios than gzip). Uses extension `.tar.bz2`
+
+```shell
+# example: compress the `scriptArchive.tar` file
+bzip2 scriptArchive.*
+
+ls -lh
+-rw-r--r-- 1 kali kali  808 Apr  6 23:35 scriptArchive.tar.bz2
+```
+
+## bunzip
+Uncompress a file with the `bunzip` command.
+
+```shell
+# example: uncompress `scriptArchive.tar.bz2` file.
+bunzip2 scriptArchive.tar.bz2
+
+-rw-r--r-- 1 kali kali 10240 Apr  6 23:35 scriptArchive.tar
+```
+
+## compress
+`compress` command exports with file extension `.tar.Z`
+
+```shell
+# exports MyScript.tar.Z
+compress MyScript.*
+
+```
+
+Uncompress
+```shell
+# exports MyScript.tar
+uncompress MyScript.tar.Z
+```
+
+
 ## curl
 ### GET Request
 ```shell
@@ -947,11 +1125,49 @@ curl -X PUT '{url}' -H "Content-Type: application/json" -d '{"key1":"value"}'
 - [GitHub](https://github.com/curl/curl)
 - [wiki](https://en.wikipedia.org/wiki/CURL)
 
+## dd
+Use `dd` to make a bit-by-bit physical copy of storage devices without logical structures such as a filesystem. This can be used to recover artifacts such as deleted files.
+
+```shell
+# usage
+dd if=inputfile of=outputfile
+
+# example: make bit-by-bit copy of flashdrive
+dd if=/dev/sdb of=/root/flashdrivecopy bs=4096 conv:noerror
+```
+Where:
+| arg        | description                                                                                 |
+|------------|---------------------------------------------------------------------------------------------|
+| `bs`       | block size: Num of bytes read/written per block of data being copied [default = 512 bytes]  |
+| `noerror`  | Continue to copy even if errors occur.                                                      |
+
+## df
+Use Disk Free command `df` to monitor the state of the filesystem.
+
+The df command displays hard disks or mounted devices information such as disk space usage and availability.
+
+Usage where input `drive` is used to specify the drive to view information from. If no input, will default to the first drive on the system (i.e. `df sdb1`).
+
+```shell
+df {drive}
+
+# example - specify the first drive of the system
+df
+Filesystem     1K-blocks     Used Available Use% Mounted on
+...
+/dev/sda1       81000912 11078484  65761816  15% /
+...
+```
+
 ## dig
 Domain Information Groper (DIG) tool is used for performing DNS querying.
 > By default `dig` uses the servers listed in `/etc/reolv.conf` file.
 
 ```shell
+# check version
+dig -v
+DiG 9.10.6
+
 # usage
 dig {domain}
 
@@ -1039,7 +1255,7 @@ find . -type f -name '.*'
 # example -- find log files by extension
 find . -name ".log"
 
-# example -- find files at the top of system owned by root user having a SUID permission bit set (-perm -4000)
+# example -- find files at the top of system (/) owned by root user having a SUID permission bit set (-perm -4000)
 find / -user root -perm -4000
 ```
 
@@ -1069,6 +1285,45 @@ find . -type f -exec grep "\w*[T|t]able[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 ```
 
+## Filesystem Checks (fsck)
+Utilize the `fsck` command to check for any errors.
+
+> You must unmount the drive before running a filesystem check else you will receive an error.
+
+**Example:** Perform a filesystem check for any errors on device `/dev/sdb1/`
+```shell
+
+# first, unmount the device
+unmount /dev/sdb1
+
+# perform filesystem check
+fsck -p /dev/sdb1
+```
+
+## gzip
+### Compress gzip (GNU zip)
+Compress files using the `gzip` command. Uses extensions `.tar.gz` or `.tgz`.
+
+```shell
+# example: compress the `scriptArchive.tar` file
+ls -lh
+-rw-r--r-- 1 kali kali  10K Apr  6 20:41 scriptArchive.tar
+
+gzip scriptArchive.*
+-rw-r--r-- 1 kali kali  792 Apr  6 20:41 scriptArchive.tar.gz
+```
+> Note: wildcard `*` used as file extension to denote that the command should apply to any file that begins with `scriptArchive` with any extension.
+
+### Decompress gunzip (GNU unzip)
+Use `gunzip` command to decompress a `tar.gz` or `.tgz` file.
+```shell
+# example: decompress the `scriptArchive.tar.gz` file
+gunzip scriptArchive.*
+
+ls -lh
+-rw-r--r-- 1 kali kali  10K Apr  6 23:27 scriptArchive.tar
+```
+
 ## hostname
 Get IP Address and hostname information.
 ```shell
@@ -1094,6 +1349,67 @@ Command Options
 | -4        | protocol | Use IPv4 only      |
 | -6        | protocol | Use IPv6 only      |
 | -u, --udp | protocol | Use UDP connection |
+
+
+## tar
+### Compress
+Use `tar` command to compress files together and combine them into an archive (tape archive -> tar). The command will also compress files and directories recursively.
+
+*Example*: Combine a pair of scripts into one single archive.
+```shell
+ls -lh
+total 24K
+-rwxr-xr-x 1 kali kali   55 Apr  6 20:33 HelloWorld
+-rwxr-xr-x 1 kali kali 1.1K Apr  6 20:33 MySQLScan.sh
+
+tar -cvf scriptArchive.tar HelloWorld MySQLScan.sh
+HelloWorld
+MySQLScan.sh
+
+ls -lh
+-rwxr-xr-x 1 kali kali   55 Apr  6 20:33 HelloWorld
+-rwxr-xr-x 1 kali kali 1.1K Apr  6 20:33 MySQLScan.sh
+-rw-r--r-- 1 kali kali  10K Apr  6 20:41 scriptArchive.tar
+
+# example: compress a directory of stuff into a tar.
+tar -cvf archive.tar stuff
+
+# example: compress a directory of stuff into a gzip.
+tar -czvf archive.tar.gz stuff
+```
+> Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
+
+**tar options**
+| option | description                                      |
+|--------|--------------------------------------------------|
+|    c   | create archive                                   |
+|    f   | specify filename                                 |
+|    t   | show files from tarbell without extracting them  |
+|    v   | verbose                                          |
+|    x   | extract files from the tarball                   |
+|    z   | compress the archive with "gzip"                  |
+
+### View Archived File Contents
+Display files from the tarbell without extracting them.
+```shell
+# example: display files within `scriptArchive.tar` without extracting the file using the `t` option.
+```shell
+$ tar -tvf scriptArchive.tar
+-rwxr-xr-x kali/kali        55 2022-04-06 20:40 HelloWorld
+-rwxr-xr-x kali/kali      1094 2022-04-06 20:33 MySQLScan.sh
+```
+
+### Extract Archive File Contents
+Extract files from the tarball using the `tar` command.
+```shell
+# example: extract the files from `scriptArchive.tar` into the current directory.
+tar -xvf scriptArchive.tar
+HelloWorld
+MySQLScan.sh
+```
+> Notes:
+> - The `-v` switch will output which files are being extracted. Omit this switch to perform "silently" (without showing any output).
+> - If the extracted files already exist, `tar` will remove the existing files and replace them with the extracted files.
 
 # Environment Variables
 Key-value string pairs that are inherited by any child shells or system processes.
@@ -1176,9 +1492,11 @@ PATH=$PATH:/root/tools/MyNewTool
 
 # Scripting
 ## Terms
-*Bash (Bourne-again shell)* - a type of shell available for Linux that can run any system commands, utilities, processes, programs, or applications.
+*Bash (Bourne-again shell)* - A type of shell available for Linux that can run any system commands, utilities, processes, programs, or applications.
 
-*shell* - an interface between the user and the operating system.
+*shell* - An interface between the user and the operating system.
+
+*mounting* - Attaching drives or disks to the filesystem, making them available to the operating system.
 
 ## Shebang
 *shebang* - combination of a hash mark and an exclamation mark (`#!`) to communicate with the operating system which interpreter to use for the script.
@@ -1204,7 +1522,6 @@ Every command executed by the shell script or user, has an exit status integer n
 
 > If a command is not found, the child process created to execute it returns a status of 127.
 > If a command is found but is not executable, the return status is 126.
-
 
 ## Make Script Executable
 Change the permissions of script file to execute. Give all perms for file owner and read/execute perms for group and other users.
@@ -1244,3 +1561,68 @@ read name
 
 echo "Welcome ${name}!"
 ```
+
+# Filesystem Management
+## Device Directory (/dev/)
+The device directory (located at `/dev/`) contains a file representing every device on the system. Each file's permission is denoted with either a `c` or `b`.
+- character devices (`c`): receive data character by character, such as keyboards or mice.
+- block devices (`b`): communicate  in blocks of data (multiple bytes at a time), such as hard drives.
+
+The devices listed as `sda1, sda2, sda3, sdb` represent the hard drive (or USB flash drive) and its partitions.
+> Newer Serial ATA (SATA) interface drives and Small Computer System Interface (SCSI) hard drives are represented as `sda`. If more than one hard drives exist, Linux will increment the last letter of the name.
+> - `sda` -> First SATA hard drive
+> - `sdb` -> Second SATA hard drive
+> - `sdc` -> Third SATA hard drive
+
+```shell
+# long list the device directory for any hard drives/USB flash drives, and their partitions
+ls -l /dev/sd*
+```
+
+## Partitions
+Partitions of a storage device are labeled with a number after the drive designation name. For example, the first partition of the first SATA drive will be designated as sda1, and the second partition of the first SATA drive will be sda2.
+
+Use `fdisk` command to view the partitions on the Linux system (use w/ `-l` to list all partitions on the drive).
+```shell
+fdisk -l
+```
+
+## List Block Devices (lsblk)
+Use `lsblk` (list block) command to list information about each block device within `/dev/`.
+
+```shell
+lsblk
+
+# will output table with following header
+NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
+...
+```
+> The column `MOUNTPOINT` is the position/location the drive was attached to the filesystem.
+
+## Mounting Devices (mount)
+A storage device must be both physically and logically attached to the filesystem for the data to be available to the operating system.
+
+Mount pionts are locations in the directory tree where the devices area attached to. Two main mount opints in Linux are:
+1. `/mnt`: Usually used to mount internal hard drives.
+2. `/media`: Usually used to mount external USB devices (flash drives) and external USB hard drives.
+> The filesystems that are mounted on a system are kept in a file at `/etc/fstab/` (filesystem table) which is read by the system at every bootup.
+
+Example of mounting hard drive.
+```shell
+# mount a sbd1 hard drive to the /mnt directory, to access its content
+mount /dev/sdb1 /mnt
+```
+
+## Unmounting Devices (unmount)
+"Eject" a device to keep from causing damage to the files stored on the device.
+> Can not unmount a device that is busy, that is if the system is busy reading or writing data to the storage device.
+
+```shell
+# usage:
+unmount {file_entry_of_device}
+```
+
+## Filesystem Checks
+Utilize the [Disk Free `df` command](#df) to monitor the state of the filesystem.
+
+Perform filesystem checks on devices with the [Filesystem check `fsck` command](#filesystem-checks-fsck).
