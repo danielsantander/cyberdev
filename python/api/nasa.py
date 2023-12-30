@@ -23,6 +23,7 @@ sys.path.insert(0, SCRIPTS_DIR)
 from utils import constants, custom_exceptions, custom_logging, file_helper, image_helper, navigation, script_helper, validation
 
 def get_args():
+    # TODO: add output_dir option, utilize in EPIC.get_epic_images()
     parser = script_helper.get_args(description="NASA API", debug_mode=DEBUG_MODE)
     parser.add_argument('--noinput',
                         dest='noinput',

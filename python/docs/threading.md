@@ -49,7 +49,7 @@ if __name__ == '__main__':
 ## Daemon Threads
 Daemon threads will shut down immediately when the main program completes. If threads are running that are not daemon, the main program will wait for those threads to complete before exiting. However, uncompleted threads that *are* daemons will be terminated once the main program exits.
 
-When a python program exits, part of the shutdown process is cleaning up threading routines. `threading._shutdown()` iterates through all running threads and calls `.join()` on each that do not have a daemon flag set as True. 
+When a python program exits, part of the shutdown process is cleaning up threading routines. `threading._shutdown()` iterates through all running threads and calls `.join()` on each that do not have a daemon flag set as True.
 
 **Example**: Run the program again, this time as a daemon thread:
 ```python
@@ -107,7 +107,7 @@ def some_function(name: str):
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s: %(message)s', level=logging.INFO, datefmt="%H:%M:%S")
     start = time.time()
-    use_join = False  
+    use_join = False
     thread_list = []
 
     logging.info('MAIN\t: before creating multi-threads')
@@ -115,7 +115,7 @@ if __name__ == '__main__':
         t = threading.Thread(target=some_function, name=f'multi-thread-{i}', args=(i,))
         thread_list.append(t)
         t.start()
-    logging.info('MAIN\t: wait for multi-threads to finish')    
+    logging.info('MAIN\t: wait for multi-threads to finish')
 
     if (use_join):
         for index, t in enumerate(thread_list):

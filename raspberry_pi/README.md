@@ -1,40 +1,29 @@
 *Table of Contents*
-- [System Info](#system-info)
+- [Download Rasberry Pi OS](#download-rasberry-pi-os)
   - [View OS](#view-os)
   - [View Bit Size](#view-bit-size)
 - [Update and Upgrade System](#update-and-upgrade-system)
 - [Install Docker](#install-docker)
   - [Troubleshoot](#troubleshoot)
+- [Install Picamera](#install-picamera)
+- [raspi-config](#raspi-config)
+  - [Boot Raspberry Pi to Desktop GUI](#boot-raspberry-pi-to-desktop-gui)
 
-# System Info
+# Download Rasberry Pi OS
 Download Raspberry Pi Operating Systems here: https://www.raspberrypi.com/software/operating-systems/
 
 ## View OS
 ```shell
-$ cat /etc/os-release
-
-# returns the following:
-PRETTY_NAME="Raspbian GNU/Linux 10 (buster)"
-NAME="Raspbian GNU/Linux"
-VERSION_ID="10"
-VERSION="10 (buster)"
-VERSION_CODENAME=buster
-ID=raspbian
-ID_LIKE=debian
-HOME_URL="http://www.raspbian.org/"
-SUPPORT_URL="http://www.raspbian.org/RaspbianForums"
-BUG_REPORT_URL="http://www.raspbian.org/RaspbianBugs"
+cat /etc/os-release
 ```
 
 ## View Bit Size
 ```shell
-$ uname -m
+uname -m
 ```
 Output Expected:
 - aarch64 (64 bit)
 - armv7l (32 bit)
-
-
 
 # Update and Upgrade System
 ```shell
@@ -60,23 +49,12 @@ sudo docker run --rm hello-world
 ```
 
 ## Troubleshoot
+Check status
 ```shell
 systemctl status docker.service
-● docker.service - Docker Application Container Engine
-   Loaded: loaded (/lib/systemd/system/docker.service; disabled; vendor preset: enabled)
-   Active: failed (Result: exit-code) since Fri 2022-08-26 02:36:09 CDT; 1min 3s ago
-     Docs: https://docs.docker.com
- Main PID: 13459 (code=exited, status=1/FAILURE)
-
-Aug 26 02:36:09 raspberrypi systemd[1]: docker.service: Service RestartSec=100ms expired, scheduling res
-Aug 26 02:36:09 raspberrypi systemd[1]: docker.service: Scheduled restart job, restart counter is at 3.
-Aug 26 02:36:09 raspberrypi systemd[1]: Stopped Docker Application Container Engine.
-Aug 26 02:36:09 raspberrypi systemd[1]: docker.service: Start request repeated too quickly.
-Aug 26 02:36:09 raspberrypi systemd[1]: docker.service: Failed with result 'exit-code'.
-Aug 26 02:36:09 raspberrypi systemd[1]: Failed to start Docker Application Container Engine.
 ```
 
-**Reboot Docker Service**
+Reboot Docker Service
 ```shell
 systemctl status docker.service
 sudo systemctl stop docker
@@ -84,3 +62,53 @@ sudo reboot
 # sudo systemctl enable docker
 sudo systemctl start docker
 ```
+
+# Install Picamera
+- [source](https://picamera.readthedocs.io/en/release-1.13/install.html)
+
+Check (If no error, you’ve already got picamera installed)
+```shell
+python -c "import picamera"
+python3 -c "import picamera"
+```
+
+Install
+```shell
+# install
+sudo apt-get update
+sudo apt-get install python-picamera python3-picamera
+
+# update
+sudo apt-get update
+sudo apt-get upgrade
+
+# remove installation
+sudo apt-get remove python-picamera python3-picamera
+
+# ---------------------------------------------------------------------------
+# Alternate distro installation
+# (probably simplest to install system wide using Python’s pip tool)
+sudo pip install picamera
+
+# upgrade installation
+sudo pip install -U picamera
+
+# remove installation
+sudo pip uninstall picamera
+# ---------------------------------------------------------------------------
+```
+
+# raspi-config
+Raspberry Pi Configurations through CLI
+
+## Boot Raspberry Pi to Desktop GUI
+Open the Raspberry Pi configuration screen by running the following command:
+```shell
+sudo raspi-config
+```
+
+Within the configurations screen, look for and select the option of **Enable Boot to Desktop/Scratch**.
+
+In the next screen, choose **Desktop Login as user 'Pi' at the graphical desktop**
+
+Reboot after configuration changes submitted.

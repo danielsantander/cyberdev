@@ -40,5 +40,5 @@ class TestNASA(unittest.TestCase):
         self.assertTrue(data_dir.exists() and data_dir.is_dir())
 
 if __name__ == '__main__':
+    print(f"Testing NASA API...")
     unittest.main()
-    print(f"inside test API")

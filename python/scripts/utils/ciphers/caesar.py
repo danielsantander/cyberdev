@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 #!/usr/bin/python3
+
 """ Methods for utilizing the Caesar Cipher. """
 
 import argparse
@@ -14,8 +16,9 @@ def encrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->
     """ Encrypt message with the Caesar Cipher method.
 
     Keyword arguments:
-    message -- message to encrypt (required)
-    offset -- number of characters in alphabet to shift (default = 3)
+    message (str) -- message to encrypt (required)
+    offset (int) -- number of characters in alphabet to shift (default = 3)   # TODO: make default shift random, 1-25.
+    case_sensitive (bool) - True to enable case sensitivity. Defaults to False.
     """
     offset = int(offset) % 26   # keep offset between 0-26
     word_list:List[str]= message.split() if case_sensitive else message.lower().split()
@@ -35,13 +38,17 @@ def encrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->
         cipher_list.append(cipher_word)
     return ' '.join(cipher_list)
 
+def brute_decrypt(message:str)->str:
+    #TODO: create method that will brute force decrypt a caesar encrypted message.
+    pass
 
 def decrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->str:
     """ Decrypts Caesar Cipher message.
 
     Keyword arguments:
-    message -- message to decrypt
-    offset -- number of characters in alphabet to shift
+    message (str) -- message to decrypt
+    offset (int) -- number of characters in alphabet to shift
+    case_sensitive (bool) - True to enable case sensitivity. Defaults to False.
     """
     if (offset > 25 or offset < 0): raise Exception('Invalid offset value. Offset must be between 0-25')
     offset = int(offset) % 26   # keep offset between 0-26

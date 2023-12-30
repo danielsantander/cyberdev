@@ -3,7 +3,8 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
 Table of Contents
 - [Tips](#tips)
   - [Install](#install)
-    - [Kali for Rasberry Pi 4](#kali-for-rasberry-pi-4)
+    - [Kali for Raspberry Pi 4](#kali-for-raspberry-pi-4)
+    - [Install VS Code](#install-vs-code)
   - [Check Kali Linux Version](#check-kali-linux-version)
   - [View Bit Size](#view-bit-size)
   - [Determine revision of current firmware](#determine-revision-of-current-firmware)
@@ -152,11 +153,16 @@ More Docs:
 
 # Tips
 ## Install
-### Kali for Rasberry Pi 4
+### Kali for Raspberry Pi 4
 [src](https://www.kali.org/docs/arm/raspberry-pi-4/)
-
 **Prereq**
 > We recommend using the 32-bit image on Raspberry Pi devices as that gets far more testing, and a lot of documentation out there expects you to be running RaspberryPi OS which is 32-bit.
+
+### Install VS Code
+Install VS Code from the Kali command line:
+```shell
+apt-get install code
+```
 
 ## Check Kali Linux Version
 ```bash

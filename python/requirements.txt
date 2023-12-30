@@ -1,1 +1,2 @@
-picamera
+Django==3.2.10
+lxml==4.6.2
