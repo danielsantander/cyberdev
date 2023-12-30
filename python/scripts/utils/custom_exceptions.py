@@ -28,3 +28,7 @@ class InvalidFile(Exception):
         err_msg = f'Invalid file'
         err_msg += f' {self.f}' if self.f is not None else err_msg
         return err_msg
+
+class UnauthorizedError(Exception):
+    '''If the client does not provide the necessary or correct credentials.'''
+    pass
