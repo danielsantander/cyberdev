@@ -30,7 +30,7 @@ def make_directory(directory_path: Union[str, Path]) -> Path:
     directory_path -- path of directory to create
     """
     p = directory_path if isinstance(directory_path, Path) else Path(directory_path)
-    if not p.exists(): p.mkdir(parents=True, exist_ok=True)
+    if not (p.exists() or p.is_dir()): p.mkdir(parents=True, exist_ok=True)
     return p
 
 def clean_directory(directory_path: Union[str, Path], remove_directory: bool=False) -> Path:
@@ -71,7 +71,7 @@ def move_file(file_src:Path, dst_dir:Path, rename:str=None, lgr:logging.Logger=N
     target_file_path: Path = (dst_dir / filename)
 
     if target_file_path.exists():
-        if lgr: lgr.debug(f'File already exists at destination path.')
+        if lgr: lgr.debug('move_file - File already exists at destination path.')
         return None
 
     # TODO: add options to copy instead of only move
@@ -83,6 +83,6 @@ def move_file(file_src:Path, dst_dir:Path, rename:str=None, lgr:logging.Logger=N
     try:
         assert target_file_path.exists() and target_file_path.is_file()
     except AssertionError as err:
-        if lgr: lgr.error(f'failed to move file {file_src.absolute()}')
+        if lgr: lgr.error(f'move_file - Failed to move file {file_src.absolute()}')
         return None
     return target_file_path
