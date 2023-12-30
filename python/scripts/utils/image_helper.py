@@ -5,6 +5,8 @@ import imageio
 import logging
 import os
 from pathlib import Path
+from pytube import YouTube
+from pytube.exceptions import AgeRestrictedError
 from typing import Union, List
 from utils.custom_exceptions import InvalidDirectory
 from utils.date_helper import timestamp_to_date_string
@@ -75,3 +77,26 @@ def pdf_to_jpg(path:Union[str,Path], outPath:Union[str,Path]=None) -> None:
             out_file: Path = outDir / (pdf_path.name[:-4] + '.jpg')
             page.save(out_file)
     return
+
+def yt_download(video_url:str, output_path:Union[str,Path], quality:str="highest", is_mp3:bool=False, title:str=None)->Path:
+    out_path:Path = output_path if isinstance(output_path, Path) else Path(output_path)
+    yt = YouTube(url=video_url)
+    new_filename = yt.title if title is None else title
+    new_filename += "" if new_filename.endswith(".mp4") else ".mp4"
+
+    is_progressive = True
+    order_by = "resolution"
+    file_extension = "mp4"
+    try:
+        if is_mp3:
+            file_extension = "mp3"
+            # TODO: pass
+            return
+        if quality in ['high', 'highest']:
+            yt.streams.filter(progressive=is_progressive, file_extension=file_extension).order_by(order_by).desc().first().download(filename=new_filename, output_path=out_path)    # highest quality
+        else:
+            yt.streams.filter(progressive=is_progressive, file_extension=file_extension).order_by(order_by).asc().first().download(filename=new_filename, output_path=out_path)  # lowest quality
+    except KeyError as err:
+        print(f"ERROR downloading yt video: {err.__str__()}")
+        return None
+    return (out_path / str(new_filename))
