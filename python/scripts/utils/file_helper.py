@@ -4,6 +4,8 @@
 import datetime
 import json
 import re
+import os
+import platform
 import sys
 from pathlib import Path
 from typing import Union, List
@@ -11,6 +13,51 @@ from typing import Union, List
 import PyPDF2 # python3 -m pip install PyPDF2
 from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
 from utils.custom_exceptions import InvalidDirectory
+
+def file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->datetime.datetime:
+    """
+    Returns datetime of file creation date.
+    Keyword arguments:
+    - filepath (str, Path): path of file to retrieve date created.
+    - timezone
+    - use_timestamp (bool): return timestamp value instead of datetime.
+    """
+    filename = filename if isinstance(filename, Path) else Path(filename)
+    if filename.exists() is False: return None
+    path_to_file = filename.resolve()
+    file_timestamp = None
+
+    # source: https://stackoverflow.com/a/39501288/14745606
+    # if platform.system() == 'Windows':
+    if platform.system().lower() in ['windows']:
+        return os.path.getctime(path_to_file)
+    else:
+        stat = os.stat(path_to_file)
+        try:
+            #return stat.st_birthtime
+            file_timestamp = stat.st_birthtime
+        except AttributeError:
+            # We're probably on Linux. No easy way to get creation dates here,
+            # so we'll settle for when its content was last modified.
+            #return stat.st_mtime
+            file_timestamp = stat.st_mtime
+    if use_timestamp: return file_timestamp
+    return datetime.datetime.fromtimestamp(file_timestamp, tz=timezone)
+
+def file_modification_date(filename: Union[str, Path], timezone=datetime.timezone.utc)->datetime.datetime:
+    """
+    Returns datetime of file modification date.
+
+    Keyword arguments:
+    - filepath (str, Path): path of file to retrieve modification date.
+    - timezone [datetime.timezone.utc]: timezone of returned datetime
+    """
+    # source: https://stackoverflow.com/a/1526089/14745606
+    filename = filename if isinstance(filename, Path) else Path(filename)
+    if filename.exists() is False: return None
+    path_to_file = filename.resolve()
+    t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
+    return datetime.datetime.fromtimestamp(t, tz=timezone)
 
 def open_json_from_file(filepath:Union[str,Path]):
     """ Open JSON from filepath and return as dictionary object.
@@ -35,7 +82,7 @@ def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
     if not p.exists():
         if not p.parent.exists(): p.parent.mkdir()
         p.touch()
-    p = p if str(p.name).endswith('.json') else p.parent/f"{p.name}.json"
+    p = p if str(p.name).endswith('.json') else p.parent/f"{p.stem}.json"
 
     with open(p.absolute(), "w") as f:
         # json.dump(dict, f, indent=2)  # should work as well
