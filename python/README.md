@@ -1,71 +1,36 @@
+- [Tips](#tips)
+  - [Check Python Version](#check-python-version)
+  - [Upgrade Python distribution](#upgrade-python-distribution)
+  - [Make script executable](#make-script-executable)
+- [Create Python Environment](#create-python-environment)
+- [Pip Module](#pip-module)
 
-**Table of Contents**
+---
+More Docs:
 - [Ciphers](docs/ciphers.md)
   - [Caesar Cipher](docs/ciphers.md#caesar-cipher)
     - [Encrypt Caesar Cypher](docs/ciphers.md#encrypt-caesar-cipher)
     - [Decrypt Caesar Cypher](docs/ciphers.md#decrypt-caesar-cipher)
-- [Docker](docs/docker.md)
 - [Unit Testing](docs/unittesting.md)
   - [Writing Tests](docs/unittesting.md#writing-tests)
   - [Running Tests](docs/unittesting.md#running-tests)
   - [Code Coverage](docs/unittesting.md#code-coverage)
-- [Threading](docs/threding.md)
-  - [Daemon Threads](docs/threding.md#daemon-threads)
-  - [Join Threads](docs/threding.md#joining-threads)
+- [Threading](docs/threading.md)
+  - [Daemon Threads](docs/threading.md#daemon-threads)
+  - [Join Threads](docs/threading.md#joining-threads)
+---
 
-# Python
-Python documentation and scripts.
-
-Contents:
-```
-├── README.md
-├── docs
-│   ├── README.md
-│   ├── ciphers.md
-│   ├── docker.md
-│   ├── threding.md
-│   └── unittesting.md
-├── examples
-│   ├── docker
-│   │   ├── Dockerfile
-│   │   ├── entrypoint.sh
-│   │   └── src
-│   └── threading
-│       ├── daemon_thread.py
-│       ├── multithread.py
-│       └── threads.py
-└── scripts
-    ├── README.md
-    ├── encryptPDF.py
-    ├── rename_screenshot_files.py
-    ├── tests
-    │   ├── README.md
-    │   ├── __init__.py
-    │   ├── __pycache__
-    │   ├── sample_data
-    │   ├── test_ciphers.py
-    │   └── test_utils.py
-    └── utils
-        ├── __init__.py
-        ├── __pycache__
-        ├── ciphers/
-        ├── custom_exceptions.py
-        ├── custom_logging.py
-        ├── date_helper.py
-        ├── file_helper.py
-        ├── image_helper.py
-        ├── logs
-        ├── navigation.py
-        └── validation.py
-```
-
-Python scripts should contain the following shebang: `#!/usr/bin/python3`
-
+# Tips
 ## Check Python Version
 Enter into terminal:
 ```shell
-$ python -V
+python -V
 Python 3.9.2
+```
+
+## Upgrade Python distribution
+```shell
+sudo apt-get upgrade python3
 ```
 
 ## Make script executable
@@ -75,4 +40,26 @@ $ sudo chmod +x <python_file>
 
 # or
 $ sudo chmod 755 <python_file>
+```
+
+# Create Python Environment
+```shell
+
+# create environment
+python3 -m venv {environment_name}
+
+# activate environment
+source virtual_environment_directory/bin/activate
+```
+> Exit the environment with the `deactivate` command
+
+# Pip Module
+Search if python package is installed
+```shell
+python -m pip search {package_name}
+```
+
+Install python packages
+```shell
+python -m pip install {package_name}
 ```
