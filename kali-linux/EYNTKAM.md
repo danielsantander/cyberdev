@@ -108,6 +108,7 @@ Table of Contents
     - [Decompress gunzip (GNU unzip)](#decompress-gunzip-gnu-unzip)
   - [hostname](#hostname)
   - [netcat](#netcat)
+  - [shred](#shred)
   - [tar](#tar)
     - [Compress](#compress-1)
     - [View Archived File Contents](#view-archived-file-contents)
@@ -132,6 +133,13 @@ Table of Contents
   - [Mounting Devices (mount)](#mounting-devices-mount)
   - [Unmounting Devices (unmount)](#unmounting-devices-unmount)
   - [Filesystem Checks](#filesystem-checks)
+- [Logging](#logging)
+  - [Configuration](#configuration)
+    - [Log Rules](#log-rules)
+      - [Rule Format](#rule-format)
+  - [Logrotate](#logrotate)
+  - [Disable Logging](#disable-logging)
+  - [Shred Files](#shred-files)
 
 More Docs:
 - [scripting](docs/scripting.md)
@@ -1351,6 +1359,16 @@ Command Options
 | -u, --udp | protocol | Use UDP connection |
 
 
+## shred
+Utilize the `shred` command to delete a file and overwrite it several times.
+
+Usage: `shred -f -n {number_of_overwrites} {file}`
+- `-f` -> gives permission to shred files
+- `-n` -> followed by the number of times to overwrite
+  - > The more times a file is overwritten, the harder it is to recover. Overwriting larger files may be time-consuming.
+
+
+
 ## tar
 ### Compress
 Use `tar` command to compress files together and combine them into an archive (tape archive -> tar). The command will also compress files and directories recursively.
@@ -1626,3 +1644,85 @@ unmount {file_entry_of_device}
 Utilize the [Disk Free `df` command](#df) to monitor the state of the filesystem.
 
 Perform filesystem checks on devices with the [Filesystem check `fsck` command](#filesystem-checks-fsck).
+
+# Logging
+Logging involves automatically storing events that occur when the operating system runs (including errors & security alerts).
+
+Logs are stored based on a series of defined rules.
+
+> Log files can leave 'footprints' of a users activities or even their identity. To secure a system, the user would need to know how to manage logging to determine if a system has been compromised, and by who.
+
+> Each linux distribution uses their own logging service. For the sake of consistency with Kali Linux, we will be focusing on the `rsyslog` utility variation of syslogd.
+
+## Configuration
+The `rsyslog` configuration file is usually located at `/etc/rsyslog.conf`
+
+You can modify the log configuration to update and set rules for what the system will automatically log.
+
+### Log Rules
+With a text editor navigate down to the "Rules" section of the rsyslog.conf file. Each line represents a logging rule for what logs are sent where.
+
+#### Rule Format
+Rule Format: `facility.priority     action` where:
+- 'facility' references the program name
+- 'priority' the log level or what kind of messages to log
+- 'action' references the filename and location at which to send the logs
+> an asterisk (`*`) may be used as a wildcard to reference either all facilities and/or all priorities.
+
+## Logrotate
+The logrotate config file is usually located at `/etc/logrotate.conf`.
+
+Utilize log rotation to maintain log space, archiving log files by moving them to another location. The moved logged files will be cleaned out after a set period of time. This leaves space for more recent log files and having an archive or historical logs.
+
+Logroate Configuration file information:
+- The unit of time to rotate logs, default is set to `weekly`
+- Interval at which to rotate logs, default (`rotate 4`) is set to rotating logs every 4 weeks
+  - set `rotate 1` to set rotating logs to once a week, saving more storage space on the system
+  - set `rotate 52` to set rotating logs to once a year
+- Create a new log file after log rotation
+  - uncomment `compressed` to enable compression of rotated logs
+
+**Example:** With a text editor, open the logrotate config file located at `/etc/logrotate.conf`.
+```shell
+$ vi /etc/logrotate.conf
+# see "man logrotate" for details
+
+# global options do not affect preceding include directives
+
+# rotate log files weekly
+weekly
+
+# keep 4 weeks worth of backlogs
+rotate 4
+
+# create new (empty) log files after rotating old ones
+create
+
+# use date as a suffix of the rotated file
+#dateext
+
+# uncomment this if you want your log files compressed
+#compress
+
+# packages drop log rotation information into this directory
+include /etc/logrotate.d
+
+# system-specific logs may also be configured here.
+```
+
+## Disable Logging
+Disable logging by using the `service` command to stop the rsyslog daemon.
+
+```shell
+service rsyslog stop
+```
+Log files will now stop generating until the service is restarted.
+
+## Shred Files
+Use the [`shred` command](#shred) to delete a file and overwrite it several times.
+
+**Example:** Use the `shred` command to delete and overwrite all auth log file 10 times. (Use the `*` to shred all auth logs including the rotated logs).
+```shell
+shred -f -n 10 /var/log/auth.log.*
+```
+Once successful, the contents of the auth log files should now be illegible.
