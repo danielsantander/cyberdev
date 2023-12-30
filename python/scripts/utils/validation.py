@@ -4,11 +4,12 @@
 from typing import Union
 from utils.custom_exceptions import InvalidBoolValue
 
-def str2bool(v:Union[str,bool,int]) -> bool:
+def str2bool(v:Union[str,bool,int]=None) -> bool:
     """Returns boolean value of given input.
     Keyword arguments:
     v -- value to convert into boolean (required)
     """
+    if v is None: return False
     if isinstance(v, bool):
         return v
     elif isinstance(v, int):
