@@ -1349,7 +1349,7 @@ hostname -I
 ```
 
 ## netcat
-Allows users to read & write data over a network connection.
+Allows users to read & write data over a network connection. Use it to execute remote commands, pass files back and forth, or even open a remote shell.
 
 Usage, where host is either a numeric IP address or s symbolic hostname, and port is either a numeric port a service name
 
@@ -1364,7 +1364,6 @@ Command Options
 | -6        | protocol | Use IPv6 only      |
 | -u, --udp | protocol | Use UDP connection |
 
-
 ## shred
 Utilize the `shred` command to delete a file and overwrite it several times.
 
@@ -1372,8 +1371,6 @@ Usage: `shred -f -n {number_of_overwrites} {file}`
 - `-f` -> gives permission to shred files
 - `-n` -> followed by the number of times to overwrite
   - > The more times a file is overwritten, the harder it is to recover. Overwriting larger files may be time-consuming.
-
-
 
 ## tar
 ### Compress
