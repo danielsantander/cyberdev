@@ -31,7 +31,7 @@ Usage:
 ./netcat.py -h
 usage: netcat.py [-h] [-c] [-e EXECUTE] [-l] [-p PORT] [-t TARGET] [-u UPLOAD]
 
-BHP Net Tool
+Network client server tool
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -66,10 +66,10 @@ On another within another machine's terminal run in client mode.
 
 ```shell
 python3 netcat.py -t {listener_ip_address} -p 5555
+
+CTRL-D
+<NETCAT:#>  ls -la
 ```
-
-
-
 
 
 # encryptPDF.py
