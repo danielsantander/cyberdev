@@ -39,6 +39,7 @@ def execute(cmd):
     output = subprocess.check_output(shlex.split(cmd), stderr=subprocess.STDOUT)
     return output.decode()
 
+
 class NetCat:
     def __init__(self, args, buffer=None) -> None:
         self.args = args
@@ -65,6 +66,7 @@ class NetCat:
         # send command to execute function
         # and send output back on the socket
         if self.args.execute:
+            print("in execute mode")
             output = execute(self.args.execute)
             client_socket.send(output)
 
@@ -72,6 +74,7 @@ class NetCat:
         # set up loop to listen for content on the listening socket
         # and receive data until there's no more data coming in.
         elif self.args.upload:
+            print("in upload mode")
             file_buffer = b''
             while True:
                 data = client_socket.recv(4096)
@@ -87,6 +90,7 @@ class NetCat:
         # set up loop, send prompt to the sender, wait for command string to come back,
         # then execute command and return the output to sender.
         elif self.args.command:
+            print("in command mode")
             cmd_buffer = b''
             while True:
                 try:
@@ -96,11 +100,11 @@ class NetCat:
                     response = execute(cmd_buffer.decode())
                     if response:
                         client_socket.send(response.encode())
+                    cmd_buffer = b''
                 except Exception as e:
                     print(f"sever killed: {e}")
                     self.socket.close()
                     sys.exit()
-
 
     def listen(self):
         """
@@ -119,8 +123,10 @@ class NetCat:
         Send buffer to target first, if exists.
         Manually close the connection with CTRL-C.
         """
+        print('\tconnecting...')
         self.socket.connect((self.args.target, self.args.port))
         if self.buffer:
+            print('\thas buffer, sending...')
             self.socket.send(self.buffer)
 
         try:

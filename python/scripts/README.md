@@ -4,8 +4,10 @@
   - [Setup Lister and Client](#setup-lister-and-client)
 - [encryptPDF.py](#encryptpdfpy)
 - [rename\_files.py](#rename_filespy)
+---
 
 # cleanup.py
+
 Will iterate through the given source directory to consolidate files into their own sub-directories, such as:
     - screenshots/
     - <extension name>
@@ -58,10 +60,11 @@ Example:
 On a machine setup a listener using its own IP and port 5555 to provide a command shell.
 
 ```shell
-python3 netcat.py -t 192.168.1.203 -p 5555 -l -c
+python3 netcat.py -t {ip_address} -p 5555 -l -c
 ```
 
 On another within another machine's terminal run in client mode.
+
 > script reads from stdin and will do so until the end-of-file (EOF) marker.
 
 ```shell
@@ -81,18 +84,22 @@ Usage: `./encryptPDF [PDF file] [output location]`
 
 **Example**: Encrypt `tests/sample_data/pdfs/HelloWorld.pdf` and output the encrypted file in the same directory as the file to encrypt.
 There should then be an encrypted PDF file located at `tests/sample_data/pdfs/HelloWorldENCRYPTED.pdf` (outputs in same directory as the input file).
+
 ```shell
 $ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf
 ```
 
 **Example**: Encrypt the same PDF file, but send output to the current directory.
 There should then be an encrypted PDF file located in the current directory named `HelloWorldENCRYPTED.pdf`.
+
 ```shell
-$ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf .
+./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf .
 ```
 
 # rename_files.py
+
 run in debug mode:
+
 ```shell
 ./rename_files.py <filepath> -i --debug --preface="preface_filename_with_this__"
 ```
