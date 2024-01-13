@@ -52,10 +52,8 @@ class NetCat:
         Delegates execution to two methods (listen or send).
         """
         if self.args.listen:
-            print('listening...')
             self.listen()
         else:
-            print('in client mode...')
             self.send()
 
     def handle(self, client_socket:socket):
@@ -68,7 +66,7 @@ class NetCat:
         if self.args.execute:
             print("in execute mode")
             output = execute(self.args.execute)
-            client_socket.send(output)
+            client_socket.send(output.encode())
 
         # if file should be uploaded,
         # set up loop to listen for content on the listening socket
@@ -80,6 +78,7 @@ class NetCat:
                 data = client_socket.recv(4096)
                 if data:
                     file_buffer += data
+                    print(f"\tfile_buffer length: {len(file_buffer)}")
                 else: break
             with open(self.args.upload, 'wb') as f:
                 f.write(file_buffer)
@@ -94,7 +93,7 @@ class NetCat:
             cmd_buffer = b''
             while True:
                 try:
-                    client_socket.send(b'NETCAT: #> ')
+                    client_socket.send(b' #> ')
                     while '\n' not in cmd_buffer.decode():
                         cmd_buffer += client_socket.recv(64)
                     response = execute(cmd_buffer.decode())
@@ -110,6 +109,7 @@ class NetCat:
         """
         Bind the target and port and start listening in a loop.
         """
+        print('listening...')
         self.socket.bind((self.args.target, self.args.port))
         self.socket.listen(5)
         while True:
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     else:
         buffer = sys.stdin.read()
 
-    nc = NetCat(args, buffer.encode())
+    nc = NetCat(args, buffer.encode('utf-8'))
     nc.run()
 
 
