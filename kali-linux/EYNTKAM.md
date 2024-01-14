@@ -150,26 +150,32 @@ More Docs:
     - [OpenSSH](docs/15_services.md#openssh)
 
 ---
-
 # Tips
+
 ## Install
+
 ### Kali for Raspberry Pi 4
+
 [src](https://www.kali.org/docs/arm/raspberry-pi-4/)
-**Prereq**
-> We recommend using the 32-bit image on Raspberry Pi devices as that gets far more testing, and a lot of documentation out there expects you to be running RaspberryPi OS which is 32-bit.
+
+> **Prereq:** Recommendation is to use the 32-bit image on Raspberry Pi devices as that gets far more testing, and a lot of documentation out there expects you to be running RaspberryPi OS which is 32-bit.
 
 ### Install VS Code
+
 Install VS Code from the Kali command line:
+
 ```shell
 apt-get install code
 ```
 
 ## Check Kali Linux Version
-```bash
+
+```shell
 lsb_release -a
 ```
 
 ## View Bit Size
+
 ```shell
 uname -m
 # Output Expected:
@@ -178,6 +184,7 @@ uname -m
 ```
 
 ## Determine revision of current firmware
+
 ```shell
 uname -a
 # Linux kermit 3.12.26+ #707 PREEMPT Sat Aug 30 17:39:19 BST 2014 armv6l GNU/Linux
@@ -187,28 +194,35 @@ uname -a
 ```
 
 ## Update and Upgrade System
+
 ```shell
 sudo apt-get update && sudo apt-get upgrade
 ```
 
 ## Change Shell
+
 ```shell
 # change to zsh shell
 chsh -s /bin/zsh`
 ```
 
 ## Script Shebang
+
 Script files will begin with the shebang: `#!/bin/bash`
 
 ## Print Random Line From File
+
 ```shell
 # output "n" number of random lines from file
-$ shuf -n 1 {filename}
+shuf -n 1 {filename}
 ```
 
 # Permissions
+
 ## Change File Ownership
+
 Use `chown` to change or grant ownership.
+
 ```shell
 chown {user} {file}
 
@@ -217,16 +231,20 @@ chown john /tmp/scriptfile
 ```
 
 Use `chgrp` to grant a group ownership.
+
 ```shell
 chgrp {group_name} {file}
 
 # example
 chgrp blueteam newProgram
 ```
+
 > **Group inheritance**: `root user` is part of `root group` by default. Each new user will need to be added to a group in order to inherit the permissions of that group.
 
 ## Permission Levels
+
 Three level of permissions:
+
 1. `r` : permission to read (open and view a file)
 2. `w` : permission to write (view and edit a file)
 3. `x` : permission to execute (execute a file, but not necessarily view or edit)
@@ -247,6 +265,7 @@ Permissions can be represented as binary numbers, where `111` in binary represen
 | rwx | 111    |   7   |
 
 ## Change Permissions
+
 Use `chmod` to change the directory and/or file permissions.
 
 ```shell
@@ -261,9 +280,11 @@ chmod 755 script.sh
 ```
 
 ### UGO Symbolic Method
+
 Change permissions with symbolic method (UGO). UGO stand for "user" (file owner), "group", and "others" (u, g o).
 
 Operator symbols
+
 ```text
 + Adds permission(s)
 - Removes permission(s)
@@ -283,6 +304,7 @@ chmod u-w, o+x, script.sh
 ```
 
 ## Check Permissions
+
 ```shell
 ls -l /home/
 -rwxr-xr-x 1 root root 752 Sep  5 04:56 script.sh
@@ -303,6 +325,7 @@ Where:
 ```
 
 ## Configure Default Permissions
+
 Use `umask` to change default permissions for the user. Umask value is a three-digit decimal number subtracted from the permissions number to give the new permission status. Each user can set their default umask value (not universal) within their `.profile` file.
 
 *Example*: If the default permissions for a new files are `666`, and the default permissions for new directories are `777`, with `unmask` set to `022`, the new permissions for files will be `644` (022 subtracted from 666), and the new permissions for directories will be `755` (022 subtracted from 777).
@@ -319,13 +342,15 @@ vi /home/root/.profile
 umask 077
 ```
 
-
 # Network
 ## Check Wireless Network Devices
+
 `iwconfig` -- gather information such as the wireless adapter's IP address, MAC address, what mode it is in, and much more.
 
 ## Assign IP Address
+
 Call DHCP server with `dhclient` to request IP address.
+
 ```shell
 dhclient {interface}
 
@@ -337,6 +362,7 @@ dhclient wlan0
 ```
 
 ### Troubleshoot
+
 ```shell
 # ERROR:
 dhclient wlan0
@@ -361,6 +387,7 @@ ifconfig eth0 192.168.180.115
 ```
 
 ## Map IP Address To Host File
+
 Configure the `/etc/hosts` file for mapping to determine which IP address the browser directs a given domain.
 
 > It's important to ensure you are using **TAB** between the IP address and the domain name, instead of spaces.
@@ -378,13 +405,17 @@ ff02::2 ip6-allrouters
 ```
 
 ## Change Network Mask and Broadcast
+
 Use `ifconfig` command to change the network mask (netmask) and broadcast address.
+
 ```shell
 ifconfig eth0 192.168.180.115 netmask 255.255.0.0 broadcast 192.168.1.255
 ```
 
 ## Change MAC Address
+
 Using `ifconfig` perform the following steps:
+
 1. Use the `down` option to take down the interface (eth0 in this case)
 2. Change the MAC Address
 3. Bring up the interface with the `up` option
@@ -402,7 +433,9 @@ ifconfig wlan0 up
 ```
 
 ## Change DNS
+
 Update `/etc/resolv.conf` file:
+
 1. Locate `resolv.conf` file
 2. Update nameserver value
 
@@ -420,14 +453,17 @@ echo "nameserver 8.8.8.8" > /etc/resolv.conf
 cat /etc/resolv.conf
 nameserver 8.8.8.8
 ```
+
 > The machine will now go out to Google's DNS server rather than the initial local DNS server to resolve the domain names into IP addresses.
 
 ### Regenerate resolvconf
+
 ```shell
 sudo resolvconf -u
 ```
 
 ### Install resolvconf service
+
 ```shell
 # install resolvconf
 sudo apt-get install resolvconf
@@ -441,8 +477,11 @@ systemctl status resolvconf.service
 ```
 
 # Packages and Services
+
 ## Manage Services
+
 A service is a program or application that runs in the background waiting to be used. Manage these services through the command line.
+
 ```shell
 # Manage Services
 service {service_name} {start|stop|restart}
@@ -461,16 +500,20 @@ $ service {service_name} restart
 ```
 
 ## Manage Software
+
 Advanced Packaging Tool (apt) is the default software manager for debian-based Linux distributions. Usage: `apt-get`
 
 ### Search for Packages
+
 Before downloading a software package, check whether the package is available from the repository.
+
 ```shell
 # search for software packages before downloading
 apt-cache search {keyword}
 ```
 
 ### Installing Software
+
 ```shell
 apt-get install {package-name}
 ```
@@ -482,24 +525,30 @@ apt-get update
 ```
 
 ### Upgrade Packages
+
 Actually upgrade the packages to the latest version
+
 ```shell
 apt-get upgrade
 ```
+
 > `apt-get update` updates the list of available packages and their versions, but does not install or upgrade any packages. Whereas `apt-get upgrade` actually installs newer versions of the packages.
 
 ### Removing Software
+
 ```shell
 apt-get remove {package-name}
 ```
 > `remove` does not remove the configuration file. This allows future re-installation of the same package without then need of reconfiguring the settings.
 
 ### Remove Software and Configurations
+
 ```shell
 apt-get purge {package-name}
 ```
 
 ### Repository Source List File
+
 The `source.list` file contains repositories the system will search for software. Update this file to define which repositories to download software.
 
 To add a repository, add the name of the repository to the list and then save the file.
@@ -509,7 +558,9 @@ vi /etc/apt/sources.list
 ```
 
 # Applications
+
 ## Apache Web Server (apache2)
+
 A free and open-source Web server software created by American software developer Robert McCool. Apache was released in 1995.
 
 > Apache comes already installed on Kali Linux and many other Linux distros.
@@ -521,10 +572,13 @@ apt-get install apache2
 # start server -- once started, the default web page can be accessed at http://localhost/
 sudo services apache2 start
 ```
+
 ### Configure Web Server
+
 Apache's default index page is located at `/var/www/html/index.html`.
 
 Update index page `/var/www/html/index.html`.
+
 ```html
 <html>
   <body>
@@ -533,28 +587,35 @@ Update index page `/var/www/html/index.html`.
   </body>
 </html>
 ```
+
 > If the page is not updating, try restarting the Apache2 service with `sudo service apache2 restart`
 
 ## Docker
 
 Check status
+
 ```shell
 systemctl status docker.service
 ```
 
 Start Container
+
 ```shell
 docker start -i {container_id}
 ```
 
 ### Check Storage
+
 Check Available Storage
+
 ```shell
 docker system df
 ```
 
 ### System Prune
+
 Use prune to do some clean up and remove unused data. (view more info: `docker system prune --help`)
+
 ```shell
 docker system prune --all --force
 
@@ -563,17 +624,21 @@ docker system prune -a --volumes
 ```
 
 Remove all unused local volumes.
+
 ```shell
 docker volume prune
 ```
 
 ### Delete
+
 Delete Untagged Images
+
 ```shell
 docker rmi -f $(docker image ls -a | grep "<none>" | awk "{print \$3}")
 ```
 
 ### Reboot Docker Services
+
 ```shell
 # check status
 systemctl status docker.service
@@ -589,7 +654,9 @@ sudo systemctl start docker
 ```
 
 ## Metasploit
+
 Steps for exploiting a system:
+
 1. Check if target system is vulnerable to an exploit
 2. Select & configure an exploit
 3. Select & configure a payload to utilize in the exploit
@@ -597,7 +664,9 @@ Steps for exploiting a system:
 5. Execute the exploit
 
 ### PostgreSQL (postgres)
+
 Install and start postgres before launching Metasploit.
+
 ```shell
 # install postgres
 
@@ -613,7 +682,9 @@ service postgresql --status
 ```
 
 ### Start Metasploit
+
 With postgres running, launch Metasploit and enter the msfconsole.
+
 ```shell
 # start metasploit, and enter console
 msfconsole
@@ -621,16 +692,19 @@ msfconsole
 
 ### Setup PostgreSQL
 Initialize DB
+
 ```shell
 msf6 > sudo msfdb init
 ```
 
 Reinitialize
+
 ```shell
 msf6 > sudo msfdb reinit
 ```
 
 Create user
+
 ```shell
 # within msfconsole, switch user to obtain root privileges
 msf6 > su postgres
@@ -643,6 +717,7 @@ postgres@kali:/home/kali$
 ```
 
 Create Database
+
 ```shell
 # create db with msf_user as owner
 postgres@kali:/home/kali$ createdb --owner=msf_user my_hacker_db
@@ -652,7 +727,9 @@ postgres@kali:/home/kali$ exit
 ```
 
 ### Connect to Database
+
 Connect to database for Metasploit framework to store:
+
   - modules for fast results
   - results of system scans
   - exploits ran
@@ -673,9 +750,11 @@ msf6> db_disconnect
 ```
 
 ### sources
+
 - [Metasploit Wiki](https://en.wikipedia.org/wiki/Metasploit_Project)
 
 ## MySql
+
 ```shell
 # start service
 service mysql start
@@ -691,6 +770,7 @@ sudo mysql -u root -p
 ```
 
 ### Commands
+
 |  operation  |   description                                       |
 |-------------|-----------------------------------------------------|
 | `SELECT`    | retrieve data                                       |
@@ -700,6 +780,7 @@ sudo mysql -u root -p
 | `DELETE`    | remove/delete data                                  |
 
 The two default admin databases (information_schema, performance_schema) and one non-admin database (mysql):
+
 ```sql
 +--------------------+
 | Database           |
@@ -711,24 +792,29 @@ The two default admin databases (information_schema, performance_schema) and one
 ```
 
 ### Connect to database
+
 ```sql
 USE {database_name}
 ```
 
 ### List Users
+
 ```sql
 -- Retrieve user, host and password fields from `mysql` database and `user` table:
 SELECT user, host, password FROM mysql.user;
 ```
 
 ### Set Password
+
 ```sql
 -- set password for root user
 UPDATE user SET password = PASSWORD("enter_password_here") where user = 'root';
 ```
 
 ### SHOW Data
+
 Show databases.
+
 ```sql
 -- view databases
 SHOW DATABASES;
@@ -738,6 +824,7 @@ SHOW SCHEMAS;
 ```
 
 Show tables.
+
 ```sql
 SHOW TABLES FROM {database_name}
 
@@ -746,6 +833,7 @@ SHOW TABLES FROM mysql
 ```
 
 Show columns.
+
 ```sql
 -- display column field info of a table
 DESCRIBE {database_name.table_name}
@@ -761,14 +849,18 @@ DESCRIBE mysql.user;
 ```
 
 ### SELECT Data
+
 Retrieve data from a database table given the column name(s).
+
 ```sql
 -- usage
 SELECT <col1,col2,col3> FROM <table_name>;
 ```
 
 ### Filter Data
+
 Use `LIKE` clause to filter the output given a pattern.
+
 ```sql
 SHOW DATABASES LIKE {pattern};
 
@@ -776,10 +868,13 @@ SHOW DATABASES LIKE {pattern};
 SHOW DATABASES LIKE 'open%';
 Empty set (0.000 sec)
 ```
+
 > percent sign (%) is used to express matching zero, one, or multiple characters.
 
 ## nmap
+
 Network scanning tool. Send packets analyze responses to discover hosts and services on a computer network.
+
 ```shell
 # install
 sudo apt-get install -y nmap
@@ -791,6 +886,7 @@ nmap {SCAN_TYPE} {IP/CIDR} {PORT}
 > TIP: specify the `--packet-trace` option to report what is happening on the packet level.
 
 ### Scan Type Options
+
 | option           |  description                                                  |
 |------------------|---------------------------------------------------------------|
 | -sL              | List Scan - simply list targets to scan                       |
@@ -806,6 +902,7 @@ nmap {SCAN_TYPE} {IP/CIDR} {PORT}
 |-v                | Increase verbosity level (use -vv or more for greater effect) |
 
 ### Examples
+
 ```shell
 # Host Detection -- get live hosts
 nmap -n -sP {IP/CIDR} | grep report | awk '{print $5}'
@@ -822,6 +919,7 @@ nmap -sV -O -v 129.128.X.XX
 ```
 
 ### Output Results to File
+
 ```shell
 nmap {SCAN_TYPE} {IP/CIDR} {PORT} > /dev/null -oG {OUTPUT_FILE}
 
@@ -836,6 +934,7 @@ cat ResultsOpenMySQLPorts
 > TIP: `-oG` is deprecated, XML output format is far more powerful: `-oX` filespec (XML output)
 
 ### sources
+
 - [nmap.org](https://nmap.org/)
   - [Port Scanning Techniques and Algorithms](https://nmap.org/book/scan-methods.html)
   - [Reference Guide](https://nmap.org/book/man.html)
@@ -843,21 +942,25 @@ cat ResultsOpenMySQLPorts
 
 ## OpenSSH
 Secure shell (SSH) is used to securely connect to a remote system, which enables:
+
 - creating a  user access list
 - authentication with encrypted passwords
 - communication encryption
 
 Start service
+
 ```shell
 service ssh start
 ```
 
 SSH into the remote machine
+
 ```shell
 ssh {user}@{address}
 ```
 
 ## PostgreSQL
+
 ```shell
 # login
 psql -U {USERNAME} {DATABASE}
@@ -878,11 +981,13 @@ Inside PostgreSQL
 ```
 
 ### Create Database
+
 ```sql
 CREATE DATABASE {DB_NAME};
 ```
 
 ### Create User
+
 ```shell
 
 # MacOS -- If postgres installed through Homebrew, create user by:
@@ -890,12 +995,15 @@ CREATE DATABASE {DB_NAME};
 ```
 
 ### Set Password
+
 ```sql
 \password {USERNAME}
 ```
 
 ### Associate User with Database
+
 Create root user with admin privileges. Login to create a user that will have privileges to create and manage databases within the service.
+
 ```sql
 CREATE ROLE newUser WITH LOGIN PASSWORD 'password';
 ALTER ROLE newUser CREATEDB;
@@ -905,19 +1013,25 @@ GRANT ALL PRIVILEGES {DATABASE_NAME} TO {USERNAME}
 ```
 
 ### Drop Tables
+
 ```sql
 DROP TABLE {TABLE_NAME}
 ```
 
 ### Truncate Table
+
 Truncate/remove data from table(s).
+
 ```sql
 TRUNCATE {TABLE_NAME}, {SECOND_TABLE_NAME}
 ```
 
 # Process Management
+
 ## ps
+
 View processes and their assigned unique process identification number (PID).
+
 ```shell
 # usage
 ps {options}
@@ -942,9 +1056,11 @@ root        1249  0.0  0.1   9708  3372 pts/0    R+   00:11   0:00 ps aux
 > Tip: Combine command with `grep` to filter by process name `ps aux | grep {process_name}`
 
 ## top
+
 Use `top` command to produce a list of processes ordered by resources used, starting with the largest. The output will refresh dynamically every 10 seconds.
 
 ## nice
+
 Start processes and manipulate their priority with the `nice` command. Elevate a process to allocate more resources speeding up it's completion.
 
 The "nice" value ranges from -20 to +19 with 0 being the default. Think of nice values as inverted in priority; the high nice value means a low priority, and a low nice value means a high priority.
@@ -959,6 +1075,7 @@ nice -n -10 /usr/bin/myprocess
 ```
 
 ## renice
+
 Change priority of a running process with `renice` command. Note that only the root user can update a system process to a negative value, giving it a higher priority.
 
 ```shell
@@ -971,6 +1088,7 @@ renice 20 6789
 > Renice a process using the `top` command by entering the `R` key, the PID of the process, and then the new nice value.
 
 ## Run Background Processes
+
 Start a process and run in the background by adding append an ampersand `&` at the end of a command.
 
 ```shell
@@ -982,7 +1100,9 @@ Start a process and run in the background by adding append an ampersand `&` at t
 ```
 
 ## Foreground Processes
+
 Move a process back to the foreground with `fg` command
+
 ```shell
 # usage
 fg {PID}
@@ -992,7 +1112,9 @@ fg 6789
 ```
 
 ## Schedule Processes
+
 ### at
+
 A daemon to schedule executions to run once at some point of time. Enter the `at` command followed by the time to execute, then an interactive shell prompt will be available to enter the command to execute.
 
 ```shell
@@ -1016,6 +1138,7 @@ at > /home/myscript.sh
 | at now + 2 weeks     | run in 2 weeks from the current time    |
 
 ### cron
+
 Utilize the cron daemon (crond) and the cron table (cront) for scheduling recurring tasks to execute. The cron table is used to to schedule tasks/jobs, located at `/etc/contab`. The cron daemon checks the cron table for which commands to run at the specified times. Edit the cron table with the `cront` command followed by the `-e` argument (edit), you will then be prompted to edit the crontable.
 
 > `/etc/crontab` is the system wide crontab, whereas `crontab -e` is per user. Specify which user with `crontab -e -u <username>`
@@ -1047,8 +1170,8 @@ Cron table input is represented as 7 fields:
 | month  (MON)       | 1-12   |
 | day of week (DOW)  | 0-7    |
 
-
 ### rc
+
 Use `update-rc.d` command to add or remove services to the `rc.d` script that will run at startup.
 
 ```shell
@@ -1060,7 +1183,9 @@ update-rc.d postgresql defaults
 ```
 
 ## kill
+
 Kill system processes.
+
 ```shell
 kill -{signal_value} {PID}
 
@@ -1081,7 +1206,9 @@ Signal Value Options (optional)
 | SIGTERM | 15  | Termination signal (TERM): default kill signal               |
 
 # Commands
+
 ## bzip2 (compress)
+
 Use `bzip2` to compress files (usually with better compression ratios than gzip). Uses extension `.tar.bz2`
 
 ```shell
@@ -1093,6 +1220,7 @@ ls -lh
 ```
 
 ## bunzip
+
 Uncompress a file with the `bunzip` command.
 
 ```shell
@@ -1103,43 +1231,49 @@ bunzip2 scriptArchive.tar.bz2
 ```
 
 ## compress
+
 `compress` command exports with file extension `.tar.Z`
 
 ```shell
 # exports MyScript.tar.Z
 compress MyScript.*
-
 ```
 
 Uncompress
+
 ```shell
 # exports MyScript.tar
 uncompress MyScript.tar.Z
 ```
 
-
 ## curl
+
 ### GET Request
+
 ```shell
 curl -X GET '{url}' --header "key:value ${ENVIRONMENT_VARIABLE}"
 ```
 
 ### POST Request
+
 ```shell
 curl -X POST '{url}' -H "Content-Type: application/json" -d '{"key1":"value"}'
 ```
 
 ### PUT Request
+
 ```shell
 curl -X PUT '{url}' -H "Content-Type: application/json" -d '{"key1":"value"}'
 ```
 
 ### curl sources
+
 - [Site](https://curl.se/)
 - [GitHub](https://github.com/curl/curl)
 - [wiki](https://en.wikipedia.org/wiki/CURL)
 
 ## dd
+
 Use `dd` to make a bit-by-bit physical copy of storage devices without logical structures such as a filesystem. This can be used to recover artifacts such as deleted files.
 
 ```shell
@@ -1149,6 +1283,7 @@ dd if=inputfile of=outputfile
 # example: make bit-by-bit copy of flashdrive
 dd if=/dev/sdb of=/root/flashdrivecopy bs=4096 conv:noerror
 ```
+
 Where:
 | arg        | description                                                                                 |
 |------------|---------------------------------------------------------------------------------------------|
@@ -1156,6 +1291,7 @@ Where:
 | `noerror`  | Continue to copy even if errors occur.                                                      |
 
 ## df
+
 Use Disk Free command `df` to monitor the state of the filesystem.
 
 The df command displays hard disks or mounted devices information such as disk space usage and availability.
@@ -1174,6 +1310,7 @@ Filesystem     1K-blocks     Used Available Use% Mounted on
 ```
 
 ## dig
+
 Domain Information Groper (DIG) tool is used for performing DNS querying.
 > By default `dig` uses the servers listed in `/etc/reolv.conf` file.
 
@@ -1216,14 +1353,16 @@ linux.org.              300     IN      A       172.67.176.128
 ;; MSG SIZE  rcvd: 70
 ```
 
-
 ### dig options
+
 Specify options within home directory file `.digrc`
-```
+
+```txt
 +nocmd +noall +answer
 ```
 
 Some available options
+
 ```shell
 # SHORT ANSWER TO QUERY
 dig linux.org +short
@@ -1256,6 +1395,7 @@ dig {domain} +noall +answer
 ```
 
 ## find
+
 ```shell
 # usage
 find {LOCATION} {OPTIONS} {EXPRESSION}
@@ -1285,12 +1425,15 @@ find / -user root -perm -4000
 
 ### Find File Based on Content
 Execute `grep` command for every file that satisfies the conditions. Print matches to console.
+
 ```shell
 find . -type f -exec grep "EXAMPLE_TEXT_TO_SEARCH" '{}' \; -print
 ```
+
 The curly braces (`{}`) are a placeholder for the `find` match results, and are enclosed with single quotes to avoid passing the `grep` command malformed filenames. The `-exec` command is terminated with an escaped semicolon (`\;`) to avoid interpretation  by the shell.
 
 ### Search for Content with Regular Expressions
+
 ```shell
 # search current directory for a file containing text "TableOrderingFilter"
 find . -type f -exec grep "\w*[T|t]able[O|o]rdering[F|f]ilter\w*" '{}' \; -print
@@ -1300,11 +1443,13 @@ find . -type f -exec grep "[^\.]*[O|o]rdering[F|f]ilter\w*" '{}' \; -print
 ```
 
 ## Filesystem Checks (fsck)
+
 Utilize the `fsck` command to check for any errors.
 
 > You must unmount the drive before running a filesystem check else you will receive an error.
 
 **Example:** Perform a filesystem check for any errors on device `/dev/sdb1/`
+
 ```shell
 
 # first, unmount the device
@@ -1315,7 +1460,9 @@ fsck -p /dev/sdb1
 ```
 
 ## gzip
+
 ### Compress gzip (GNU zip)
+
 Compress files using the `gzip` command. Uses extensions `.tar.gz` or `.tgz`.
 
 ```shell
@@ -1326,10 +1473,13 @@ ls -lh
 gzip scriptArchive.*
 -rw-r--r-- 1 kali kali  792 Apr  6 20:41 scriptArchive.tar.gz
 ```
+
 > Note: wildcard `*` used as file extension to denote that the command should apply to any file that begins with `scriptArchive` with any extension.
 
 ### Decompress gunzip (GNU unzip)
+
 Use `gunzip` command to decompress a `tar.gz` or `.tgz` file.
+
 ```shell
 # example: decompress the `scriptArchive.tar.gz` file
 gunzip scriptArchive.*
@@ -1339,7 +1489,9 @@ ls -lh
 ```
 
 ## hostname
+
 Get IP Address and hostname information.
+
 ```shell
 # usage
 hostname -[option] [file]
@@ -1349,6 +1501,7 @@ hostname -I
 ```
 
 ## netcat
+
 Allows users to read & write data over a network connection. Use it to execute remote commands, pass files back and forth, or even open a remote shell.
 
 Usage, where host is either a numeric IP address or s symbolic hostname, and port is either a numeric port a service name
@@ -1365,18 +1518,23 @@ Command Options
 | -u, --udp | protocol | Use UDP connection |
 
 ## shred
+
 Utilize the `shred` command to delete a file and overwrite it several times.
 
 Usage: `shred -f -n {number_of_overwrites} {file}`
+
 - `-f` -> gives permission to shred files
 - `-n` -> followed by the number of times to overwrite
   - > The more times a file is overwritten, the harder it is to recover. Overwriting larger files may be time-consuming.
 
 ## tar
+
 ### Compress
+
 Use `tar` command to compress files together and combine them into an archive (tape archive -> tar). The command will also compress files and directories recursively.
 
 *Example*: Combine a pair of scripts into one single archive.
+
 ```shell
 ls -lh
 total 24K
@@ -1398,6 +1556,7 @@ tar -cvf archive.tar stuff
 # example: compress a directory of stuff into a gzip.
 tar -czvf archive.tar.gz stuff
 ```
+
 > Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
 
 **tar options**
@@ -1411,7 +1570,9 @@ tar -czvf archive.tar.gz stuff
 |    z   | compress the archive with "gzip"                  |
 
 ### View Archived File Contents
+
 Display files from the tarbell without extracting them.
+
 ```shell
 # example: display files within `scriptArchive.tar` without extracting the file using the `t` option.
 ```shell
@@ -1421,18 +1582,23 @@ $ tar -tvf scriptArchive.tar
 ```
 
 ### Extract Archive File Contents
+
 Extract files from the tarball using the `tar` command.
+
 ```shell
 # example: extract the files from `scriptArchive.tar` into the current directory.
 tar -xvf scriptArchive.tar
 HelloWorld
 MySQLScan.sh
 ```
+
 > Notes:
+>
 > - The `-v` switch will output which files are being extracted. Omit this switch to perform "silently" (without showing any output).
 > - If the extracted files already exist, `tar` will remove the existing files and replace them with the extracted files.
 
 # Environment Variables
+
 Key-value string pairs that are inherited by any child shells or system processes.
 > Shell variables: different from Environment variables in that they are only valid within shell they are created in.
 
@@ -1452,7 +1618,9 @@ HISTSIZE=0
 ```
 
 ## Change variables
+
 Change variables for current session
+
 ```shell
 # single value usage:
 KEY=value
@@ -1468,6 +1636,7 @@ kali@kali: ~$ PS1='H@CK3R: $ '
 > export variable to make permanent across all sessions: `export PS1`
 
 Change variables system wide with `export` command
+
 ```shell
 export KEY=value
 
@@ -1484,6 +1653,7 @@ echo $HISTSIZE
 ```
 
 May be a good idea to save the current variable values in a text document before changing ENV variables system wide.
+
 ```shell
 # make copy all environment variables
 $ echo set > ~/ValuesOfAllVariables.txt
@@ -1493,12 +1663,14 @@ $ echo $ENV_NAME > ValueOf_ENV_NAME.txt
 ```
 
 use `unset` command to delete the new variable
+
 ```shell
 $ unset NEWVARIABLE
 $ echo NEWVARIABLE
 ```
 
 ## Update PATH
+
 Update `PATH` environment variable to include a new tool directory named `/root/tools/MyNewTool` to allow `MyNewTool` to be executed anywhere on the system.
 
 > It's important to remember that you want to *append* to the `PATH`, *not* replace it's whole value.
@@ -1512,7 +1684,9 @@ PATH=$PATH:/root/tools/MyNewTool
 ```
 
 # Scripting
+
 ## Terms
+
 *Bash (Bourne-again shell)* - A type of shell available for Linux that can run any system commands, utilities, processes, programs, or applications.
 
 *shell* - An interface between the user and the operating system.
@@ -1520,20 +1694,24 @@ PATH=$PATH:/root/tools/MyNewTool
 *mounting* - Attaching drives or disks to the filesystem, making them available to the operating system.
 
 ## Shebang
+
 *shebang* - combination of a hash mark and an exclamation mark (`#!`) to communicate with the operating system which interpreter to use for the script.
 
 Bash
+
 ```bash
 #!/bin/bash
 ```
 
 Python
+
 ```python
 #!/usr/bin/env python
 #!/usr/bin/python3
 ```
 
 ## Exit Status Codes
+
 Every command executed by the shell script or user, has an exit status integer number.
 
 | exit status       | value    |
@@ -1545,16 +1723,21 @@ Every command executed by the shell script or user, has an exit status integer n
 > If a command is found but is not executable, the return status is 126.
 
 ## Make Script Executable
+
 Change the permissions of script file to execute. Give all perms for file owner and read/execute perms for group and other users.
+
 ```shell
 sudo chmod 755 {SCRIPT}
 ```
 
 ## Conditions
+
 ### Check Number of Input Args
+
 Use `$#` to return the number of arguments.
 
 Compare if number of args is equal to zero (`-eq 0`) to assert no arguments were supplied.
+
 ```shell
 if [ $# -eq 0 ]; then
     echo "No arguments supplied"
@@ -1562,7 +1745,9 @@ fi
 ```
 
 ### Check If Variable Is Empty
+
 Check if variable is non-defined/empty. Use `-z {string}` to return True if the length of string is zero.
+
 ```shell
 # True if argument ($1) has zero length
 if [[ -z $1 ]]; then
@@ -1571,8 +1756,11 @@ fi
 ```
 
 ## Useful Commands
+
 ### read
+
 Use the `read` command to retrieve and save user input.
+
 ```shell
 #! /bin/bash
 echo 'What is your name?'
@@ -1605,6 +1793,7 @@ ls -l /dev/sd*
 ```
 
 ## Partitions
+
 Partitions of a storage device are labeled with a number after the drive designation name. For example, the first partition of the first SATA drive will be designated as sda1, and the second partition of the first SATA drive will be sda2.
 
 Use `fdisk` command to view the partitions on the Linux system (use w/ `-l` to list all partitions on the drive).
