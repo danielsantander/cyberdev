@@ -1584,13 +1584,17 @@ echo "Welcome ${name}!"
 ```
 
 # Filesystem Management
+
 ## Device Directory (/dev/)
+
 The device directory (located at `/dev/`) contains a file representing every device on the system. Each file's permission is denoted with either a `c` or `b`.
+
 - character devices (`c`): receive data character by character, such as keyboards or mice.
 - block devices (`b`): communicate  in blocks of data (multiple bytes at a time), such as hard drives.
 
 The devices listed as `sda1, sda2, sda3, sdb` represent the hard drive (or USB flash drive) and its partitions.
 > Newer Serial ATA (SATA) interface drives and Small Computer System Interface (SCSI) hard drives are represented as `sda`. If more than one hard drives exist, Linux will increment the last letter of the name.
+>
 > - `sda` -> First SATA hard drive
 > - `sdb` -> Second SATA hard drive
 > - `sdc` -> Third SATA hard drive
@@ -1604,11 +1608,13 @@ ls -l /dev/sd*
 Partitions of a storage device are labeled with a number after the drive designation name. For example, the first partition of the first SATA drive will be designated as sda1, and the second partition of the first SATA drive will be sda2.
 
 Use `fdisk` command to view the partitions on the Linux system (use w/ `-l` to list all partitions on the drive).
+
 ```shell
 fdisk -l
 ```
 
 ## List Block Devices (lsblk)
+
 Use `lsblk` (list block) command to list information about each block device within `/dev/`.
 
 ```shell
@@ -1618,23 +1624,29 @@ lsblk
 NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 ...
 ```
+
 > The column `MOUNTPOINT` is the position/location the drive was attached to the filesystem.
 
 ## Mounting Devices (mount)
+
 A storage device must be both physically and logically attached to the filesystem for the data to be available to the operating system.
 
 Mount pionts are locations in the directory tree where the devices area attached to. Two main mount opints in Linux are:
+
 1. `/mnt`: Usually used to mount internal hard drives.
 2. `/media`: Usually used to mount external USB devices (flash drives) and external USB hard drives.
+
 > The filesystems that are mounted on a system are kept in a file at `/etc/fstab/` (filesystem table) which is read by the system at every bootup.
 
-Example of mounting hard drive.
+Example of mouning hard drive.
+
 ```shell
 # mount a sbd1 hard drive to the /mnt directory, to access its content
 mount /dev/sdb1 /mnt
 ```
 
 ## Unmounting Devices (unmount)
+
 "Eject" a device to keep from causing damage to the files stored on the device.
 > Can not unmount a device that is busy, that is if the system is busy reading or writing data to the storage device.
 
@@ -1644,11 +1656,13 @@ unmount {file_entry_of_device}
 ```
 
 ## Filesystem Checks
+
 Utilize the [Disk Free `df` command](#df) to monitor the state of the filesystem.
 
 Perform filesystem checks on devices with the [Filesystem check `fsck` command](#filesystem-checks-fsck).
 
 # Logging
+
 Logging involves automatically storing events that occur when the operating system runs (including errors & security alerts).
 
 Logs are stored based on a series of defined rules.
@@ -1658,26 +1672,33 @@ Logs are stored based on a series of defined rules.
 > Each linux distribution uses their own logging service. For the sake of consistency with Kali Linux, we will be focusing on the `rsyslog` utility variation of syslogd.
 
 ## Configuration
+
 The `rsyslog` configuration file is usually located at `/etc/rsyslog.conf`
 
 You can modify the log configuration to update and set rules for what the system will automatically log.
 
 ### Log Rules
+
 With a text editor navigate down to the "Rules" section of the rsyslog.conf file. Each line represents a logging rule for what logs are sent where.
 
 #### Rule Format
+
 Rule Format: `facility.priority     action` where:
+
 - 'facility' references the program name
 - 'priority' the log level or what kind of messages to log
 - 'action' references the filename and location at which to send the logs
+
 > an asterisk (`*`) may be used as a wildcard to reference either all facilities and/or all priorities.
 
 ## Logrotate
+
 The logrotate config file is usually located at `/etc/logrotate.conf`.
 
 Utilize log rotation to maintain log space, archiving log files by moving them to another location. The moved logged files will be cleaned out after a set period of time. This leaves space for more recent log files and having an archive or historical logs.
 
 Logroate Configuration file information:
+
 - The unit of time to rotate logs, default is set to `weekly`
 - Interval at which to rotate logs, default (`rotate 4`) is set to rotating logs every 4 weeks
   - set `rotate 1` to set rotating logs to once a week, saving more storage space on the system
@@ -1686,6 +1707,7 @@ Logroate Configuration file information:
   - uncomment `compressed` to enable compression of rotated logs
 
 **Example:** With a text editor, open the logrotate config file located at `/etc/logrotate.conf`.
+
 ```shell
 $ vi /etc/logrotate.conf
 # see "man logrotate" for details
@@ -1714,18 +1736,23 @@ include /etc/logrotate.d
 ```
 
 ## Disable Logging
+
 Disable logging by using the `service` command to stop the rsyslog daemon.
 
 ```shell
 service rsyslog stop
 ```
+
 Log files will now stop generating until the service is restarted.
 
 ## Shred Files
+
 Use the [`shred` command](#shred) to delete a file and overwrite it several times.
 
 **Example:** Use the `shred` command to delete and overwrite all auth log file 10 times. (Use the `*` to shred all auth logs including the rotated logs).
+
 ```shell
 shred -f -n 10 /var/log/auth.log.*
 ```
+
 Once successful, the contents of the auth log files should now be illegible.
