@@ -112,7 +112,13 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     # some server daemons expect this (FTP servers typically send a banner first, for example)
     if receive_first:
         remote_buffer = receive_from(remote_socket)
-        hexdump(remote_buffer)
+        if len(remote_buffer):
+            print("[<==] Received %d bytes from remote." % len(remote_buffer))
+            hexdump(remote_buffer)
+
+            # remote_buffer = response_handler(remote_buffer)
+            # client_socket.send(remote_buffer)
+            # print("[==>] Sent to local.")
 
     remote_buffer = response_handler(remote_buffer)
     if len(remote_buffer):
