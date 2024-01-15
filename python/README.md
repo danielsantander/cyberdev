@@ -4,6 +4,7 @@
   - [Make script executable](#make-script-executable)
 - [Create Python Environment](#create-python-environment)
 - [Pip Module](#pip-module)
+- [Print Numbers By Base](#print-numbers-by-base)
 
 ---
 More Docs:
@@ -62,4 +63,28 @@ python -m pip search {package_name}
 Install python packages
 ```shell
 python -m pip install {package_name}
+```
+
+# Print Numbers By Base
+
+Print binary: `{number}:{width}{base}`
+
+```python
+>>> num = 100
+>>> width = 4
+>>> base = 'b'
+>>> bases = 'dXob'
+>>> print ('{num:{width}{base}}'.format(num=num,width=width,base=base))
+ 101
+
+>>> num = 42
+>>> bases = 'dXob'
+>>> for base in bases:
+# ...     print ('{num:0{width}{base}}'.format(num=num,width=width,base=base))  # add '0' for leading zeros
+...     print ('{num:{width}{base}}'.format(num=num,width=width,base=base))
+...
+  42
+  2A
+  52
+101010
 ```
