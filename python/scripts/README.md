@@ -1,8 +1,9 @@
 *Python Scripts Table of Contents*
 - [cleanup.py](#cleanuppy)
+- [encryptPDF.py](#encryptpdfpy)
 - [netcat.py](#netcatpy)
   - [Setup Lister and Client](#setup-lister-and-client)
-- [encryptPDF.py](#encryptpdfpy)
+- [proxy.py](#proxypy)
 - [rename\_files.py](#rename_filespy)
 ---
 
@@ -21,6 +22,27 @@ Example:
 
 ```shell
 ./cleanup.py /home/ /home/results/
+```
+
+# encryptPDF.py
+Python script for encrypting PDF files.
+
+Usage: `./encryptPDF [PDF file] [output location]`
+
+> pw defaults to 'fairbanks' if not given when prompted
+
+**Example**: Encrypt `tests/sample_data/pdfs/HelloWorld.pdf` and output the encrypted file in the same directory as the file to encrypt.
+There should then be an encrypted PDF file located at `tests/sample_data/pdfs/HelloWorldENCRYPTED.pdf` (outputs in same directory as the input file).
+
+```shell
+$ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf
+```
+
+**Example**: Encrypt the same PDF file, but send output to the current directory.
+There should then be an encrypted PDF file located in the current directory named `HelloWorldENCRYPTED.pdf`.
+
+```shell
+./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf .
 ```
 
 # netcat.py
@@ -74,26 +96,23 @@ CTRL-D
 <NETCAT:#>  ls -la
 ```
 
+# proxy.py
 
-# encryptPDF.py
-Python script for encrypting PDF files.
+TCP proxy
 
-Usage: `./encryptPDF [PDF file] [output location]`
+Usage: `./proxy.py [localhost] [localport] [remotehost] [remoteport] [receive_first]`
 
-> pw defaults to 'fairbanks' if not given when prompted
-
-**Example**: Encrypt `tests/sample_data/pdfs/HelloWorld.pdf` and output the encrypted file in the same directory as the file to encrypt.
-There should then be an encrypted PDF file located at `tests/sample_data/pdfs/HelloWorldENCRYPTED.pdf` (outputs in same directory as the input file).
+Example -- run proxy against FTP server
 
 ```shell
-$ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf
+# fire up proxy w/ sudo bc port 21 is a privileged port
+sudo python3 proxy.py {ftp_server_ip_address} 21 ftp.sun.ac.za 21 True
 ```
 
-**Example**: Encrypt the same PDF file, but send output to the current directory.
-There should then be an encrypted PDF file located in the current directory named `HelloWorldENCRYPTED.pdf`.
+In another terminal, start a FTP session using default port 21
 
 ```shell
-./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf .
+sudo ftp {ftp_server_ip_address}
 ```
 
 # rename_files.py
