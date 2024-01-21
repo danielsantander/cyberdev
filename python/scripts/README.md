@@ -7,6 +7,7 @@
 - [rename\_files.py](#rename_filespy)
 - [SSH](#ssh)
   - [ssh\_cmd](#ssh_cmd)
+  - [SSH client and server](#ssh-client-and-server)
 
 ---
 
@@ -150,3 +151,9 @@ Enter command or [id]: {enter_command_to_run}
 --- Output ---
 uid=1000(admin) gid=1000(admin) groups=1000(admin),27(sudo)
 ```
+
+## SSH client and server
+
+**ssh_rcmd.py** is a modification of `ssh_cmd.py` script to run commands on the Windows client over SSH.
+
+Because most versions of Microsoft Windows don't include a SSH server (out of the box), we need to reverse and send commands from a SSH server to the SSH client. This script will act as the client to the server.
