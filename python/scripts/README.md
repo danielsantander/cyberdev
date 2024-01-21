@@ -5,6 +5,9 @@
   - [Setup Lister and Client](#setup-lister-and-client)
 - [proxy.py](#proxypy)
 - [rename\_files.py](#rename_filespy)
+- [SSH](#ssh)
+  - [ssh\_cmd](#ssh_cmd)
+
 ---
 
 # cleanup.py
@@ -121,4 +124,29 @@ run in debug mode:
 
 ```shell
 ./rename_files.py <filepath> -i --debug --preface="preface_filename_with_this__"
+```
+
+# SSH
+
+The `Paramiko` library is used in these scripts to utilize raw sockets in order to create SSH clients/servers. Install Paramiko library if necessary:
+
+```shell
+python3 -m pip install paramiko
+```
+
+## ssh_cmd
+
+Tunnel traffic using a secure shell (SHH). Encrypt traffic to help avoid detection. However, a lot of clients do not provide a SSH client (such as most Window systems, however PuTTY may be available).
+
+Example -- Make SSH connection and run single command on server.
+
+```shell
+python3 ssh_cmd.py
+Username: admin
+Password:
+Enter server IP: {enter_server_ip_address}
+Enter port or [22]: {enter_server_port}
+Enter command or [id]: {enter_command_to_run}
+--- Output ---
+uid=1000(admin) gid=1000(admin) groups=1000(admin),27(sudo)
 ```
