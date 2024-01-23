@@ -1,8 +1,13 @@
 *Python Scripts Table of Contents*
+
 - [cleanup.py](#cleanuppy)
 - [encryptPDF.py](#encryptpdfpy)
 - [netcat.py](#netcatpy)
   - [Setup Lister and Client](#setup-lister-and-client)
+- [pollen8.py](#pollen8py)
+  - [SSH Commands](#ssh-commands)
+    - [Single Command](#single-command)
+    - [SSH Client/Server Setup](#ssh-clientserver-setup)
 - [proxy.py](#proxypy)
 - [rename\_files.py](#rename_filespy)
 - [SSH](#ssh)
@@ -100,6 +105,68 @@ CTRL-D
 <NETCAT:#>  ls -la
 ```
 
+# pollen8.py
+
+Script that does some neat network stuff in Python.
+
+## SSH Commands
+
+### Single Command
+
+USAGE: `./pollen8 --ssh-cmd {IP_ADDRESS} {USERNAME} {COMMAND} {PORT}`
+
+```shell
+./pollen8.py --ssh-cmd {IP_ADDRESS}
+
+Starting SSH command...
+User: root
+Password: password123!
+command: whoami
+--- OUTPUT ---
+root
+
+# may also add username and command into args:
+python3 pollen8.py --ssh-cmd {IP_ADDRESS} root "whoami"
+
+Starting SSH command...
+Password:
+--- OUTPUT ---
+root
+```
+
+### SSH Client/Server Setup
+
+On Machine-A start a SSH server and begin listening:
+
+```shell
+python pollen8.py --ssh-server {SERVER_IP_ADDRESS} 2222
+2024-01-22 23:48:25,252 [INFO] Pollen8: ssh_server: starting SSH server on {SERVER_IP_ADDRESS}, 2222...
+2024-01-22 23:48:25,325 [INFO] Pollen8: [+] Listening for connection ...
+```
+
+On Machine-B create the SSH client:
+
+```shell
+python3 pollen8.py --ssh-client {SERVER_IP_ADDRESS}
+User [root]:
+Password:
+2024-01-22 23:48:32,374 [INFO] Pollen8: ssh_rcmd: starting ssh client on {SERVER_IP_ADDRESS}, 2222
+Welcome to Pollen8 SHH server.
+```
+
+Then back on Machine-A (the SSH server), you can enter commands to run on the client.
+
+```shell
+2024-01-22 23:48:32,649 [INFO] Pollen8: [+] Got a connection! <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('{SERVER_IP_ADDRESS}', 2222), raddr=('{CLIENT_IP_ADDRESS}', {CLIENT_PORT})> ('{CLIENT_IP_ADDRESS}', CLIENT_PORT)
+2024-01-22 23:48:32,875 [INFO] Pollen8: [+] Authenticated
+2024-01-22 23:48:32,883 [INFO] Pollen8: ClientConnected
+Enter command: pwd
+--- OUTPUT ---
+/home/root/
+
+Enter command:
+```
+
 # proxy.py
 
 TCP proxy
@@ -178,10 +245,9 @@ Then on Windows machine, run the client script:
 ```shell
 sudo python3 ssh_rcmd.py
 Password:
-Enter server IP: 192.168.0.100
+Enter server IP: {SERVER_IP_ADDRESS}
 Enter port [2222]:
 Welcome to SHH server
-
 ```
 
 Back on the Mac SSH server, output should now be:
@@ -191,5 +257,4 @@ Back on the Mac SSH server, output should now be:
 [+] Authenticated
 ClientConnected
 Enter command:
-
 ```
