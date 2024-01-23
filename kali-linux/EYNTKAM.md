@@ -9,6 +9,7 @@ Table of Contents
   - [View Bit Size](#view-bit-size)
   - [Determine revision of current firmware](#determine-revision-of-current-firmware)
   - [Update and Upgrade System](#update-and-upgrade-system)
+  - [Generate SSH Keys](#generate-ssh-keys)
   - [Change Shell](#change-shell)
   - [Script Shebang](#script-shebang)
   - [Print Random Line From File](#print-random-line-from-file)
@@ -197,6 +198,19 @@ uname -a
 
 ```shell
 sudo apt-get update && sudo apt-get upgrade
+```
+
+## Generate SSH Keys
+
+Generate a SSH key pair consisting of a public key and a private key.
+
+```shell
+# use -t option to specify key type
+ssh-keygen -t rsa
+
+# use -b option to specify length (in bit size)
+ssh-keygen -b 2048 -t rsa
+
 ```
 
 ## Change Shell
