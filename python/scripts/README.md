@@ -157,3 +157,39 @@ uid=1000(admin) gid=1000(admin) groups=1000(admin),27(sudo)
 **ssh_rcmd.py** is a modification of `ssh_cmd.py` script to run commands on the Windows client over SSH.
 
 Because most versions of Microsoft Windows don't include a SSH server (out of the box), we need to reverse and send commands from a SSH server to the SSH client. This script will act as the client to the server.
+
+**ssh_server.py** is a script to create a SSH server that will listen for the client started by ssh_rcmd.
+
+Example:
+
+Run server on MacOS
+
+```shell
+sudo python3 ssh_server.py
+Password:
+Enter server IP: {SERVER_IP_ADDRESS}
+Enter port [2222]:
+starting ssh server:	{SERVER_IP_ADDRESS}, 2222
+[+] Listening for connection ...
+```
+
+Then on Windows machine, run the client script:
+
+```shell
+sudo python3 ssh_rcmd.py
+Password:
+Enter server IP: 192.168.0.100
+Enter port [2222]:
+Welcome to SHH server
+
+```
+
+Back on the Mac SSH server, output should now be:
+
+```shell
+[+] Got a connection! <socket.socket fd=4, family=AddressFamily.AF_INET, type=SocketKind.SOCK_STREAM, proto=0, laddr=('{SERVER_IP_ADDRESS}', 2222), raddr=('{CLIENT_IP_ADDRESS}', 54255)> ('{CLIENT_IP_ADDRESS}', 54255)
+[+] Authenticated
+ClientConnected
+Enter command:
+
+```
