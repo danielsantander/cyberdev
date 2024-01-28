@@ -13,6 +13,9 @@ Table of Contents
   - [Change Shell](#change-shell)
   - [Script Shebang](#script-shebang)
   - [Print Random Line From File](#print-random-line-from-file)
+  - [PCAP Files](#pcap-files)
+    - [Generate PCAP Files](#generate-pcap-files)
+    - [Quickly Read PCAP Files](#quickly-read-pcap-files)
 - [Permissions](#permissions)
   - [Change File Ownership](#change-file-ownership)
   - [Permission Levels](#permission-levels)
@@ -229,6 +232,26 @@ Script files will begin with the shebang: `#!/bin/bash`
 ```shell
 # output "n" number of random lines from file
 shuf -n 1 {filename}
+```
+
+## PCAP Files
+
+### Generate PCAP Files
+
+```shell
+tcpdump -s 0 -w server_request.pcap {target_IP}
+
+# example: tcpdump -s 0 -w request_server.pcap 10.1.2.3
+```
+
+### Quickly Read PCAP Files
+
+```shell
+tcpdump -qns 0 -X -r server_request.pcap
+
+# or
+
+rcpdump -qns 0 -A -r server_request.pcap
 ```
 
 # Permissions
