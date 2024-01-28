@@ -31,40 +31,54 @@ def get_args():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=textwrap.dedent('''Example:
             --ssh-server 192.168.0.100 2222
-            --ssh-client 192.168.1.100
-            --ssh-cmd 192.168.1.100 root "whoami" 22
+            --ssh-client 192.168.0.100
+            --ssh-cmd 192.168.0.100 root "whoami" 22
+            --scan 192.168.0.100/24
         '''))
     parser.add_argument('-d', '--debug',
-        dest='debug',
-        action='store_true',
-        default=DEBUG_MODE,
-        help=f'Debug mode. [{DEBUG_MODE}]')
+                        dest='debug',
+                        action='store_true',
+                        default=DEBUG_MODE,
+                        help=f'Debug mode. [{DEBUG_MODE}]')
+
+    parser.add_argument('-p', '--port',
+                        dest='port',
+                        type=int,
+                        action='store', help='Port value.')
 
     # nargs='+' takes 1 or more arguments, nargs='*' takes zero or more.
     parser.add_argument('--ssh-server',
-        dest='ssh_server',
-        metavar="IP PORT",
-        nargs="*",
-        action='store',
-        required=False,
-        help='Create SSH server. Input server ip address & port as arguments.',
-    )
+                        dest='ssh_server',
+                        metavar="IP PORT",
+                        nargs="*",
+                        action='store',
+                        required=False,
+                        help='Create SSH server. Input server ip address & port as arguments.',
+                    )
     parser.add_argument('--ssh-client',
-        dest='ssh_client',
-        metavar="IP PORT",
-        nargs="*",
-        action='store',
-        required=False,
-        help='Create SSH client. Input server IP address as argument.',
-    )
+                        dest='ssh_client',
+                        metavar="IP PORT",
+                        nargs="*",
+                        action='store',
+                        required=False,
+                        help='Create SSH client. Input server IP address as argument.',
+                    )
     parser.add_argument('--ssh-cmd',
-        dest='ssh_cmd',
-        metavar="IP PORT",
-        nargs="+",
-        action='store',
-        required=False,
-        help='Make connection to SSH server and run single command',
-    )
+                        dest='ssh_cmd',
+                        metavar="IP PORT",
+                        nargs="+",
+                        action='store',
+                        required=False,
+                        help='Make connection to SSH server and run single command',
+                    )
+    parser.add_argument('--scan',
+                        dest='scan',
+                        metavar="IP_ADDRESS/CIDR",
+                        nargs="*",
+                        action="store",
+                        required=False,
+                        help="Scan a host or subnet."
+                        )
     args = parser.parse_args()
     return args
 
@@ -103,6 +117,58 @@ class Server(paramiko.ServerInterface):
 class Pollen8:
     def __init__(self, **kwargs):
         self.logger = setup_logger("Pollen8")
+
+    """
+    def reverse_forward_tunnel(self, server_port, remote_host, remote_port, transport):
+        transport.request_port_forward("", server_port)
+        while True:
+            # TODO: pull from rforward.py
+            pass
+    """
+
+    def scan(self):
+        """
+        Sniffer for Windows and Linux machines. Note: use sudo.
+
+        Keyword Arguments:
+        - host (string): ip address/cidr
+        """
+
+        def get_ip_address():
+            """ Creates UDP socket to retrieve the eth0 address."""
+            # src: https://stackoverflow.com/a/30990617/14745606
+            # TODO: source to perhaps make socket into context manager:
+            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            s.connect(("8.8.8.8", 80))
+            return s.getsockname()[0]
+
+        # get host IP address of machine
+        hostname = socket.gethostname()
+        # commented out following bc it kept returning 127.0.0.1 instead (set in )
+        # hostname += '.local' if not hostname.endswith('.local') else hostname
+        # host_ip = socket.gethostbyname('localhost')
+        host_ip = get_ip_address()
+
+        self.logger.info(f"Starting scan on {hostname} ({host_ip})...")
+        # create raw socket, bin to public interface
+        os_name = os.name
+        socket_protocol = socket.IPPROTO_IP if (os_name=='nt') else socket.IPPROTO_ICMP
+        sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
+        sniffer.bind((host_ip, 0))
+
+        # set sock option to include the IP header in the captured packets
+        sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+
+        # enable promiscuous mode if on Windows by sending an IOCTL to the network card driver (note may be issues running Windows on virtual machine, notification may be sent to user).
+        if os_name == 'nt':
+            sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
+
+        # read one packet -- print out entire raw back w/o decoding
+        print(sniffer.recvfrom(65565))
+
+        # Disable promiscuous mode if on Windows, before exiting script.
+        if os_name == 'nt':
+            sniffer.ioctl(socket.SID_RCVALL, socket.RCVALL_OFF)
 
     def ssh_cmd(self, ip, port, user, passwd, cmd):
         """
@@ -233,11 +299,10 @@ class Pollen8:
         return
 
 def main():
-    args = get_args()
-    if args.debug:
-        print("DEBUG MODE")
-        sys.exit(0)
+    global DEBUG_MODE
 
+    args = get_args()
+    DEBUG_MODE = args.debug is True or DEBUG_MODE
     diablo = Pollen8()
 
     # setup SSH server
@@ -282,8 +347,14 @@ def main():
         port = args.ssh_cmd[3] if len(args.ssh_cmd) >=4 else 22
         diablo.ssh_cmd(ip=args.ssh_cmd[0], port=int(port), user=user, passwd=passwd, cmd=cmd)
 
+    # sniffer on local network
+    elif args.scan is not None:
+        # target:str = args.scan[0] if len(args.scan) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
+        diablo.scan()
+
+
     else:
-        print("no action")
+        print("no action, exiting . . .")
         sys.exit()
 
 if __name__ == '__main__':
