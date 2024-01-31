@@ -129,7 +129,7 @@ Run:
 
 ```shell
 python3 pollen8.py --sniff
-2024-01-30 23:46:36,153 [INFO] Pollen8: Starting scan on santander-2.local ({host_ip_address})...
+2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on {host_ip_address} . . .
 ```
 
 In another terminal, ping google:
@@ -141,10 +141,21 @@ ping google.com
 In the original terminal, see the  decoded IP headers from the captured packets:
 
 ```shell
-2024-01-30 23:46:36,153 [INFO] Pollen8: Starting scan on 192.168.0.7 . . .
-Protocol: ICMP 142.250.138.101 -> 192.168.0.7
-Protocol: ICMP 142.250.138.101 -> 192.168.0.7
-Protocol: ICMP 142.250.138.101 -> 192.168.0.7
+2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on {host_ip_address} . . .
+Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Version: 4
+Header Length: 5 TTL: 105
+ICMP -> Type: 0 Code: 0
+
+Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Version: 4
+Header Length: 5 TTL: 105
+ICMP -> Type: 0 Code: 0
+
+Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Version: 4
+Header Length: 5 TTL: 105
+ICMP -> Type: 0 Code: 0
 
 ```
 

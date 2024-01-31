@@ -447,7 +447,17 @@ IP Headers contain information such as:
 
 ### ICMP Header
 
-Each portion of the ICMP message is a multiple of 8 bits.
+Each portion of the ICMP message is a multiple of 8 bits. Each ICMP message contains three elements that stay consistent:
+
+1. type -- first 8 bits
+2. code -- second 8 bits
+3. checksum
+
+Type & code fields notify the receiving host what type of ICMP message is arriving, which dictates how to decode the message properly.
+
+---
+
+*Sample Echo Reply ICMP Message*
 
 <table>
   <thead>
@@ -473,7 +483,35 @@ Each portion of the ICMP message is a multiple of 8 bits.
       <td colspan=4>Sequence number</td>
     </tr>
     <tr>
-      <td colspane=8>Optional Data</td>
+      <td colspan=8>Optional Data</td>
+    </tr>
+  </tbody>
+</table>
+
+---
+
+*Destination Unreachable ICMP Message*
+
+<table>
+  <thead>
+    <tr>
+      <th>0-7</th>
+      <th>8-15</th>
+      <th>16-31</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Type = 3</td>
+      <td>Code</td>
+      <td>Header checksum</td>
+    </tr>
+    <tr>
+      <td colspan=2>Unused</td>
+      <td>Next-hop MTU</td>
+    </tr>
+    <tr>
+      <td colspan=3>IP header and first 8 bytes of original datagram's data</td>
     </tr>
   </tbody>
 </table>

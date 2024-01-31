@@ -187,7 +187,7 @@ class IP:
 
 class ICMP:
     """
-    ICMP class that can read a packet and parse the header into it's own separate fields.
+    ICMP class that can decode a packet and parse the header into it's own separate fields.
 
     Keyword Arguments:
     - buff (string): packet data
@@ -277,8 +277,21 @@ class Pollen8:
                 # create IP header from the first 20 bytes
                 ip_header = IP(raw_buffer[0:20])
 
-                # print the detected protocol and hosts:
-                print(f"Protocol: {ip_header.protocol} {ip_header.src_address} -> {ip_header.dst_address}")
+                # if it's ICMP, we want it
+                if ip_header.protocol == "ICMP":
+                    # print the detected protocol and hosts:
+                    print(f"Protocol: {ip_header.protocol} {ip_header.src_address} -> {ip_header.dst_address}")
+                    print(f"Version: {ip_header.ver}")
+                    print(f"Header Length: {ip_header.ihl} TTL: {ip_header.ttl}")
+
+                    # calculate offset in raw packet where ICMP body starts
+                    offset = ip_header.ihl * 4 # header length indicates number of 32-bit words (4 byte chunks) -- multiply by 4 to know the size of IP header, and next network layer ICMP begins
+                    buf = raw_buffer[offset:offset+8]
+
+                    # create ICMP struct
+                    icmp_header = ICMP(buf)
+                    print(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
+
         except KeyboardInterrupt:
             # Disable promiscuous mode if on Windows, before exiting script.
             if os_name == 'nt':
