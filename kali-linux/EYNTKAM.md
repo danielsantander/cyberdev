@@ -24,6 +24,9 @@ Table of Contents
   - [Check Permissions](#check-permissions)
   - [Configure Default Permissions](#configure-default-permissions)
 - [Network](#network)
+  - [Networking](#networking)
+    - [IP Header](#ip-header)
+    - [ICMP Header](#icmp-header)
   - [Check Wireless Network Devices](#check-wireless-network-devices)
   - [Assign IP Address](#assign-ip-address)
     - [Troubleshoot](#troubleshoot)
@@ -380,6 +383,101 @@ umask 077
 ```
 
 # Network
+
+## Networking
+
+### IP Header
+
+IP Headers contain information such as:
+
+- Protocol Types:
+  1. UDP
+  2. TCP
+  3. ICMP
+- Source IP Address
+- Destination IP Address
+
+**INTERNET PROTOCOL**
+
+<table>
+  <thead>
+    <tr>
+      <th>Bit Offset</th>
+      <th>0-3</th>
+      <th>4-7</th>
+      <th>8-15</th>
+      <th>16-18</th>
+      <th>19-31</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>0</td>
+      <td>Version</td>
+      <td>HDR Length</td>
+      <td>Type of service</td>
+      <td colspan=2>Total Length</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td colspan=3>Identification</td>
+      <td>Flags</td>
+      <td>Fragment offset</td>
+    </tr>
+    <tr>
+      <td>64</td>
+      <td colspan=2>Time to live</td>
+      <td>Protocol</td>
+      <td colspan=2>Header checksum</td>
+    </tr>
+    <tr>
+      <td>96</td>
+      <td colspan=5>Source IP Address</td>
+    </tr>
+    <tr>
+      <td>128</td>
+      <td colspan=5>Destination IP Address</td>
+    </tr>
+    <tr>
+      <td>160</td>
+      <td colspan=5>Options</td>
+    </tr>
+  </tbody>
+</table>
+
+### ICMP Header
+
+Each portion of the ICMP message is a multiple of 8 bits.
+
+<table>
+  <thead>
+    <tr>
+      <th>0-3</th>
+      <th>4-7</th>
+      <th>8-11</th>
+      <th>12-15</th>
+      <th>16-19</th>
+      <th>20-23</th>
+      <th>24-27</th>
+      <th>28-31</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td colspan=2>Type</td>
+      <td colspan=2>Code</td>
+      <td colspan=4>Checksum</td>
+    </tr>
+    <tr>
+      <td colspan=4>Identifier</td>
+      <td colspan=4>Sequence number</td>
+    </tr>
+    <tr>
+      <td colspane=8>Optional Data</td>
+    </tr>
+  </tbody>
+</table>
+
 ## Check Wireless Network Devices
 
 `iwconfig` -- gather information such as the wireless adapter's IP address, MAC address, what mode it is in, and much more.
