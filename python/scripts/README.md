@@ -132,7 +132,7 @@ python3 pollen8.py --scan
 2024-01-30 23:46:36,153 [INFO] Pollen8: Starting scan on santander-2.local ({host_ip_address})...
 ```
 
-In another termina, ping google:
+In another terminal, ping google:
 
 ```shell
 ping google.com
