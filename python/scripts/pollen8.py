@@ -37,7 +37,7 @@ def get_args():
             --ssh-server 192.168.0.100 2222
             --ssh-client 192.168.0.100
             --ssh-cmd 192.168.0.100 root "whoami" 22
-            --scan 192.168.0.100/24
+            --sniff
         '''))
     parser.add_argument('-d', '--debug',
                         dest='debug',
@@ -75,13 +75,13 @@ def get_args():
                         required=False,
                         help='Make connection to SSH server and run single command',
                     )
-    parser.add_argument('--scan',
-                        dest='scan',
+    parser.add_argument('--sniff',
+                        dest='sniff',
                         metavar="IP_ADDRESS/CIDR",
                         nargs="*",
                         action="store",
                         required=False,
-                        help="Scan a host or subnet."
+                        help="Sniff network packet data."
                         )
     args = parser.parse_args()
     return args
@@ -229,7 +229,7 @@ class Pollen8:
             pass
     """
 
-    def scan(self, host_ip:str=None):
+    def sniff(self, host_ip:str=None):
         """
         Sniffer for Windows and Linux machines. Note: use sudo.
 
@@ -252,7 +252,7 @@ class Pollen8:
         # host_ip = socket.gethostbyname('localhost')   # 127.0.0.1
         host_ip = get_ip_address() if host_ip is None else host_ip
 
-        self.logger.info(f"Starting scan on {host_ip} . . .")
+        self.logger.info(f"Starting sniffer on {host_ip} . . .")
         os_name = os.name
         socket_protocol = socket.IPPROTO_IP if (os_name=='nt') else socket.IPPROTO_ICMP
         sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
@@ -463,10 +463,10 @@ def main():
         port = args.ssh_cmd[3] if len(args.ssh_cmd) >=4 else 22
         diablo.ssh_cmd(ip=args.ssh_cmd[0], port=int(port), user=user, passwd=passwd, cmd=cmd)
 
-    # scan/sniffer on local network
-    elif args.scan is not None:
-        # target:str = args.scan[0] if len(args.scan) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
-        diablo.scan()
+    # sniffer on local network
+    elif args.sniff is not None:
+        # target:str = args.sniff[0] if len(args.sniff) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
+        diablo.sniff()
 
 
     else:

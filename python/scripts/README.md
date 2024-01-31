@@ -128,7 +128,7 @@ Uses raw sockets to read low level network data:
 Run:
 
 ```shell
-python3 pollen8.py --scan
+python3 pollen8.py --sniff
 2024-01-30 23:46:36,153 [INFO] Pollen8: Starting scan on santander-2.local ({host_ip_address})...
 ```
 
