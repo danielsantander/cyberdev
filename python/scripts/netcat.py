@@ -116,7 +116,7 @@ class NetCat:
         """
         Bind the target and port and start listening in a loop.
         """
-        logger.info('listening...')
+        logger.info(f'listening on target ${self.args.target}:{self.args.port}')
         self.socket.bind((self.args.target, self.args.port))
         self.socket.listen(5)
         while True:
