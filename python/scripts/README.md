@@ -156,7 +156,6 @@ Protocol: ICMP 142.251.116.138 -> {host_ip_address}
 Version: 4
 Header Length: 5 TTL: 105
 ICMP -> Type: 0 Code: 0
-
 ```
 
 ### Discover Active Hosts On Network
