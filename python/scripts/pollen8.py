@@ -11,12 +11,16 @@ Script that does some neat network stuff in Python.
 
 import argparse
 import getpass
+import ipaddress
 import logging
 import paramiko
 import os
 import socket
+import struct
 import sys
 import threading
+
+from ctypes import *
 
 DEBUG_MODE = False
 CWD = os.path.dirname(os.path.realpath(__file__))
@@ -98,6 +102,105 @@ def setup_logger(name:str=None, debug_mode:bool=DEBUG_MODE):
     logger.setLevel(lgr_lvl)
     return logger
 
+# ctype Struct Model
+class IP_CTYPE(Structure):
+    """
+    IP class that can read a packet and parse the header into it's own separate fields.
+    Class maps C data types to the IP header.
+    """
+
+    # ctypes.Structure requires a '_fields_' variable.
+    # Fields defining parts of IP header,each field takes three args:
+        # 1. name of field
+        # 2. type of value it takes
+        # 3. width in bits for the field
+    _fields_ = [
+        ("ihl",          c_ubyte,  4),    # 4 bit unsigned char
+        ("version",      c_ubyte,  4),    # 4 bit unsigned char
+        ("tos",          c_ubyte,  8),    # 1 byte char
+        ("len",          c_ushort, 16),   # 2 byte unsigned short
+        ("id",           c_ushort, 16),   # 2 byte unsigned short
+        ("offset",       c_ushort, 16),   # 2 byte unsigned short
+        ("ttl",          c_ubyte,  8),    # 1 byte char
+        ("protocol_num", c_ubyte,  8),    # 1 byte char
+        ("sum",          c_ushort, 16),   # 2 byte unsigned short
+        ("src",          c_uint32, 32),   # 4 byte unsigned int
+        ("dst",          c_uint32, 32)    # 4 byte unsigned int
+    ]
+    def _new_ (cls, socket_buffer=None):
+        return cls.from_buffer_copy(socket_buffer)
+
+    def __init__(self, socket_buffer=None):
+        # human readable IP addresses
+        self.src_address = socket.inet_ntoa(struct.pack("<L", self.src))
+        self.dst_address = socket.inet_ntoa(struct.pack("<L", self.dst))
+
+
+# Struct IP Model
+class IP:
+    """
+    IP class that can read a packet and parse the header into it's own separate fields (map the first 20 bytes of the received buffer into a friendly IP header).
+
+    Keyword Arguments:
+    - buff (string): packet data
+
+    Example:
+    mypacket = IP(buff)
+    print (f'{mypacket.src_address} -> {mypacket.dst_address}')
+    """
+    def __init__(self, buff=None):
+        # first char '<' specifies endianness of the data (order of bytes within binary number)
+        # B -> 1-byte unsigned char
+        # H -> 2-byte unsigned short
+        # s -> a byte array requiring byte-width specifications (4s means 4-byte string)
+        header = struct.unpack('<BBHHHBBH4s4s', buff)
+
+
+        # With first byte of header data:
+        # - assign version variable the high-order nybble by right-shifting the byte by four places (prepending four 9s to the front)
+        # - assign hdrlen variable the lower-order nybble (last 4 bits of byte) by Using boolean AND with 0xF (00001111) - replacing first 4 bits with 0.
+        self.ver = header[0] >> 4
+        self.ihl = header[0] & 0xF
+
+        self.tos = header[1]
+        self.len = header[2]
+        self.id = header[3]
+        self.offset = header[4]
+        self.ttl = header[5]
+        self.protocol_num = header[6]
+        self.sum = header[7]
+        self.src = header[8]
+        self.dst = header[9]
+
+        # human readable IP addresses
+        self.src_address = ipaddress.ip_address(self.src)
+        self.dst_address = ipaddress.ip_address(self.dst)
+
+        self.protocol_map = { 1: "ICMP", 6: "TCP", 17: "UDP" }
+
+        try:
+            self.protocol = self.protocol_map[self.protocol_num]
+        except Exception as e:
+            err_msg = ("%s No protocol f or %s" % (e,  self.protocol_num))
+            print(err_msg)
+            self.protocol = str(self.protocol_num)
+
+class ICMP:
+    """
+    ICMP class that can read a packet and parse the header into it's own separate fields.
+
+    Keyword Arguments:
+    - buff (string): packet data
+    """
+    def __init__(self, buff):
+        # assign  1 byte to the first two attributes, and 2 bytes to the next three attributes
+        header = struct.unpack('<BBHHH', buff)
+        self.type = header[0]
+        self.code = header[1]
+        self.sum = header[2]
+        self.id = header[3]
+        self.seq = header[4]
+
 class Server(paramiko.ServerInterface):
     def __init__(self, _username:str='root', _passwd:str='fairbanks'):
         self.event = threading.Event()
@@ -126,7 +229,7 @@ class Pollen8:
             pass
     """
 
-    def scan(self):
+    def scan(self, host_ip:str=None):
         """
         Sniffer for Windows and Linux machines. Note: use sudo.
 
@@ -142,15 +245,14 @@ class Pollen8:
             s.connect(("8.8.8.8", 80))
             return s.getsockname()[0]
 
-        # get host IP address of machine
-        hostname = socket.gethostname()
-        # commented out following bc it kept returning 127.0.0.1 instead (set in )
-        # hostname += '.local' if not hostname.endswith('.local') else hostname
-        # host_ip = socket.gethostbyname('localhost')
-        host_ip = get_ip_address()
 
-        self.logger.info(f"Starting scan on {hostname} ({host_ip})...")
-        # create raw socket, bin to public interface
+        # get host IP address of machine
+        # hostname = socket.gethostname()
+
+        # host_ip = socket.gethostbyname('localhost')   # 127.0.0.1
+        host_ip = get_ip_address() if host_ip is None else host_ip
+
+        self.logger.info(f"Starting scan on {host_ip} . . .")
         os_name = os.name
         socket_protocol = socket.IPPROTO_IP if (os_name=='nt') else socket.IPPROTO_ICMP
         sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
@@ -163,12 +265,26 @@ class Pollen8:
         if os_name == 'nt':
             sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
-        # read one packet -- print out entire raw back w/o decoding
-        print(sniffer.recvfrom(65565))
+        # # read one packet -- print out entire raw back w/o decoding
+        # print(sniffer.recvfrom(65565))
 
-        # Disable promiscuous mode if on Windows, before exiting script.
-        if os_name == 'nt':
-            sniffer.ioctl(socket.SID_RCVALL, socket.RCVALL_OFF)
+        # continually read in and print out packets (read in the packet and  pass in the first 20 bytes)
+        try:
+            while True:
+                # read packet
+                raw_buffer = sniffer.recvfrom(65535)[0]
+
+                # create IP header from the first 20 bytes
+                ip_header = IP(raw_buffer[0:20])
+
+                # print the detected protocol and hosts:
+                print(f"Protocol: {ip_header.protocol} {ip_header.src_address} -> {ip_header.dst_address}")
+        except KeyboardInterrupt:
+            # Disable promiscuous mode if on Windows, before exiting script.
+            if os_name == 'nt':
+                sniffer.ioctl(socket.SID_RCVALL, socket.RCVALL_OFF)
+            sys.exit()
+
 
     def ssh_cmd(self, ip, port, user, passwd, cmd):
         """
@@ -347,7 +463,7 @@ def main():
         port = args.ssh_cmd[3] if len(args.ssh_cmd) >=4 else 22
         diablo.ssh_cmd(ip=args.ssh_cmd[0], port=int(port), user=user, passwd=passwd, cmd=cmd)
 
-    # sniffer on local network
+    # scan/sniffer on local network
     elif args.scan is not None:
         # target:str = args.scan[0] if len(args.scan) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
         diablo.scan()

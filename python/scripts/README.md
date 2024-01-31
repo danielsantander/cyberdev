@@ -129,7 +129,7 @@ Run:
 
 ```shell
 python3 pollen8.py --scan
-2024-01-26 22:22:19,790 [INFO] Pollen8: Starting scan on santander-2.local ({host_ip_address})...
+2024-01-30 23:46:36,153 [INFO] Pollen8: Starting scan on santander-2.local ({host_ip_address})...
 ```
 
 In another termina, ping google:
@@ -138,11 +138,14 @@ In another termina, ping google:
 ping google.com
 ```
 
-In the original terminal, see the  captured initial ICMP ping. The output should be similar to:
+In the original terminal, see the  decoded IP headers from the captured packets:
 
 ```shell
-2024-01-26 22:22:19,790 [INFO] Pollen8: Starting scan on santander-2.local ({host_ip_address})...
-(b'E\x00@\x00\x00\x00\x00\x00i\x01\x90\x99\x8e\xfaqe\xc0\xa8\x00\x08\x00\x00\xba\xea\xa9e\x00\x00e\xb4\x86^\x00\x05\xc4\x94\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !"#$%&\'()*+,-./01234567', ('142.250.113.101', 0))
+2024-01-30 23:46:36,153 [INFO] Pollen8: Starting scan on 192.168.0.7 . . .
+Protocol: ICMP 142.250.138.101 -> 192.168.0.7
+Protocol: ICMP 142.250.138.101 -> 192.168.0.7
+Protocol: ICMP 142.250.138.101 -> 192.168.0.7
+
 ```
 
 ### Discover Active Hosts On Network
