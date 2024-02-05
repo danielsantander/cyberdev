@@ -5,10 +5,9 @@
 - [netcat.py](#netcatpy)
   - [Setup Lister and Client](#setup-lister-and-client)
 - [pollen8.py](#pollen8py)
+  - [Scanner](#scanner)
   - [Sniffer](#sniffer)
-    - [Discover Active Hosts On Network](#discover-active-hosts-on-network)
     - [Packet Sniffing](#packet-sniffing)
-    - [Scanner](#scanner)
   - [SSH Commands](#ssh-commands)
     - [Single Command](#single-command)
     - [SSH Client/Server Setup](#ssh-clientserver-setup)
@@ -113,6 +112,27 @@ CTRL-D
 
 Script that does some neat network stuff in Python.
 
+## Scanner
+
+Host discovery scan covering a whole subnet. Trigger with `--scan` option. Exit script loop with `^C`.
+
+> note: this script utilizes promiscuous mode, requiring admin privileges on Windows or root on Linux. This allows sniffing of all packets that the network card sees. May need to use with `sudo`.
+
+```shell
+sudo python3 pollen8.py --scan
+Password:
+2024-02-04 20:20:05,675 [INFO] scanner: Initializing scanner on subnet 192.168.0.0/24...
+.++.+++++.+.+++Host Up: 192.168.0.11
+^C
+.++++.+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+User interrupted.
+
+
+Summary: Hosts up on 192.168.0.0/24
+192.168.0.1
+192.168.0.2 *
+```
+
 ## Sniffer
 
 Uses raw sockets to read low level network data:
@@ -158,22 +178,6 @@ Header Length: 5 TTL: 105
 ICMP -> Type: 0 Code: 0
 ```
 
-### Discover Active Hosts On Network
-
-Main goal of sniffer is to discover hosts on a target network.
-
-Attackers want to see potential all of the targets on a network so they can focus their reconnaissance and exploitation attempts.
-
-- Determine if there is an active host at a particular IP address.
-  - When sending a UDP datagram to ta closed port on a host the host typically sends back an ICMP message indicating that the port is unreachable.
-    - This ICMP message tells s that there is a host alive, because if there no host, we probably wouldn't receive a response to the UDP datagram.
-      - Therefore, pick a UDP port that won't likely be used (for maximum coverage, we can probe several ports to ensure we aren't hitting an active UDP service)
-    - Why use UDP -> not a lot of overhead sending UDP messages across a subnet.
-      - Really a simple scanner to build
-
-> TODO: implement logic in scanner to kick off full Nmap port scans on any hosts we discover
->   - used to determine a viable network attack surface
-
 ### Packet Sniffing
 
 Windows machines require additional flags for socket input/output control (IOCTL) to enable promiscuous mode on the network interface.
@@ -182,26 +186,6 @@ Windows machines require additional flags for socket input/output control (IOCTL
 
 Windows will allow sniffing of all incoming packets regardless of protocol, whereas Linux requires sniffing of ICMP packets.
 
-### Scanner
-
-> note this script utilizes promiscuous mode, requiring admin privileges on Windows or root on Linux. This allows sniffing of all packets that the network card sees.
-
-```shell
-sudo ./pollen8.py [IP_ADDRESS/CIDR]
-```
-
-Then in another terminal, make a ping.
-
-```shell
-ping google.com
-```
-
-The sniffer terminal should now show results:
-
-```shell
-sudo ./pollen8.py --scan 192.168.0.100/24
-(b'E\x00@\x00\x00\x00\x00\x00i\x01\x8f\x98\x8e\xfarf\xc0\xa8\x00\x08\x00\x00*\x1f\x1fM\x00\x00e\xb4_\xdd\x00\x07\x05\xf8\x08\t\n\x0b\x0c\r\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f !"#$%&\'()*+,-./01234567', ('142.250.114.102', 0))
-```
 
 ## SSH Commands
 

@@ -19,6 +19,7 @@ import socket
 import struct
 import sys
 import threading
+import time
 
 from ctypes import *
 
@@ -38,6 +39,7 @@ def get_args():
             --ssh-client 192.168.0.100
             --ssh-cmd 192.168.0.100 root "whoami" 22
             --sniff
+            --scan
         '''))
     parser.add_argument('-d', '--debug',
                         dest='debug',
@@ -83,10 +85,15 @@ def get_args():
                         required=False,
                         help="Sniff network packet data."
                         )
+    parser.add_argument('--scan',
+                        dest='scan',
+                        action='store_true',
+                        default=False,
+                        help=f'Scan local network.')
     args = parser.parse_args()
     return args
 
-def setup_logger(name:str=None, debug_mode:bool=DEBUG_MODE):
+def setup_logger(name:str=None, debug_mode:bool=False):
     """
     setup logger
     """
@@ -155,10 +162,9 @@ class IP:
         # s -> a byte array requiring byte-width specifications (4s means 4-byte string)
         header = struct.unpack('<BBHHHBBH4s4s', buff)
 
-
         # With first byte of header data:
         # - assign version variable the high-order nybble by right-shifting the byte by four places (prepending four 9s to the front)
-        # - assign hdrlen variable the lower-order nybble (last 4 bits of byte) by Using boolean AND with 0xF (00001111) - replacing first 4 bits with 0.
+        # - assign hdrlen variable (self.ihl) the lower-order nybble (last 4 bits of byte) by Using boolean AND with 0xF (00001111) - replacing first 4 bits with 0.
         self.ver = header[0] >> 4
         self.ihl = header[0] & 0xF
 
@@ -185,6 +191,9 @@ class IP:
             print(err_msg)
             self.protocol = str(self.protocol_num)
 
+    def __str__(self) -> str:
+        return f"{self.src_address} -> {self.dst_address}"
+
 class ICMP:
     """
     ICMP class that can decode a packet and parse the header into it's own separate fields.
@@ -200,6 +209,119 @@ class ICMP:
         self.sum = header[2]
         self.id = header[3]
         self.seq = header[4]
+
+class Scanner:
+    def __init__(self, host:str=None):
+        self._logger = setup_logger("scanner", debug_mode=DEBUG_MODE)
+        self.host = self.get_ip_address() if host is None else host
+        self.subnet = self.get_subnet(self.host)
+
+        self._logger.info(f"Initializing scanner on subnet {self.subnet}...")
+        socket_protocol = socket.IPPROTO_IP if (os.name=='nt') else socket.IPPROTO_ICMP
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
+        self.socket.bind((self.host, 0))
+
+        # set sock option to include the IP header in the captured packets
+        self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+
+        self._logger.debug('hitting promiscuous mode')
+        if os.name == 'nt':
+            self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
+
+    @classmethod
+    def get_ip_address(self):
+        """ Retrieve IP address (eth0 address) by creating UDP socket."""
+        # src: https://stackoverflow.com/a/30990617/14745606
+        # TODO: source to perhaps make socket into context manager:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+
+    @classmethod
+    def get_subnet(self, host:str, subnet_mask:str="255.255.255.0"):
+        """
+        Retrieve subnet given host and a subnet mask. For example, given subnet of 255.255.255.0, return value is 192.178.2.0/24
+
+        Keyword arguments:
+        - host (string): ip address
+        - subnet mask (string): defaults to 255.255.255.0
+
+        src: https://stackoverflow.com/a/50867508/14745606
+        """
+         # commented out for classmethod
+        # host = self.host if host is None else host
+        iface = ipaddress.ip_interface(f"{host}/{subnet_mask}")
+        return iface.network  # 192.178.2.0/24 (given 192.178.2.10 with subnet 255.255.255.0)
+
+    @classmethod
+    def udp_sender(self, subnet, message:str="ACK!"):
+        """
+        Sends UDP datagrams to all IP address in given subnet.
+        """
+        # TODO: provide blacklist of addresses to skip?
+
+         # commented out for classmethod
+        # subnet = self.subnet if subnet is None else subnet
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
+            for ip in ipaddress.ip_network(subnet).hosts():
+                time.sleep(1)
+                print('+', end='')
+                sender.sendto(bytes(message, 'utf8'), (str(ip), 65212))
+
+    def start(self, message:str="ACK!"):
+        """
+        Sniffer for Windows and Linux machines. Note: use sudo.
+
+        Keyword Arguments:
+        - message (string): simple string structure to test the response coming from UDP packets.
+        """
+        hosts_up = set([f'{str(self.host)} *'])
+        try:
+            while True:
+                print('.',end='')
+                # read packet
+                raw_buffer = self.socket.recvfrom(65535)[0]
+
+                self._logger.debug(f"received raw_buffer:\t{raw_buffer}") # debugging
+
+                # create IP header from the first 20 bytes
+                ip_header = IP(raw_buffer[0:20])
+                self._logger.debug(f"ip_header (protocol -- {ip_header.protocol}):\t{ip_header}") # debugging
+
+                if ip_header.protocol == "ICMP":
+                    # print the detected protocol and hosts:
+                    # print(f"Protocol: {ip_header.protocol} {ip_header.src_address} -> {ip_header.dst_address}")
+                    # print(f"Version: {ip_header.ver}")
+                    # print(f"Header Length: {ip_header.ihl} TTL: {ip_header.ttl}")
+
+                    # calculate offset in raw packet where ICMP body starts
+                    # header length indicates number of 32-bit words (4 byte chunks) -- multiply by 4 to know the size of IP header, and next network layer ICMP begins
+                    offset = ip_header.ihl * 4
+                    self._logger.debug(f"offset where ICMP body starts: {offset}")
+                    buf = raw_buffer[offset:offset + 8]
+                    self._logger.debug(f"buf val: {buf}")
+
+                    # create ICMP struct
+                    icmp_header = ICMP(buf)
+
+                    if icmp_header.code == 3 and icmp_header.type == 3:
+                        if ipaddress.ip_address(ip_header.src_address) in ipaddress.IPv4Network(self.subnet):
+                            if raw_buffer[len(raw_buffer) - len(message): ] == bytes(message, 'utf8'):
+                                hosts_up.add(str(ip_header.src_address))
+                                print(f'Host Up: {str(ip_header.src_address)}')
+
+        # handle CTRL-C
+        except KeyboardInterrupt:
+            # Disable promiscuous mode if on Windows, before exiting script.
+            if os.name == 'nt':
+                self.socket.ioctl(socket.SID_RCVALL, socket.RCVALL_OFF)
+            print('\nUser interrupted.')
+            if hosts_up:
+                print(f"\n\nSummary: Hosts up on {self.subnet}")
+            for host in sorted(hosts_up):
+                print(f"{host}")
+            print('')
+            sys.exit()
 
 class Server(paramiko.ServerInterface):
     def __init__(self, _username:str='root', _passwd:str='fairbanks'):
@@ -219,7 +341,7 @@ class Server(paramiko.ServerInterface):
 
 class Pollen8:
     def __init__(self, **kwargs):
-        self.logger = setup_logger("Pollen8")
+        self.logger = setup_logger("Pollen8", debug_mode=DEBUG_MODE)
 
     """
     def reverse_forward_tunnel(self, server_port, remote_host, remote_port, transport):
@@ -229,7 +351,7 @@ class Pollen8:
             pass
     """
 
-    def sniff(self, host_ip:str=None):
+    def sniff(self, host_ip:str=None, subnet:str=None):
         """
         Sniffer for Windows and Linux machines. Note: use sudo.
 
@@ -237,20 +359,11 @@ class Pollen8:
         - host (string): ip address/cidr
         """
 
-        def get_ip_address():
-            """ Creates UDP socket to retrieve the eth0 address."""
-            # src: https://stackoverflow.com/a/30990617/14745606
-            # TODO: source to perhaps make socket into context manager:
-            s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            s.connect(("8.8.8.8", 80))
-            return s.getsockname()[0]
-
-
         # get host IP address of machine
         # hostname = socket.gethostname()
 
         # host_ip = socket.gethostbyname('localhost')   # 127.0.0.1
-        host_ip = get_ip_address() if host_ip is None else host_ip
+        host_ip = Scanner().get_ip_address() if host_ip is None else host_ip
 
         self.logger.info(f"Starting sniffer on {host_ip} . . .")
         os_name = os.name
@@ -480,6 +593,14 @@ def main():
     elif args.sniff is not None:
         # target:str = args.sniff[0] if len(args.sniff) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
         diablo.sniff()
+
+    # scan local network
+    elif args.scan is not None:
+        scanner = Scanner()
+        time.sleep(10)
+        t = threading.Thread(target=scanner.udp_sender, args=(scanner.subnet,))
+        t.start()
+        scanner.start()
 
 
     else:
