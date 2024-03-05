@@ -5,6 +5,9 @@
 - [netcat.py](#netcatpy)
   - [Setup Lister and Client](#setup-lister-and-client)
 - [pollen8.py](#pollen8py)
+  - [Scanner](#scanner)
+  - [Sniffer](#sniffer)
+    - [Packet Sniffing](#packet-sniffing)
   - [SSH Commands](#ssh-commands)
     - [Single Command](#single-command)
     - [SSH Client/Server Setup](#ssh-clientserver-setup)
@@ -108,6 +111,81 @@ CTRL-D
 # pollen8.py
 
 Script that does some neat network stuff in Python.
+
+## Scanner
+
+Host discovery scan covering a whole subnet. Trigger with `--scan` option. Exit script loop with `^C`.
+
+> note: this script utilizes promiscuous mode, requiring admin privileges on Windows or root on Linux. This allows sniffing of all packets that the network card sees. May need to use with `sudo`.
+
+```shell
+sudo python3 pollen8.py --scan
+Password:
+2024-02-04 20:20:05,675 [INFO] scanner: Initializing scanner on subnet 192.168.0.0/24...
+.++.+++++.+.+++Host Up: 192.168.0.11
+^C
+.++++.+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+User interrupted.
+
+
+Summary: Hosts up on 192.168.0.0/24
+192.168.0.1
+192.168.0.2 *
+```
+
+## Sniffer
+
+Uses raw sockets to read low level network data:
+
+- Internet Protocol (IP) headers
+- Internet Control Message Protocol (ICMP) headers
+
+> TODO: decode Ethernet information. Use Ethernet frames and their use, such as:
+>
+> - ARP poisoning
+> - wireless assessment tools
+
+Run:
+
+```shell
+python3 pollen8.py --sniff
+2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on {host_ip_address} . . .
+```
+
+In another terminal, ping google:
+
+```shell
+ping google.com
+```
+
+In the original terminal, see the  decoded IP headers from the captured packets:
+
+```shell
+2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on {host_ip_address} . . .
+Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Version: 4
+Header Length: 5 TTL: 105
+ICMP -> Type: 0 Code: 0
+
+Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Version: 4
+Header Length: 5 TTL: 105
+ICMP -> Type: 0 Code: 0
+
+Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Version: 4
+Header Length: 5 TTL: 105
+ICMP -> Type: 0 Code: 0
+```
+
+### Packet Sniffing
+
+Windows machines require additional flags for socket input/output control (IOCTL) to enable promiscuous mode on the network interface.
+
+**Input/Output Control (IOCTL)** means for user spce programs to communicate with kernel mode components [src](http://en.wikipedia.org/wiki/Ioctl).
+
+Windows will allow sniffing of all incoming packets regardless of protocol, whereas Linux requires sniffing of ICMP packets.
+
 
 ## SSH Commands
 
