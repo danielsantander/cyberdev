@@ -92,7 +92,7 @@ def yt_download(video_url:str, output_path:Union[str,Path], quality:str="highest
             file_extension = "mp3"
             # TODO: pass
             return
-        if quality in ['high', 'highest']:
+        if quality.lower() in ['high', 'highest']:
             yt.streams.filter(progressive=is_progressive, file_extension=file_extension).order_by(order_by).desc().first().download(filename=new_filename, output_path=out_path)    # highest quality
         else:
             yt.streams.filter(progressive=is_progressive, file_extension=file_extension).order_by(order_by).asc().first().download(filename=new_filename, output_path=out_path)  # lowest quality
