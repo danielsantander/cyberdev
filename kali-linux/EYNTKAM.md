@@ -1421,6 +1421,8 @@ uncompress MyScript.tar.Z
 
 ## curl
 
+> use `-L, --location` flag to allow redirects
+
 ### GET Request
 
 ```shell
