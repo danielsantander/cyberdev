@@ -964,7 +964,19 @@ The two default admin databases (information_schema, performance_schema) and one
 +--------------------+
 ```
 
-### Connect to database
+### Show Current Databse
+
+```sql
+mysql> SELECT DATABASE();
++-------------+
+| DATABASE()  |
++-------------+
+| current_db  |
++-------------+
+1 row in set (0.00 sec)
+```
+
+### Connect to Database
 
 ```sql
 USE {database_name}
