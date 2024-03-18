@@ -1,13 +1,16 @@
 *Table of Contents*
 - [Download Rasberry Pi OS](#download-rasberry-pi-os)
   - [View OS](#view-os)
+  - [Check Linux Version](#check-linux-version)
   - [View Bit Size](#view-bit-size)
 - [Update and Upgrade System](#update-and-upgrade-system)
+- [Disable or Extend Sleep on Raspberry Pi](#disable-or-extend-sleep-on-raspberry-pi)
 - [Install Docker](#install-docker)
   - [Troubleshoot](#troubleshoot)
 - [Install Picamera](#install-picamera)
 - [raspi-config](#raspi-config)
   - [Boot Raspberry Pi to Desktop GUI](#boot-raspberry-pi-to-desktop-gui)
+  - [Disable Screen Blanking](#disable-screen-blanking)
 
 # Download Rasberry Pi OS
 Download Raspberry Pi Operating Systems here: https://www.raspberrypi.com/software/operating-systems/
@@ -15,6 +18,11 @@ Download Raspberry Pi Operating Systems here: https://www.raspberrypi.com/softwa
 ## View OS
 ```shell
 cat /etc/os-release
+```
+
+## Check Linux Version
+```shell
+lsb_release -a
 ```
 
 ## View Bit Size
@@ -28,6 +36,18 @@ Output Expected:
 # Update and Upgrade System
 ```shell
 sudo apt-get update && sudo apt-get upgrade
+```
+
+# Disable or Extend Sleep on Raspberry Pi
+
+[source](https://stackoverflow.com/a/54239349/14745606)
+
+Update `consoleblank` (a kernel parameter). In order to be permanently set, it needs to be defined on the kernel command line.
+
+```shell
+# view current console blanking settings
+cat /sys/module/kernel/parameters/consoleblank
+0
 ```
 
 # Install Docker
@@ -112,3 +132,13 @@ Within the configurations screen, look for and select the option of **Enable Boo
 In the next screen, choose **Desktop Login as user 'Pi' at the graphical desktop**
 
 Reboot after configuration changes submitted.
+
+## Disable Screen Blanking
+
+[source](https://stackoverflow.com/a/72623494/14745606)
+
+```shell
+sudo raspi-config
+# update configuration through interface
+sudo reboot
+```
