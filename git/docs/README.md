@@ -26,6 +26,12 @@
 
 ---
 
+# git ammend
+
+```shell
+git commit --amend -m "my new commit message to replace old commit message"
+```
+
 # git stash
 
 Usage:
@@ -172,6 +178,9 @@ Reset entire repository to the last committed state:
 
 ```shell
 git reset --hard
+
+# if last commit has not been pushed, undo last commit (keep changes, reverts files back to staging)
+git reset --soft HEAD~
 ```
 
 # Sources
