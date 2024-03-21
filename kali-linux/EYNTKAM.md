@@ -56,11 +56,12 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [PostgreSQL (postgres)](#postgresql-postgres)
     - [Start Metasploit](#start-metasploit)
     - [Setup PostgreSQL](#setup-postgresql)
-    - [Connect to Database](#connect-to-database)
+    - [Connect to SQL Database](#connect-to-sql-database)
     - [sources](#sources)
   - [MySql](#mysql)
     - [Commands](#commands)
-    - [Connect to database](#connect-to-database-1)
+    - [Show Current Databse](#show-current-databse)
+    - [Connect to Database](#connect-to-database)
     - [List Users](#list-users)
     - [Set Password](#set-password)
     - [SHOW Data](#show-data)
@@ -69,7 +70,6 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [UPDATE Data](#update-data)
     - [LIMIT results returned](#limit-results-returned)
     - [Filter Data](#filter-data)
-    
     - [Filter For Column Names](#filter-for-column-names)
   - [nmap](#nmap)
     - [Scan Type Options](#scan-type-options)
@@ -898,13 +898,13 @@ postgres@kali:/home/kali$ createdb --owner=msf_user my_hacker_db
 postgres@kali:/home/kali$ exit
 ```
 
-### Connect to Database
+### Connect to SQL Database
 
 Connect to database for Metasploit framework to store:
 
-  - modules for fast results
-  - results of system scans
-  - exploits ran
+- modules for fast results
+- results of system scans
+- exploits ran
 
 ```shell
 # usage
@@ -966,7 +966,7 @@ The two default admin databases (information_schema, performance_schema) and one
 ### Show Current Databse
 
 ```sql
-mysql> SELECT DATABASE();
+SELECT DATABASE();
 +-------------+
 | DATABASE()  |
 +-------------+
@@ -1050,7 +1050,7 @@ INSERT INTO table_name (column1, column2, column3, ...)
 VALUES (value1, value2, value3, ...);
 ```
 
-Inserting values for all columns in table. 
+Inserting values for all columns in table.
 > ensure the order of the values is in the same order as the columns in the table
 
 ```sql
@@ -1058,7 +1058,7 @@ INSERT INTO table_name
 VALUES (value1, value2, value3, ...);
 ```
 
-# UPDATE Data
+### UPDATE Data
 
 Update values for column1:
 
@@ -1068,7 +1068,7 @@ SET column1 = value1, column2 = value2, ...
 WHERE condition;
 ```
 
-# LIMIT results returned
+### LIMIT results returned
 
 ```sql
 -- use `LIMIT` to limit the amount of data returned
@@ -1097,7 +1097,7 @@ Empty set (0.000 sec)
 Get all tables with columns `columnA` or `ColumnB` in the database YourDatabase:
 
 ```sql
-SELECT DISTINCT TABLE_NAME 
+SELECT DISTINCT TABLE_NAME
     FROM INFORMATION_SCHEMA.COLUMNS
     WHERE COLUMN_NAME IN ('columnA','ColumnB')
         AND TABLE_SCHEMA='YourDatabase';
