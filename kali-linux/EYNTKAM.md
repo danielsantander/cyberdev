@@ -68,7 +68,12 @@ Table of Contents
     - [Set Password](#set-password)
     - [SHOW Data](#show-data)
     - [SELECT Data](#select-data)
+    - [INSERT Data](#insert-data)
+    - [UPDATE Data](#update-data)
+    - [LIMIT results returned](#limit-results-returned)
     - [Filter Data](#filter-data)
+    
+    - [Filter For Column Names](#filter-for-column-names)
   - [nmap](#nmap)
     - [Scan Type Options](#scan-type-options)
     - [Examples](#examples)
@@ -1042,19 +1047,78 @@ Retrieve data from a database table given the column name(s).
 SELECT <col1,col2,col3> FROM <table_name>;
 ```
 
-### Filter Data
+### INSERT Data
 
-Use `LIKE` clause to filter the output given a pattern.
+Sepcifying which columns to insert into a table:
 
 ```sql
+INSERT INTO table_name (column1, column2, column3, ...)
+VALUES (value1, value2, value3, ...);
+```
+
+Inserting values for all columns in table. 
+> ensure the order of the values is in the same order as the columns in the table
+
+```sql
+INSERT INTO table_name
+VALUES (value1, value2, value3, ...);
+```
+
+# UPDATE Data
+
+Update values for column1:
+
+```sql
+UPDATE table_name
+SET column1 = value1, column2 = value2, ...
+WHERE condition;
+```
+
+# LIMIT results returned
+
+```sql
+-- use `LIMIT` to limit the amount of data returned
+SELECT * FROM users LIMIT 10
+
+-- reverse order by descending
+SELECT * FROM users ORDER BY user.id DESC LIMIT 10
+```
+
+### Filter Data
+
+```sql
+-- use `LIKE` clause to filter the output given a pattern.
 SHOW DATABASES LIKE {pattern};
 
--- example list databases with names that start with 'open'
+-- example: list databases with names that start with 'open'
 SHOW DATABASES LIKE 'open%';
 Empty set (0.000 sec)
 ```
 
 > percent sign (%) is used to express matching zero, one, or multiple characters.
+
+### Filter For Column Names
+
+[src](https://stackoverflow.com/a/193860/14745606)
+Get all tables with columns `columnA` or `ColumnB` in the database YourDatabase:
+
+```sql
+SELECT DISTINCT TABLE_NAME 
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE COLUMN_NAME IN ('columnA','ColumnB')
+        AND TABLE_SCHEMA='YourDatabase';
+```
+
+or
+
+[src](https://stackoverflow.com/a/193788/14745606)
+
+```sql
+SELECT TABLE_NAME, COLUMN_NAME
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE COLUMN_NAME LIKE '%users%';
+```
+> If there are multiple databases, specify database with `WHERE TABLE_SCHEMA=""`
 
 ## nmap
 
