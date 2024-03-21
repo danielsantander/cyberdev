@@ -3,6 +3,7 @@
 - [Move files from one branch into current](#move-files-from-one-branch-into-current)
 - [Pull files from another commit](#pull-files-from-another-commit)
 - [Ignore already tracked files](#ignore-already-tracked-files)
+- [Ignore Untracked Files](#ignore-untracked-files)
 
 # List Branches by order
 
@@ -60,3 +61,13 @@ git commit -m "Your commit message"
 Usage: `git update-index --assume-unchanged [<file> ...]`
 
 Usage to start tracking again: `git update-index --no-assume-unchanged [<file> ...]`
+
+# Ignore Untracked Files
+
+Use `git clean` -- [src](https://stackoverflow.com/a/64966)
+
+```shell
+# Print out the list of files and directories which will be removed (dry run)
+# where: -n -> dry run and -d -> remove untracked directories
+git clean -n -d
+```
