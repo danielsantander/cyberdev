@@ -1,21 +1,18 @@
 EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
----
-Table of Contents
+
 - [Tips](#tips)
+  - [Change Shell](#change-shell)
+  - [Check Linux Versions and Bit Size](#check-linux-versions-and-bit-size)
+  - [Generate SSH Keys](#generate-ssh-keys)
   - [Install](#install)
     - [Kali for Raspberry Pi 4](#kali-for-raspberry-pi-4)
     - [Install VS Code](#install-vs-code)
-  - [Check Kali Linux Version](#check-kali-linux-version)
-  - [View Bit Size](#view-bit-size)
-  - [Determine revision of current firmware](#determine-revision-of-current-firmware)
-  - [Update and Upgrade System](#update-and-upgrade-system)
-  - [Generate SSH Keys](#generate-ssh-keys)
-  - [Change Shell](#change-shell)
-  - [Script Shebang](#script-shebang)
   - [Print Random Line From File](#print-random-line-from-file)
-  - [PCAP Files](#pcap-files)
-    - [Generate PCAP Files](#generate-pcap-files)
-    - [Quickly Read PCAP Files](#quickly-read-pcap-files)
+  - [Script Shebang](#script-shebang)
+  - [Update \& Upgrade](#update--upgrade)
+- [PCAP Files](#pcap-files)
+  - [Generate PCAP Files](#generate-pcap-files)
+  - [Quickly Read PCAP Files](#quickly-read-pcap-files)
 - [Permissions](#permissions)
   - [Change File Ownership](#change-file-ownership)
   - [Permission Levels](#permission-levels)
@@ -150,6 +147,7 @@ Table of Contents
   - [Shred Files](#shred-files)
 
 More Docs:
+
 - [scripting](docs/scripting.md)
 - [Documentation](docs/README.md)
   - [services](docs/15_services.md)
@@ -157,53 +155,34 @@ More Docs:
     - [OpenSSH](docs/15_services.md#openssh)
 
 ---
+
 # Tips
 
-## Install
-
-### Kali for Raspberry Pi 4
-
-[src](https://www.kali.org/docs/arm/raspberry-pi-4/)
-
-> **Prereq:** Recommendation is to use the 32-bit image on Raspberry Pi devices as that gets far more testing, and a lot of documentation out there expects you to be running RaspberryPi OS which is 32-bit.
-
-### Install VS Code
-
-Install VS Code from the Kali command line:
+## Change Shell
 
 ```shell
-apt-get install code
+# change to zsh shell
+chsh -s /bin/zsh`
 ```
 
-## Check Kali Linux Version
+## Check Linux Versions and Bit Size
 
 ```shell
+# check linux version
 lsb_release -a
-```
 
-## View Bit Size
-
-```shell
+# view bit size
 uname -m
 # Output Expected:
 # - aarch64 (for 64 bit)
 # - armv7l (for 32 bit)
-```
 
-## Determine revision of current firmware
-
-```shell
+# view revision of current firmware
 uname -a
 # Linux kermit 3.12.26+ #707 PREEMPT Sat Aug 30 17:39:19 BST 2014 armv6l GNU/Linux
 #                         /
 #                        /
 #   firmware revision --+
-```
-
-## Update and Upgrade System
-
-```shell
-sudo apt-get update && sudo apt-get upgrade
 ```
 
 ## Generate SSH Keys
@@ -216,19 +195,23 @@ ssh-keygen -t rsa
 
 # use -b option to specify length (in bit size)
 ssh-keygen -b 2048 -t rsa
-
 ```
 
-## Change Shell
+## Install
+
+### Kali for Raspberry Pi 4
+
+[src - kali docs for Raspberry Pi 4](https://www.kali.org/docs/arm/raspberry-pi-4/)
+
+> **Prerequisite:** Recommendation is to use the 32-bit image on Raspberry Pi devices as that gets far more testing, and a lot of documentation out there expects you to be running RaspberryPi OS which is 32-bit.
+
+### Install VS Code
+
+Install VS Code from CLI:
 
 ```shell
-# change to zsh shell
-chsh -s /bin/zsh`
+apt-get install code
 ```
-
-## Script Shebang
-
-Script files will begin with the shebang: `#!/bin/bash`
 
 ## Print Random Line From File
 
@@ -237,9 +220,20 @@ Script files will begin with the shebang: `#!/bin/bash`
 shuf -n 1 {filename}
 ```
 
-## PCAP Files
+## Script Shebang
 
-### Generate PCAP Files
+Script files will begin with the shebang: `#!/bin/bash`
+
+
+## Update & Upgrade
+
+```shell
+sudo apt-get update && sudo apt-get upgrade
+```
+
+# PCAP Files
+
+## Generate PCAP Files
 
 ```shell
 tcpdump -s 0 -w server_request.pcap {target_IP}
@@ -247,7 +241,7 @@ tcpdump -s 0 -w server_request.pcap {target_IP}
 # example: tcpdump -s 0 -w request_server.pcap 10.1.2.3
 ```
 
-### Quickly Read PCAP Files
+## Quickly Read PCAP Files
 
 ```shell
 tcpdump -qns 0 -X -r server_request.pcap
