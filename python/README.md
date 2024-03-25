@@ -1,9 +1,11 @@
+- [Check Version](#check-version)
+- [Create Python Virtual  Environment](#create-python-virtual-environment)
+- [Environment Variables](#environment-variables)
 - [Tips](#tips)
-  - [Check Python Version](#check-python-version)
-  - [Upgrade Python distribution](#upgrade-python-distribution)
+  - [Append Paths](#append-paths)
   - [Make script executable](#make-script-executable)
-- [Create Python Environment](#create-python-environment)
-- [Pip Module](#pip-module)
+  - [Pip Module](#pip-module)
+  - [Upgrade Python distribution](#upgrade-python-distribution)
 - [Print Numbers By Base](#print-numbers-by-base)
 
 ---
@@ -21,29 +23,18 @@ More Docs:
   - [Join Threads](docs/threading.md#joining-threads)
 ---
 
-# Tips
-## Check Python Version
+# Check Version
+
 Enter into terminal:
+
 ```shell
 python -V
+
+# output:
 Python 3.9.2
 ```
 
-## Upgrade Python distribution
-```shell
-sudo apt-get upgrade python3
-```
-
-## Make script executable
-Enter the following into the terminal:
-```shell
-$ sudo chmod +x <python_file>
-
-# or
-$ sudo chmod 755 <python_file>
-```
-
-# Create Python Environment
+# Create Python Virtual Environment
 ```shell
 
 # create environment
@@ -54,15 +45,59 @@ source virtual_environment_directory/bin/activate
 ```
 > Exit the environment with the `deactivate` command
 
-# Pip Module
-Search if python package is installed
-```shell
-python -m pip search {package_name}
+# Environment Variables
+
+```python
+import os
+
+# set environment variable
+os.environ.setdefault("LINEUP", "develop")
+
+# retrieve OS environment variables
+LINEUP = os.environ.get('develop', 'some_default_value')
 ```
 
-Install python packages
+# Tips
+
+## Append Paths
+
+```python
+import os, sys
+
+src_paths = ['/home/user/code/src', '/home/app']
+for path in src_paths:
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.append(path)
+```
+
+## Make script executable
+
+Enter the following into the terminal:
 ```shell
+$ sudo chmod +x <python_file>
+
+# or
+$ sudo chmod 755 <python_file>
+```
+
+## Pip Module
+
+```shell
+# search if python package is installed
+python -m pip search {package_name}
+
+# install python packages
 python -m pip install {package_name}
+
+# install from packages from file
+python -m pip install -r requirements.txt
+```
+
+## Upgrade Python distribution
+
+```shell
+# for linux:
+sudo apt-get upgrade python3
 ```
 
 # Print Numbers By Base
