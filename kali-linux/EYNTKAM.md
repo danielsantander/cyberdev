@@ -123,6 +123,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Compress](#compress-1)
     - [View Archived File Contents](#view-archived-file-contents)
     - [Extract Archive File Contents](#extract-archive-file-contents)
+  - [traceroute](#traceroute)
 - [Environment Variables](#environment-variables)
   - [Change variables](#change-variables)
   - [Update PATH](#update-path)
@@ -1841,6 +1842,22 @@ MySQLScan.sh
 >
 > - The `-v` switch will output which files are being extracted. Omit this switch to perform "silently" (without showing any output).
 > - If the extracted files already exist, `tar` will remove the existing files and replace them with the extracted files.
+
+## traceroute
+
+Your IP address identifies you as you traverse the internet. Sending a packet of data across the internet contains the IP addresses of the source and destination of the packet data. Packets 'hop' through multiple internet routers until it finds its destination, and then 'hops' back to the sender. Anyone intercepting this packet can see who sent it, where it has been, and where it is going.
+
+> packets do not always take the same route across the internet
+
+Utilize `traceroute` command to view what hops a packet might take between the source and the destination.
+
+```shell
+# usage:
+traceroute {IP_ADDR/DOMAIN}
+
+# example: view hops make for a request made to google.com
+traceroute google.com
+```
 
 # Environment Variables
 
