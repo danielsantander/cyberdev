@@ -1,7 +1,30 @@
 #!/usr/bin/env python
 #!/usr/bin/python3
 
-from typing import Literal
+import string
+from typing import Literal, Union
+
+def alphanumeric(data:Union[str,int], start_at_zero:bool=False)->Union[str,int]:
+    """
+    Returns numerical value of an ascii characters (str2int) and vice versa (int2str).
+    """
+    alpha_list = list(string.ascii_lowercase)
+    i = 0 if start_at_zero else 1
+    results = None
+    
+    # try converting to integer
+    try:
+        data = int(data) - 1
+    except ValueError:
+        data = str(data)
+
+    # str2int
+    if isinstance(data, str):
+        results = alpha_list.index(data) + i
+    # int2str
+    else:
+        results = alpha_list[data]
+    return results
 
 def diff_lists(list_a:list, list_b:list, verbose:bool=False):
     """
@@ -27,6 +50,8 @@ def sort_dict(data:dict, sort_by:Literal['key', 'value']='key')->dict:
     return sorted_dict
 
 if __name__ == '__main__':
+    # usage: ./utils.py -i "diff_lists"
+
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('-v','--verbose',
@@ -38,6 +63,10 @@ if __name__ == '__main__':
                         dest='input',
                         action='store',
                         type=str)
+    parser.add_argument('-d', '--data',
+                        dest='data',
+                        action='store',
+                        type=str)
     args = parser.parse_args()
     in_verbose = bool(args.verbose is True)
 
@@ -46,9 +75,12 @@ if __name__ == '__main__':
         list_a = ['a','b','c']
         list_b = ['a','b','d']
         results = diff_lists(list_a, list_b, verbose=in_verbose)    # contents in list_a which are not in list_b
+    elif args.input == 'alphanumeric':
+        data = args.data
+        results = alphanumeric(args.data)
     else:
         data = { "3": "three", "1": "one", "2": "two" }
         results = sort_dict(data)
 
     print(f"data: {data}\n")
-    print(f"results: \n{results}\n")
+    print(f"results: {results}\n")
