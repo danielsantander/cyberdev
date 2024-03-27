@@ -151,6 +151,8 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
   - [Logrotate](#logrotate)
   - [Disable Logging](#disable-logging)
   - [Shred Files](#shred-files)
+- [Notes](#notes)
+  - [The Onion Router (Tor)](#the-onion-router-tor)
 
 More Docs:
 
@@ -2207,3 +2209,19 @@ shred -f -n 10 /var/log/auth.log.*
 ```
 
 Once successful, the contents of the auth log files should now be illegible.
+
+# Notes
+
+## The Onion Router (Tor)
+
+<!-- About -->
+Developed by the US Office of Navel Research (ONR) in the '90s for anonymously navigating through the internet through encrypting traffic. Known as The Onion Router (Tor) project in 2002, is now available for anyone to use.
+
+Tor encrypts the data, destination, and sender IP address of each packet when traversing the internet. For each router hop, the data is encrypted and then decrypted by the next hop when received. This allows for each packet to only contain information about the previous hop and not the origin IP address source.
+
+Tor uses the browser to navigate through the internet through a separate set of routers without exposing traversal router history. The Tor browser may be slower as there are less routers, causing a bandwidth limit on the network.
+
+*Traffic Correlation*: Method used by NSA to look for patterns in incoming and outgoing traffic, that has been able to break Tor's anonymity.
+
+<!-- Install -->
+Install from https://www.torproject.org.
