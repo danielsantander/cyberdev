@@ -159,6 +159,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
   - [Shred Files](#shred-files)
 - [Notes](#notes)
   - [The Onion Router (Tor)](#the-onion-router-tor)
+  - [Virtual Private Networks (VPN)](#virtual-private-networks-vpn)
 
 More Docs:
 
@@ -2315,3 +2316,7 @@ Tor uses the browser to navigate through the internet through a separate set of 
 
 <!-- Install -->
 Install from https://www.torproject.org.
+
+## Virtual Private Networks (VPN)
+
+A Virtual Private Network (VPN) is used to connect to an intermediary internet device such as a router that sends your traffic to its ultimate destination tagged with the IP address of the router. This practice is not necessarily a guarantee of anonymity. The internet device you connect to must record or log your IP address to be able to properly send the data back to you, so anyone able to access these records can uncover this information.
