@@ -204,17 +204,17 @@ $arrayref = \@array;    # ARRAY(0x7fe66e00bf48)
 @{$arrayref};           # 0 1 2 3 4 5
 
 # reverse array
-reverse @array          # 5 4 3 2 1 0
-reverse @{$arrayref}    # 5 4 3 2 1 0
+reverse @array;          # 5 4 3 2 1 0
+reverse @{$arrayref};    # 5 4 3 2 1 0
 
 # assign element
 $array[3] = 18;
 ${$arrayref}[3] = 18;
 
 # get element of array
-$array[3]        # 18
-${$arrayref}[3]  # 18
-$arrayref->[3]   # 18
+$array[3];        # 18
+${$arrayref}[3];  # 18
+$arrayref->[3];   # 18
 
 # loop over an array:
 for my $element (@array) {
