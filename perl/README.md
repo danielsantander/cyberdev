@@ -9,6 +9,7 @@
     - [Scalar Variables](#scalar-variables)
     - [Array Variables](#array-variables)
         - [Referencing Arrays](#referencing-arrays)
+        - [Multi-Dimensional Arrays](#multi-dimensional-arrays)
     - [Hash Variables](#hash-variables)
         - [Referencing Hashes](#referencing-hashes)
     - [Variable Context](#variable-context)
