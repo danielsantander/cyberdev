@@ -2,23 +2,26 @@
 - [Operators](#operators)
 - [Comparing Scalars](#comparing-scalars)
 - [RegEx](#regex)
-    - [Word Matching](#word-matching)
-    - [Split Function](#split-function)
-    - [OS Version Detection Example](#os-version-detection-example)
+  - [Word Matching](#word-matching)
+  - [Split Function](#split-function)
+  - [OS Version Detection Example](#os-version-detection-example)
 - [Variables](#variables)
-    - [Scalar Variables](#scalar-variables)
-    - [Array Variables](#array-variables)
-        - [Referencing Arrays](#referencing-arrays)
-        - [Multi-Dimensional Arrays](#multi-dimensional-arrays)
-    - [Hash Variables](#hash-variables)
-        - [Referencing Hashes](#referencing-hashes)
-    - [Variable Context](#variable-context)
+  - [Scalar Variables](#scalar-variables)
+  - [Array Variables](#array-variables)
+    - [Referencing Arrays](#referencing-arrays)
+    - [Multi-Dimensional Arrays](#multi-dimensional-arrays)
+  - [Hash Variables](#hash-variables)
+    - [Referencing Hashes](#referencing-hashes)
+  - [Variable Context](#variable-context)
 - [Conditionals](#conditionals)
-    - [Conditional Operator](#conditional-operator)
+  - [Conditional Operator](#conditional-operator)
 - [Functions or Subroutines](#functions-or-subroutines)
+  - [Passing Arguments](#passing-arguments)
 - [Loops](#loops)
 - [sources](#sources)
+
 ---
+
 # Perl
 
 > This doc assumes version of Perl being used is >= 5
@@ -45,7 +48,7 @@ sub my_function
     print "\nargs:\n";
     print "$_ => $args{$_}\n" for (sort keys %args);
     print "\n";
-    
+
     # asking for a particular element, just return the value
     my %hash = ('John Paul', 45, 'Lisa', 30, 'Kumar', 40);
     if($key)
@@ -145,11 +148,12 @@ return $version
 Perl has three basic data types:
 1. Scalars -- precede by a dollar sign (`$`) which can store either a number, a string, or a reference.
 2. Arrays -- precede by sign `@` and it will store ordered lists of scalars
-3. Hashes -- precede by signe `%` and stores sets of key/value pairs.
+3. Hashes -- precede by sign `%` and stores sets of key/value pairs.
 
 ## Scalar Variables
 
 A Scalar variable is an integer number, floating point, a character, a string, a paragraph, or an entire web page. Simply saying it could be anything, but only a single thing.
+
 ```perl
 #!/usr/bin/perl
 
@@ -245,6 +249,7 @@ $two_dim_array[1][2]    # 6
 $three_d_array[1]->[1]->[0] # 10
 $three_d_array[1][1][0]     # 10
 ```
+
 ## Hash Variables
 
 A hash variable is a set of key/value pairs.
@@ -331,7 +336,7 @@ Shorthand version of `if...else` statements. Usage: `Exp1 ? Exp2 : Exp3;`
 
 ```perl
 #!/usr/local/bin/perl
- 
+
 $name = "Ali";
 $age = 10;
 $status = ($age > 60 ) ? "A senior citizen" : "Not a senior citizen";
@@ -358,20 +363,20 @@ subroutine_name(arguments_list)
 Pass arguments to subroutines.
 
 ```perl
-#!/usr/bin/perl 
+#!/usr/bin/perl
 
 sub area
-{ 
-    # passing argument     
-    $side = $_[0]; 
-    return ($side * $side); 
-} 
-  
-# calling function 
-$totalArea = area(4); 
-  
-# displaying result 
-printf $totalArea; 
+{
+    # passing argument
+    $side = $_[0];
+    return ($side * $side);
+}
+
+# calling function
+$totalArea = area(4);
+
+# displaying result
+printf $totalArea;
 
 # OUTPUTS:
 # 16
