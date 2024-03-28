@@ -220,6 +220,30 @@ for my $element (@{$arrayref}) {
 }
 ```
 
+### Multi-Dimensional Arrays
+
+```perl
+# 2D array with three elements
+@two_d_array = ( [1, 2, 3],
+                 [4, 5, 6],
+                 [7, 8, 9]
+               );
+$two_dim_array[1]->[2]  # 6
+$two_dim_array[1][2]    # 6
+
+# 3D array
+@three_d_array = ( [
+                        [1, 2, 3],
+                        [4, 5, 6],
+                    ],
+                    [
+                        [7, 8, 9],
+                        [10, 11, 12]
+                    ]
+                 );
+$three_d_array[1]->[1]->[0] # 10
+$three_d_array[1][1][0]     # 10
+```
 ## Hash Variables
 
 A hash variable is a set of key/value pairs.
