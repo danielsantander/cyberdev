@@ -11,7 +11,7 @@ def alphanumeric(data:Union[str,int], start_at_zero:bool=False)->Union[str,int]:
     alpha_list = list(string.ascii_lowercase)
     i = 0 if start_at_zero else 1
     results = None
-    
+
     # try converting to integer
     try:
         data = int(data) - 1
@@ -72,8 +72,9 @@ if __name__ == '__main__':
 
     results = None
     if args.input == 'diff_lists':
-        list_a = ['a','b','c']
+        list_a = ['a','b','c', 'one', 'two', 'three']
         list_b = ['a','b','d']
+        data = (list_a, list_b)
         results = diff_lists(list_a, list_b, verbose=in_verbose)    # contents in list_a which are not in list_b
     elif args.input == 'alphanumeric':
         data = args.data
