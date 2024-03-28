@@ -6,15 +6,17 @@
     - [Split Function](#split-function)
     - [OS Version Detection Example](#os-version-detection-example)
 - [Variables](#variables)
-    - [Creating Variables](#creating-variables)
-        - [Scalar Variables](#scalar-variables)
-        - [Array Variables](#array-variables)
-        - [Hash Variables](#hash-variables)
+    - [Scalar Variables](#scalar-variables)
+    - [Array Variables](#array-variables)
+        - [Referencing Arrays](#referencing-arrays)
+    - [Hash Variables](#hash-variables)
+        - [Referencing Hashes](#referencing-hashes)
     - [Variable Context](#variable-context)
 - [Conditionals](#conditionals)
     - [Conditional Operator](#conditional-operator)
 - [Functions or Subroutines](#functions-or-subroutines)
 - [Loops](#loops)
+- [sources](#sources)
 ---
 # Perl
 
@@ -144,9 +146,7 @@ Perl has three basic data types:
 2. Arrays -- precede by sign `@` and it will store ordered lists of scalars
 3. Hashes -- precede by signe `%` and stores sets of key/value pairs.
 
-## Creating Variables
-
-### Scalar Variables
+## Scalar Variables
 
 A Scalar variable is an integer number, floating point, a character, a string, a paragraph, or an entire web page. Simply saying it could be anything, but only a single thing.
 ```perl
@@ -166,14 +166,14 @@ print "Salary = $salary\n";
 # Salary = 1445.5
 ```
 
-### Array Variables
+## Array Variables
 
 An array variable stores an ordered list of scalar variables.
 
 ```perl
 #!/usr/bin/perl
 
-@ages = (25, 30, 40);             
+@ages = (25, 30, 40);
 @names = ("John Paul", "Lisa", "Kumar");
 
 print "\$ages[0] = $ages[0]\n";
@@ -184,7 +184,43 @@ print "\$names[1] = $names[1]\n";
 print "\$names[2] = $names[2]\n";
 ```
 
-### Hash Variables
+> can reverse order of array with `my @reversearray = reverse @array`
+
+### Referencing Arrays
+
+```perl
+# reference arrays with `\@`
+@array = (0,1,2,3);     # 0 1 2 3 4 5
+$arrayref = \@array;    # ARRAY(0x7fe66e00bf48)
+
+# using a reference to array as an array:
+@{$arrayref};           # 0 1 2 3 4 5
+
+# reverse array
+reverse @array          # 5 4 3 2 1 0
+reverse @{$arrayref}    # 5 4 3 2 1 0
+
+# assign element
+$array[3] = 18;
+${$arrayref}[3] = 18;
+
+# get element of array
+$array[3]        # 18
+${$arrayref}[3]  # 18
+$arrayref->[3]   # 18
+
+# loop over an array:
+for my $element (@array) {
+    ...
+}
+
+# loop over an array from a reference:
+for my $element (@{$arrayref}) {
+  ...
+}
+```
+
+## Hash Variables
 
 A hash variable is a set of key/value pairs.
 
@@ -197,9 +233,37 @@ print "\$data{'John Paul'} = $data{'John Paul'}\n";
 print "\$data{'Lisa'} = $data{'Lisa'}\n";
 print "\$data{'Kumar'} = $data{'Kumar'}\n";
 
-# output whole hash:
-print "@{[%data]}";
-print "$_ => $my_hash{$_}\n" for (sort keys %my_hash);
+# output hash:
+print "@{[%data]}"; # Lisa 30 Kumar 40 John Paul 45
+print "$_ => $data{$_}\n" for (sort keys %data);
+```
+
+### Referencing Hashes
+
+```perl
+my %hash = ('John Paul', 45, 'Lisa', 30, 'Kumar', 40);
+my $hashref = \%hash;
+my $hashkeys = keys %hash;              # 3
+my $hashkeysref = keys %{$hashref};     # 3
+
+# assign element
+$hash{'Lisa'} = 18;
+${$hashref}{'Lisa'} = 18;
+
+# get element from hash
+$hash{'Lisa'};         # 18
+${$hashref}{'Lisa'};   # 18
+$hashref->{'Lisa'};    # 18
+
+# print contents of hash:
+for my $key (keys %hash) {
+    print "$key => $hash($key)\n";
+}
+
+# print contents of hash reference:
+for my $key (keys %{$hashref}) {
+    print "$key => $hashref{$key}\n";
+}
 ```
 
 ## Variable Context
@@ -302,3 +366,16 @@ foreach ( @numbers ) {
 }
 ```
 
+Print environment variables:
+
+```perl
+my @keys = keys %ENV;
+my @values = values %ENV;
+while (@keys) {
+    print pop(@keys), '=', pop(@values), "\n";
+}
+```
+
+# sources
+
+- [perldoc -- Using References](https://perldoc.perl.org/perlreftut#Using-References)
