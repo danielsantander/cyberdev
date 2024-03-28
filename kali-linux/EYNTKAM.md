@@ -34,6 +34,12 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
   - [Change DNS](#change-dns)
     - [Regenerate resolvconf](#regenerate-resolvconf)
     - [Install resolvconf service](#install-resolvconf-service)
+- [Proxy Servers](#proxy-servers)
+  - [proxychains](#proxychains)
+    - [proxychains configurations](#proxychains-configurations)
+      - [ProxyLists](#proxylists)
+      - [dynamic chaining](#dynamic-chaining)
+      - [Random Chaining](#random-chaining)
 - [Packages and Services](#packages-and-services)
   - [Manage Services](#manage-services)
   - [Manage Software](#manage-software)
@@ -649,6 +655,90 @@ systemctl start resolvconf.service
 
 # check status
 systemctl status resolvconf.service
+```
+
+# Proxy Servers
+
+Proxies act as 'middleman' for traffic. When using a proxy, the traffic is given the IP address of the given IP address of the proxy instead of the originating IP address. The traffic is sent back from the proxy when the response is returned from the destination.
+
+## proxychains
+
+Using more than one proxy server is a good strategy to use to make traffic harder to trace.
+
+Kali Linux's proxy tool `proxychains` uses Tor if no proxies are defined. Tor proxies can be very slow as there are less routers to traverse.
+> NSA has broken Tor before.
+
+USAGE: `proxychains <command_you_want_proxied> <arg>`
+
+**Example:** Scan a site with `nmap` anonymously. The following sends the `nmap -sS` stealth command to the given IP address through a proxy.
+
+```shell
+proxychains nmap -sT -Pn {ip_address}
+```
+
+**Example:** Open a Firefox browser and navigate to www.google.com through the chosen proxy and return results.
+
+```shell
+proxychains firefox www.google.com
+```
+
+### proxychains configurations
+
+#### ProxyLists
+
+List of proxies to use. Update `/etc/proxychains.conf` to list which proxies to use for `proxychains` tool.
+
+```shell
+[ProxyList]
+# add proxy here ...
+# socks4 some_new_proxy_ip some_port_number
+
+# meanwhile
+# defaults set to "tor"
+socks4 127.0.0.1 9050
+```
+
+The last line in the list directs `proxychains` to send traffic through the host at `127.0.0.1` on port `9050` (the default Tor configuration). Add proxies by entering the IP addresses and ports of the proxies to use.
+
+> find free proxies (google "free proxies")or use http://www.hidemy.name (note: using free proxies is not best practice.)
+
+#### dynamic chaining
+
+Enable dynamic chaining of proxies allowing for more anonymity. With dynamic chaining our traffic runs through every proxy on the ProxyList and skips to the next proxy if one runs into an issue.
+
+Uncomment both `dynamic_chain` and `strict_chain` in the config file:
+
+```shell
+dynamic_chain
+# Dynamic - Each connection will be done via chained proxies
+# all proxies chained in the order as they appear in the list
+# at least one proxy must be online to play in chain
+# (dead proxies are skipped)
+# otherwise EINTR is returned to the app
+
+strict_chain
+# Strict - Each connection will be done via chained proxies
+# all proxies chained in the order as they appear in the list
+# all proxies must be online to play in chain
+# otherwise EINTR is returned to the app
+```
+
+#### Random Chaining
+
+Randomly choose a set of IP addresses from the ProxyList to create a proxy chain. Each time `proxychains` is used, the proxy will look different to the target. This option is also considered to be "dynamic", skipping a proxy if one is down and moving to the next.
+
+Comment out both `dynamic_chain` and `strict_chain` in the config file. Uncomment both `random_chain` and `chain_len`. Assign `chain_len` a number (2 to use two proxies from ProxyList).
+
+> `chain_len` determines how many of the IP addresses in the chain to use when creating a random proxy chain.
+
+```shell
+#dynamic_chain
+#strict_chain
+
+random_chain
+# Random - Each connection will be done via random proxy
+
+chain_len = 2
 ```
 
 # Packages and Services
