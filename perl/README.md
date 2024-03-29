@@ -82,7 +82,8 @@ sub my_function
 
 # RegEx
 
-Source:
+Sources:
+
 - [Regular Expressions](https://perldoc.perl.org/perlre)
 - [Binding Operators](https://perldoc.perl.org/perlop#Binding-Operators)
 - [The Basics](https://perldoc.perl.org/perlretut#Part-1:-The-basics)
@@ -146,6 +147,7 @@ return $version
 [src](https://www.tutorialspoint.com/perl/perl_variables.htm)
 
 Perl has three basic data types:
+
 1. Scalars -- precede by a dollar sign (`$`) which can store either a number, a string, or a reference.
 2. Arrays -- precede by sign `@` and it will store ordered lists of scalars
 3. Hashes -- precede by sign `%` and stores sets of key/value pairs.
@@ -328,7 +330,6 @@ print "Number of names are : $size\n";
 |unless...else statement        | An unless statement can be followed by an optional else statement.                                                                                             |
 |unless...elsif..else statement | An unless statement can be followed by an optional elsif statement and then by an optional else statement.                                                     |
 |switch statement               | With the latest versions of Perl, you can make use of the switch statement. which allows a simple way of comparing a variable value against various conditions.|
-
 
 ## Conditional Operator
 
