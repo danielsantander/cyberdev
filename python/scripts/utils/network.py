@@ -4,6 +4,7 @@
 import argparse
 import ipaddress
 import socket
+import threading
 import time
 from typing import Union
 
@@ -87,6 +88,28 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
             print(line)
     return results
 
+def scan_port(host_ip_address:str, port:int):
+    """
+    src: https://www.geeksforgeeks.org/how-to-get-open-port-banner-in-python/
+    """
+    status: bool = False
+
+    try:
+        # create socket object with:
+        #   - AF_INET -> using standard IPv4 address or hostname
+        #   - SOCK_STREAM -> TCP client
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((host_ip_address, port))
+
+        # try getting banner
+        try:
+            banner = s.recv(1024).decode()
+            print (f"port {port} is open with banner ({len(banner)}): {banner}")
+        except:
+            print (f"port {port} is open.")
+    except:
+        pass
+
 
 if __name__ == '__main__':
     import sys
@@ -96,6 +119,7 @@ if __name__ == '__main__':
             # 'get_subnet',
             # 'udp_sender',
             'hexdump',
+            'scan_port',
         ]
         parser = argparse.ArgumentParser()
         parser.add_argument('-d','--debug',
@@ -136,5 +160,16 @@ if __name__ == '__main__':
         print (f"\n{results}\n")
     elif action == 'hexdump':
         results = hexdump(data)
+    elif action == 'scan_port':
+        host_ip = get_ip_address()
+        start_time = time.time()
+
+        # todo: if no port specified, scan all the ports
+        for i in range(0, 100000):
+            thread = threading.Thread(target=scan_port, args=[host_ip, i])
+            thread.start()
+        end_time = time.time()
+
+        print (f"To all scan all ports it took {end_time-start_time} seconds")
     else:
         sys.exit(1)
