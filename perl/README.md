@@ -1,23 +1,23 @@
 - [Perl](#perl)
+- [Conditionals](#conditionals)
+  - [Conditional Operator](#conditional-operator)
+- [Functions or Subroutines](#functions-or-subroutines)
+  - [Passing Arguments](#passing-arguments)
+- [Loops](#loops)
 - [Operators](#operators)
-- [Comparing Scalars](#comparing-scalars)
 - [RegEx](#regex)
   - [Word Matching](#word-matching)
   - [Split Function](#split-function)
   - [OS Version Detection Example](#os-version-detection-example)
 - [Variables](#variables)
   - [Scalar Variables](#scalar-variables)
+    - [Comparing Scalars](#comparing-scalars)
   - [Array Variables](#array-variables)
     - [Referencing Arrays](#referencing-arrays)
     - [Multi-Dimensional Arrays](#multi-dimensional-arrays)
   - [Hash Variables](#hash-variables)
     - [Referencing Hashes](#referencing-hashes)
   - [Variable Context](#variable-context)
-- [Conditionals](#conditionals)
-  - [Conditional Operator](#conditional-operator)
-- [Functions or Subroutines](#functions-or-subroutines)
-  - [Passing Arguments](#passing-arguments)
-- [Loops](#loops)
 - [sources](#sources)
 
 ---
@@ -63,22 +63,97 @@ sub my_function
 # my_function("Lisa") -> OUTPUTS: 30
 ```
 
+# Conditionals
+
+[src](https://www.tutorialspoint.com/perl/perl_conditions.htm)
+
+|STATEMENT                      | DESCRIPTION                                                                           |
+|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|if statement                   | An if statement consists of a boolean expression followed by one or more statements.                                                                           |
+|if...else statement            | An if statement can be followed by an optional else statement.                                                                                                 |
+|if...elsif...else statement    | An if statement can be followed by an optional elsif statement and then by an optional else statement.                                                         |
+|unless statement               | An unless statement consists of a boolean expression followed by one or more statements.                                                                       |
+|unless...else statement        | An unless statement can be followed by an optional else statement.                                                                                             |
+|unless...elsif..else statement | An unless statement can be followed by an optional elsif statement and then by an optional else statement.                                                     |
+|switch statement               | With the latest versions of Perl, you can make use of the switch statement. which allows a simple way of comparing a variable value against various conditions.|
+
+## Conditional Operator
+
+Shorthand version of `if...else` statements. Usage: `Exp1 ? Exp2 : Exp3;`
+
+```perl
+$name = "Ali";
+$age = 10;
+$status = ($age > 60 ) ? "A senior citizen" : "Not a senior citizen";
+print "$name is  - $status\n";
+
+# OUTPUT:
+# Ali is - Not a senior citizen
+```
+
+# Functions or Subroutines
+
+```perl
+sub subroutine_name
+{
+    # body of method or subroutine
+}
+
+# call the subroutine with:
+subroutine_name(arguments_list)
+```
+
+## Passing Arguments
+
+Pass arguments to subroutines.
+
+```perl
+#!/usr/bin/perl
+
+sub area
+{
+    # passing argument
+    $side = $_[0];
+    return ($side * $side);
+}
+
+# calling function
+$totalArea = area(4);
+
+# displaying result
+printf $totalArea;
+
+# OUTPUTS:
+# 16
+```
+
+# Loops
+
+```perl
+foreach ( 1, 3, 7 ) {
+    print "\$_ is $_";
+}
+
+# or
+my @numbers = ( 1, 3, 7 );
+foreach ( @numbers ) {
+    print "\$_ is $_";
+}
+```
+
+Print environment variables:
+
+```perl
+my @keys = keys %ENV;
+my @values = values %ENV;
+while (@keys) {
+    print pop(@keys), '=', pop(@values), "\n";
+}
+```
+
 # Operators
 
 [src](https://www.tutorialspoint.com/perl/perl_operators.htm)
-
-# Comparing Scalars
-
-[src](https://www.geeksforgeeks.org/perl-comparing-scalars/)
-
-| Numeric | String | Description                    |
-|---------|--------|--------------------------------|
-| ==      |  eq    | Equals to                      |
-| !=      |  ne    | Not Equals to                  |
-| <       |  lt    | Is less than                   |
-| >       |  gt    | Is greater than                |
-| <=      |  le    | Is less than or equal to       |
-| >=      |  ge    | Is greater than or equal to    |
 
 # RegEx
 
@@ -172,6 +247,19 @@ print "Salary = $salary\n";
 # Name = John Paul
 # Salary = 1445.5
 ```
+
+### Comparing Scalars
+
+[src](https://www.geeksforgeeks.org/perl-comparing-scalars/)
+
+| Numeric | String | Description                    |
+|---------|--------|--------------------------------|
+| ==      |  eq    | Equals to                      |
+| !=      |  ne    | Not Equals to                  |
+| <       |  lt    | Is less than                   |
+| >       |  gt    | Is greater than                |
+| <=      |  le    | Is less than or equal to       |
+| >=      |  ge    | Is greater than or equal to    |
 
 ## Array Variables
 
@@ -315,96 +403,6 @@ print "Number of names are : $size\n";
 # OUTPUTS:
 # Given names are : John Paul Lisa Kumar
 # Number of names are : 3
-```
-
-# Conditionals
-
-[src](https://www.tutorialspoint.com/perl/perl_conditions.htm)
-
-|STATEMENT                      | DESCRIPTION                                                                           |
-|-------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|if statement                   | An if statement consists of a boolean expression followed by one or more statements.                                                                           |
-|if...else statement            | An if statement can be followed by an optional else statement.                                                                                                 |
-|if...elsif...else statement    | An if statement can be followed by an optional elsif statement and then by an optional else statement.                                                         |
-|unless statement               | An unless statement consists of a boolean expression followed by one or more statements.                                                                       |
-|unless...else statement        | An unless statement can be followed by an optional else statement.                                                                                             |
-|unless...elsif..else statement | An unless statement can be followed by an optional elsif statement and then by an optional else statement.                                                     |
-|switch statement               | With the latest versions of Perl, you can make use of the switch statement. which allows a simple way of comparing a variable value against various conditions.|
-
-## Conditional Operator
-
-Shorthand version of `if...else` statements. Usage: `Exp1 ? Exp2 : Exp3;`
-
-```perl
-#!/usr/local/bin/perl
-
-$name = "Ali";
-$age = 10;
-$status = ($age > 60 ) ? "A senior citizen" : "Not a senior citizen";
-print "$name is  - $status\n";
-
-# OUTPUT:
-# Ali is - Not a senior citizen
-```
-
-# Functions or Subroutines
-
-```perl
-sub subroutine_name
-{
-    # body of method or subroutine
-}
-
-# call the subroutine with:
-subroutine_name(arguments_list)
-```
-
-## Passing Arguments
-
-Pass arguments to subroutines.
-
-```perl
-#!/usr/bin/perl
-
-sub area
-{
-    # passing argument
-    $side = $_[0];
-    return ($side * $side);
-}
-
-# calling function
-$totalArea = area(4);
-
-# displaying result
-printf $totalArea;
-
-# OUTPUTS:
-# 16
-```
-
-# Loops
-
-```perl
-foreach ( 1, 3, 7 ) {
-    print "\$_ is $_";
-}
-
-# or
-my @numbers = ( 1, 3, 7 );
-foreach ( @numbers ) {
-    print "\$_ is $_";
-}
-```
-
-Print environment variables:
-
-```perl
-my @keys = keys %ENV;
-my @values = values %ENV;
-while (@keys) {
-    print pop(@keys), '=', pop(@values), "\n";
-}
 ```
 
 # sources
