@@ -25,6 +25,14 @@ from ctypes import *
 
 DEBUG_MODE = False
 CWD = os.path.dirname(os.path.realpath(__file__))
+EPILOG = f"""\
+Example:
+    --ssh-server 192.168.0.100 2222
+    --ssh-client 192.168.0.100
+    --ssh-cmd 192.168.0.100 root "whoami" 22
+    --sniff
+    --scan
+"""
 
 # debug paramiko
 logging.getLogger("paramiko").setLevel(logging.DEBUG)
@@ -34,13 +42,7 @@ def get_args():
     parser = argparse.ArgumentParser(
         description="Pollen8 -- Script that does some neat network stuff.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent('''Example:
-            --ssh-server 192.168.0.100 2222
-            --ssh-client 192.168.0.100
-            --ssh-cmd 192.168.0.100 root "whoami" 22
-            --sniff
-            --scan
-        '''))
+        epilog=textwrap.dedent(EPILOG))
     parser.add_argument('-d', '--debug',
                         dest='debug',
                         action='store_true',
@@ -365,8 +367,8 @@ class Pollen8:
         # host_ip = socket.gethostbyname('localhost')   # 127.0.0.1
         host_ip = Scanner().get_ip_address() if host_ip is None else host_ip
 
-        self.logger.info(f"Starting sniffer on {host_ip} . . .")
         os_name = os.name
+        self.logger.info(f"Starting sniffer on {host_ip} - {os_name} . . .")
         socket_protocol = socket.IPPROTO_IP if (os_name=='nt') else socket.IPPROTO_ICMP
         sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
         sniffer.bind((host_ip, 0))
