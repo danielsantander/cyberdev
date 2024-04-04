@@ -121,10 +121,7 @@ sub area
 $totalArea = area(4);
 
 # displaying result
-printf $totalArea;
-
-# OUTPUTS:
-# 16
+printf $totalArea;  # 16
 ```
 
 # Loops
