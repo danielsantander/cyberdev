@@ -9,6 +9,7 @@
   - [Word Matching](#word-matching)
   - [Split Function](#split-function)
   - [OS Version Detection Example](#os-version-detection-example)
+- [String Manipulation](#string-manipulation)
 - [Variables](#variables)
   - [Scalar Variables](#scalar-variables)
     - [Comparing Scalars](#comparing-scalars)
@@ -213,6 +214,25 @@ if ($match){
 }
 return $version
 ```
+
+# String Manipulation
+
+Pad string with zeros and give certain width.
+
+[src](https://stackoverflow.com/a/73976916/14745606)
+
+```perl
+# force whole string to have certain width, pad with zeros, and enforce two decimal places
+# note: may exceed width (123.45, six places)
+my $str = sprintf "%05.2f", $num; # 1 -> 01.00
+
+# or just prepend "0" to string and format
+my $str = sprintf "0%.2f", $num;
+
+# input needed width "wd" or set default to 5, then can add as many zeros as wanted
+sprintf "%0${wd}.2f", $num;
+```
+
 
 # Variables
 
