@@ -27,14 +27,8 @@ from utils import (
 
 def get_args():
     parser = script_helper.get_args(description='Youtube Downloader', debug_mode=DEBUG_MODE)
-    parser.add_argument('url',
-        type=str,
-        action='store',
-        help='Video URL'
-    )
-    # TODO -- add args for:
-    #   - Filename
-    #   - Preface filename
+    parser.add_argument('url', type=str, action='store', help='Video URL')
+    parser.add_argument('-t', '--title', type=str, nargs='?', default=None, help="Title downloaded video.")
     return vars(parser.parse_args())
 
 def main():
@@ -43,6 +37,7 @@ def main():
     debug_mode = args.get('debug', False) or DEBUG_MODE
     output_dir_path = (CUR_DIR_PATH / 'youtube') if args.get('output') is None else Path(args.get('output'))
     video_url = args.get('url')
+    video_title = args.get('title')
 
     # logger
     log_dir = CUR_DIR_PATH / 'logs'
@@ -52,7 +47,7 @@ def main():
 
     # download video
     logger.info(f"retrieving video: {video_url}")
-    video_file_path = image_helper.yt_download(video_url=video_url, output_path=output_dir_path)
+    video_file_path = image_helper.yt_download(video_url=video_url, output_path=output_dir_path, title=video_title)
     if video_file_path.exists(): logger.info(f"Successfully downloaded video: {video_url}")
     else: logger.error(f"Failed to download video: {video_url}")
     return
