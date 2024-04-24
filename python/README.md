@@ -71,6 +71,9 @@ src_paths = ['/home/user/code/src', '/home/app']
 for path in src_paths:
     if os.path.exists(path) and path not in sys.path:
         sys.path.append(path)
+
+        # insert at beginning
+        # sys.path.insert(0, path)
 ```
 
 ## Make script executable
