@@ -1,15 +1,17 @@
 - [Check Version](#check-version)
-- [Create Python Virtual  Environment](#create-python-virtual-environment)
+- [Create Python Virtual Environment](#create-python-virtual-environment)
 - [Environment Variables](#environment-variables)
 - [Tips](#tips)
   - [Append Paths](#append-paths)
   - [Make script executable](#make-script-executable)
   - [Pip Module](#pip-module)
+  - [Print Numbers By Base](#print-numbers-by-base)
   - [Upgrade Python distribution](#upgrade-python-distribution)
-- [Print Numbers By Base](#print-numbers-by-base)
 
 ---
+
 More Docs:
+
 - [Ciphers](docs/ciphers.md)
   - [Caesar Cipher](docs/ciphers.md#caesar-cipher)
     - [Encrypt Caesar Cypher](docs/ciphers.md#encrypt-caesar-cipher)
@@ -21,6 +23,7 @@ More Docs:
 - [Threading](docs/threading.md)
   - [Daemon Threads](docs/threading.md#daemon-threads)
   - [Join Threads](docs/threading.md#joining-threads)
+
 ---
 
 # Check Version
@@ -28,13 +31,11 @@ More Docs:
 Enter into terminal:
 
 ```shell
-python -V
-
-# output:
-Python 3.9.2
+python --version
 ```
 
 # Create Python Virtual Environment
+
 ```shell
 
 # create environment
@@ -42,8 +43,10 @@ python3 -m venv {environment_name}
 
 # activate environment
 source virtual_environment_directory/bin/activate
+
+# exit environment
+deactivate
 ```
-> Exit the environment with the `deactivate` command
 
 # Environment Variables
 
@@ -73,11 +76,12 @@ for path in src_paths:
 ## Make script executable
 
 Enter the following into the terminal:
+
 ```shell
-$ sudo chmod +x <python_file>
+sudo chmod +x <python_file>
 
 # or
-$ sudo chmod 755 <python_file>
+sudo chmod 755 <python_file>
 ```
 
 ## Pip Module
@@ -93,14 +97,7 @@ python -m pip install {package_name}
 python -m pip install -r requirements.txt
 ```
 
-## Upgrade Python distribution
-
-```shell
-# for linux:
-sudo apt-get upgrade python3
-```
-
-# Print Numbers By Base
+## Print Numbers By Base
 
 Print binary: `{number}:{width}{base}`
 
@@ -122,4 +119,11 @@ Print binary: `{number}:{width}{base}`
   2A
   52
 101010
+```
+
+## Upgrade Python distribution
+
+```shell
+# for linux:
+sudo apt-get upgrade python3
 ```
