@@ -1243,16 +1243,17 @@ nmap {SCAN_TYPE} {IP/CIDR} {PORT}
 | option           |  description                                                  |
 |------------------|---------------------------------------------------------------|
 | -sL              | List Scan - simply list targets to scan                       |
-| -sn              | Ping Scan - disable port scan                                 |
 | -sP              | Ping Scan                                                     |
+| -sn              | Ping Scan - disable port scan                                 |
+| -Pn              | No ping scan - disable host discovery, often used with -sn    |
 | -sS              | TCP SYN (Stealth) Scan -- requires raw-packet privileges      |
 | -sT              | TCP Connect Scan                                              |
-| -sV              | Probe open ports to determine service/version info            |
 | -sO              | IP protocol scan                                              |
+| -sV              | Probe open ports to determine service/version info            |
 | -O               | Enable OS detection                                           |
 | -n               | Never do DNS resolution                                       |
 | -p {port ranges} | Only scan specified ports                                     |
-|-v                | Increase verbosity level (use -vv or more for greater effect) |
+| -v               | Increase verbosity level (use -vv or more for greater effect) |
 
 ### Examples
 
