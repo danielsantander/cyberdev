@@ -34,6 +34,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
   - [Change DNS](#change-dns)
     - [Regenerate resolvconf](#regenerate-resolvconf)
     - [Install resolvconf service](#install-resolvconf-service)
+  - [Ports](#ports)
 - [Proxy Servers](#proxy-servers)
   - [proxychains](#proxychains)
     - [proxychains configurations](#proxychains-configurations)
@@ -657,6 +658,19 @@ systemctl start resolvconf.service
 # check status
 systemctl status resolvconf.service
 ```
+
+## Ports
+
+Common Ports:
+| port | desc            |
+|------|-----------------|
+| 22   | SSH             |
+| 25   | SMTP            |
+| 53   | DNS             |
+| 80   | HTTP            |
+| 443  | HTTPS           |
+| 3306 | MySQL [default] |
+| 6379 | Redis           |
 
 # Proxy Servers
 
