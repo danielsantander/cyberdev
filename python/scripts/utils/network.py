@@ -88,18 +88,18 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
             print(line)
     return results
 
-def scan_port(host_ip_address:str, port:int):
+def scan_port(ip_address:str, port:int):
     """
+    src: https://www.geeksforgeeks.org/python-simple-port-scanner-with-sockets/#
     src: https://www.geeksforgeeks.org/how-to-get-open-port-banner-in-python/
     """
-    status: bool = False
-
+    ip_address = socket.gethostbyname(socket.gethostname()) if ip_address is None else ip_address
     try:
         # create socket object with:
         #   - AF_INET -> using standard IPv4 address or hostname
         #   - SOCK_STREAM -> TCP client
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((host_ip_address, port))
+        s.connect((ip_address, port))
 
         # try getting banner
         try:
