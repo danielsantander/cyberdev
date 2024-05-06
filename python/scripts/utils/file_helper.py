@@ -161,6 +161,10 @@ def file_modification_date(filename: Union[str, Path], timezone=datetime.timezon
     t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
     return datetime.datetime.fromtimestamp(t, tz=timezone)
 
+def is_file_recently_created(p:Path, within_hrs:int=24)->bool:
+    now = datetime.datetime.utcnow()
+    created_date = file_creation_date(p)
+    return bool(now-datetime.timedelta(hours=within_hrs) <= created_date <= now+datetime.timedelta(hours=within_hrs)) if created_date else False
 
 def iterate_directory(directory_path:Union[str,Path], excludeHiddenFiles:bool=True, raise_exception:bool=True)->List[Path]:
     """
