@@ -2,9 +2,13 @@
 - [Operators](#operators)
 - [Comparing Scalars](#comparing-scalars)
 - [RegEx](#regex)
+  - [Modifiers](#modifiers)
   - [Word Matching](#word-matching)
+  - [Search and Replace](#search-and-replace)
   - [Split Function](#split-function)
-  - [OS Version Detection Example](#os-version-detection-example)
+  - [Examples](#examples)
+    - [OS Version Detection Example](#os-version-detection-example)
+    - [Build RegEx From Array](#build-regex-from-array)
 - [Variables](#variables)
   - [Scalar Variables](#scalar-variables)
   - [Array Variables](#array-variables)
@@ -88,10 +92,48 @@ Sources:
 - [Binding Operators](https://perldoc.perl.org/perlop#Binding-Operators)
 - [The Basics](https://perldoc.perl.org/perlretut#Part-1:-The-basics)
 
+## Modifiers
+
+[source](https://perldoc.perl.org/perlre#Modifiers)
+
+| modifer | description |
+|---------|-------------|
+| s       | Treat the string as single line. That is, change "." to match any character whatsoever, even a newline, which normally it would not match. |
+| i       | Do case-insensitive pattern matching. For example, "A" will match "a" under /i |
+| g       | Globally match the pattern repeatedly in the string |
+
 ## Word Matching
 
 ```perl
 "Hello World" =~ /World/;  # matches
+```
+
+## Search and Replace
+
+[source](https://perldoc.perl.org/perlretut#Search-and-replace)
+
+Search and replace is accomplished with the `s///` operator. The general form is `s/regexp/replacement/modifiers`, where the *replacement* is a Perl double-quoted string that replaces in the string whatever is matched with the regexp.
+
+```perl
+$x = "Time to feed the cat!";
+$x =~ s/cat/hacker/;   # $x contains "Time to feed the hacker!"
+if ($x =~ s/^(Time.*hacker)!$/$1 now!/) {
+    $more_insistent = 1;
+}
+$y = "'quoted words'";
+$y =~ s/^'(.*)'$/$1/;  # strip single quotes,
+                       # $y contains "quoted words"
+```
+
+With the global modifier, `s///g` will search and replace all occurrences of the regexp in the string
+
+```perl
+$x = "I batted 4 for 4";
+$x =~ s/4/four/;   # doesn't do it all:
+                   # $x contains "I batted four for 4"
+$x = "I batted 4 for 4";
+$x =~ s/4/four/g;  # does it all:
+                   # $x contains "I batted four for four"
 ```
 
 ## Split Function
@@ -123,7 +165,8 @@ $x = "/usr/bin/perl";
                             # $parts[6] = 'perl'
 ```
 
-## OS Version Detection Example
+## Examples
+### OS Version Detection Example
 
 Use regex to match and retrieve OS version values.
 
@@ -140,6 +183,18 @@ if ($match){
     $version = $results[1];         # 1.2.3
 }
 return $version
+```
+
+### Build RegEx From Array
+
+```perl
+# https://stackoverflow.com/a/898675/14745606
+my @subdomains = ('www', 'mail');
+my $pattern    = '\.(' . join('|', @subdomains) . ')$';
+my $regex      = qr/$pattern/;
+if ($hostname =~ $regex) {
+    # todo: stuff if subdomain found in hostname
+}
 ```
 
 # Variables
@@ -189,6 +244,13 @@ print "\$ages[2] = $ages[2]\n";
 print "\$names[0] = $names[0]\n";
 print "\$names[1] = $names[1]\n";
 print "\$names[2] = $names[2]\n";
+
+# iterate array
+@numbers = (1,4,5,6,7,8,9);
+foreach my $number (@numbers)
+{
+    print ("$number\n");
+}
 ```
 
 > can reverse order of array with `my @reversearray = reverse @array`
