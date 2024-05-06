@@ -34,6 +34,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
   - [Change DNS](#change-dns)
     - [Regenerate resolvconf](#regenerate-resolvconf)
     - [Install resolvconf service](#install-resolvconf-service)
+  - [Ports](#ports)
 - [Proxy Servers](#proxy-servers)
   - [proxychains](#proxychains)
     - [proxychains configurations](#proxychains-configurations)
@@ -63,7 +64,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Start Metasploit](#start-metasploit)
     - [Setup PostgreSQL](#setup-postgresql)
     - [Connect to SQL Database](#connect-to-sql-database)
-    - [sources](#sources)
+    - [Metasploit sources](#metasploit-sources)
   - [MySql](#mysql)
     - [Commands](#commands)
     - [Show Current Databse](#show-current-databse)
@@ -81,7 +82,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Scan Type Options](#scan-type-options)
     - [Examples](#examples)
     - [Output Results to File](#output-results-to-file)
-    - [sources](#sources-1)
+    - [nmap sources](#nmap-sources)
   - [OpenSSH](#openssh)
   - [PostgreSQL](#postgresql)
     - [Create Database](#create-database)
@@ -126,6 +127,8 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
   - [netcat](#netcat)
   - [shred](#shred)
   - [tar](#tar)
+    - [tar usage](#tar-usage)
+    - [tar options](#tar-options)
     - [Compress](#compress-1)
     - [View Archived File Contents](#view-archived-file-contents)
     - [Extract Archive File Contents](#extract-archive-file-contents)
@@ -658,6 +661,19 @@ systemctl start resolvconf.service
 systemctl status resolvconf.service
 ```
 
+## Ports
+
+Common Ports:
+| port | desc            |
+|------|-----------------|
+| 22   | SSH             |
+| 25   | SMTP            |
+| 53   | DNS             |
+| 80   | HTTP            |
+| 443  | HTTPS           |
+| 3306 | MySQL [default] |
+| 6379 | Redis           |
+
 # Proxy Servers
 
 Proxies act as 'middleman' for traffic. When using a proxy, the traffic is given the IP address of the given IP address of the proxy instead of the originating IP address. The traffic is sent back from the proxy when the response is returned from the destination.
@@ -1015,7 +1031,7 @@ msf6> db_status
 msf6> db_disconnect
 ```
 
-### sources
+### Metasploit sources
 
 - [Metasploit Wiki](https://en.wikipedia.org/wiki/Metasploit_Project)
 
@@ -1227,16 +1243,17 @@ nmap {SCAN_TYPE} {IP/CIDR} {PORT}
 | option           |  description                                                  |
 |------------------|---------------------------------------------------------------|
 | -sL              | List Scan - simply list targets to scan                       |
-| -sn              | Ping Scan - disable port scan                                 |
 | -sP              | Ping Scan                                                     |
+| -sn              | Ping Scan - disable port scan                                 |
+| -Pn              | No ping scan - disable host discovery, often used with -sn    |
 | -sS              | TCP SYN (Stealth) Scan -- requires raw-packet privileges      |
 | -sT              | TCP Connect Scan                                              |
-| -sV              | Probe open ports to determine service/version info            |
 | -sO              | IP protocol scan                                              |
+| -sV              | Probe open ports to determine service/version info            |
 | -O               | Enable OS detection                                           |
 | -n               | Never do DNS resolution                                       |
 | -p {port ranges} | Only scan specified ports                                     |
-|-v                | Increase verbosity level (use -vv or more for greater effect) |
+| -v               | Increase verbosity level (use -vv or more for greater effect) |
 
 ### Examples
 
@@ -1270,7 +1287,7 @@ cat ResultsOpenMySQLPorts
 
 > TIP: `-oG` is deprecated, XML output format is far more powerful: `-oX` filespec (XML output)
 
-### sources
+### nmap sources
 
 - [nmap.org](https://nmap.org/)
   - [Port Scanning Techniques and Algorithms](https://nmap.org/book/scan-methods.html)
@@ -1868,26 +1885,36 @@ Usage: `shred -f -n {number_of_overwrites} {file}`
 
 ## tar
 
+### tar usage
+
+```shell
+# create/compress
+tar -c [options]
+
+# extract
+tar -x [options]
+```
+
+### tar options
+
+| option | description                                      |
+|--------|--------------------------------------------------|
+|    c   | create archive                                   |
+|    f   | specify filename                                 |
+|    t   | show files from tarbell without extracting them  |
+|    v   | verbose                                          |
+|    x   | extract files from the tarball                   |
+|    z   | compress the archive with "gzip"                 |
+
 ### Compress
 
 Use `tar` command to compress files together and combine them into an archive (tape archive -> tar). The command will also compress files and directories recursively.
 
-*Example*: Combine a pair of scripts into one single archive.
-
 ```shell
-ls -lh
-total 24K
--rwxr-xr-x 1 kali kali   55 Apr  6 20:33 HelloWorld
--rwxr-xr-x 1 kali kali 1.1K Apr  6 20:33 MySQLScan.sh
-
-tar -cvf scriptArchive.tar HelloWorld MySQLScan.sh
-HelloWorld
-MySQLScan.sh
-
-ls -lh
--rwxr-xr-x 1 kali kali   55 Apr  6 20:33 HelloWorld
--rwxr-xr-x 1 kali kali 1.1K Apr  6 20:33 MySQLScan.sh
--rw-r--r-- 1 kali kali  10K Apr  6 20:41 scriptArchive.tar
+# combine a pair of scripts into one single archive
+tar -cvf scriptArchive.tar Script1 Script2.sh
+Script1
+Script2.sh
 
 # example: compress a directory of stuff into a tar.
 tar -cvf archive.tar stuff
@@ -1896,39 +1923,22 @@ tar -cvf archive.tar stuff
 tar -czvf archive.tar.gz stuff
 ```
 
-> Notice the file size of the archive (10K). The archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
-
-**tar options**
-| option | description                                      |
-|--------|--------------------------------------------------|
-|    c   | create archive                                   |
-|    f   | specify filename                                 |
-|    t   | show files from tarbell without extracting them  |
-|    v   | verbose                                          |
-|    x   | extract files from the tarball                   |
-|    z   | compress the archive with "gzip"                  |
+> Notice that sometimes the archive file is larger due to the 'tarring' overhead to create the archive file. This overhead becomes less and less significant with larger and larger files.
 
 ### View Archived File Contents
 
-Display files from the tarbell without extracting them.
-
 ```shell
-# example: display files within `scriptArchive.tar` without extracting the file using the `t` option.
-```shell
-$ tar -tvf scriptArchive.tar
--rwxr-xr-x kali/kali        55 2022-04-06 20:40 HelloWorld
--rwxr-xr-x kali/kali      1094 2022-04-06 20:33 MySQLScan.sh
+# Display files from the tarbell without extracting them, using the 't' option
+tar -tvf scriptArchive.tar
 ```
 
 ### Extract Archive File Contents
 
-Extract files from the tarball using the `tar` command.
-
 ```shell
-# example: extract the files from `scriptArchive.tar` into the current directory.
+# extract files from the tarball
 tar -xvf scriptArchive.tar
-HelloWorld
-MySQLScan.sh
+Script1
+Script2.sh
 ```
 
 > Notes:

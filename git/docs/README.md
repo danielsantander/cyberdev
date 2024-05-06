@@ -1,3 +1,4 @@
+- [git ammend](#git-ammend)
 - [git stash](#git-stash)
   - [Stash Specified Files](#stash-specified-files)
 - [Tips](#tips)
@@ -71,6 +72,10 @@ git stash list
 
 # show changes recorded in stash as diff
 git stash show [-u|--include-untracked|--only-untracked] [<diff-options>] [<stash>]
+git stash show               # show the files in stash
+git stash show -p            # show the changes in most recent stash
+git stash show -p stash@{1}  # show changes of named stash
+git stash show -p 1          # short version
 
 # deprecated in favour of git stash push. It differs from "stash push" in that it cannot take pathspec.
 git stash save [-p|--patch] [-S|--staged] [-k|--[no-]keep-index] [-u|--include-untracked] [-a|--all] [-q|--quiet] [<message>]
@@ -210,6 +215,13 @@ git reset --hard
 
 # if last commit has not been pushed, undo last commit (keep changes, reverts files back to staging)
 git reset --soft HEAD~
+```
+
+Use `git reset` without `--hard/--soft` to move `HEAD` to point to specified commit *without* changing the files. The following will undo a commit (if not yet pushed), but keep the changes. The head will now point to the previous commit.
+
+```shell
+# undo commit but keep changes, point head to previous commit:
+git reset HEAD^
 ```
 
 # Sources
