@@ -1,19 +1,4 @@
 
-Check logs for a given branch:  `git log <branch_name>`
-
-# log options
-
-## oneline
-Simplified list of commits in one line each.
-
-Usage: `git log --oneline`
-
-
-## stat
-Displays more detail (including which files changes)
-
-Usage: `git log --stat`
-
 ## follow
 List log commits for specific file.
 
