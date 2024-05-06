@@ -1,9 +1,11 @@
+import logging
 from typing import List
 
 DEFAULT_DATETIME_FMT_SHORT = '%Y%m%d'
 DEFAULT_DATETIME_FMT_LONG = '%Y%m%d%H%M%S'
 
-DEFAULT_LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+DEFAULT_LOG_FORMAT_STR = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+DEFAULT_LOG_FORMAT = logging.Formatter(DEFAULT_LOG_FORMAT_STR)
 
 # DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
 DEFAULT_LOGGING_DATE_FORMAT = "%Y-%m-%d %I:%M:%S"
