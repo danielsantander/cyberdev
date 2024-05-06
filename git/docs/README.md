@@ -26,6 +26,35 @@
 
 ---
 
+# git config
+
+```shell
+# view git username
+git config user.name
+```
+
+# git log
+
+```shell
+# Check logs for a given branch.
+git log {BRANCH_NAME}
+
+# log of specified user
+git log --author="Jon"
+
+# List commits by Jonathan or Adam
+git log --author="\(Adam\)\|\(Jon\)"
+
+# Simplified list of commits in one line each.
+git log --oneline
+
+# Displays more detail (including which files changes)
+git log --stat
+```
+
+Sources
+- [git log by user](https://stackoverflow.com/a/4262780/14745606)
+
 # git ammend
 
 ```shell
