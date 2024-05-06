@@ -242,7 +242,6 @@ shuf -n 1 {filename}
 
 Script files will begin with the shebang: `#!/bin/bash`
 
-
 ## Update & Upgrade
 
 ```shell
