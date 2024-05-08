@@ -1,4 +1,6 @@
 - [git ammend](#git-ammend)
+- [git config](#git-config)
+- [git log](#git-log)
 - [git stash](#git-stash)
   - [Stash Specified Files](#stash-specified-files)
 - [Tips](#tips)
@@ -27,12 +29,32 @@
 
 ---
 
+# git ammend
+
+```shell
+git commit --amend -m "my new commit message to replace old commit message"
+```
+
 # git config
 
 ```shell
 # view git username
 git config user.name
+
+# view user email
+git config user.email
+
+# update email
+git config user.email "john.doe@email.com"
+
+# globally set email address
+git config --global user.email "jane@doe@email.com"
+
 ```
+
+sources:
+
+- [git config](https://stackoverflow.com/a/37805844/14745606)
 
 # git log
 
@@ -55,12 +77,6 @@ git log --stat
 
 Sources
 - [git log by user](https://stackoverflow.com/a/4262780/14745606)
-
-# git ammend
-
-```shell
-git commit --amend -m "my new commit message to replace old commit message"
-```
 
 # git stash
 
