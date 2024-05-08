@@ -13,27 +13,32 @@
   - [Disable Screen Blanking](#disable-screen-blanking)
 
 # Download Rasberry Pi OS
+
 Download Raspberry Pi Operating Systems here: https://www.raspberrypi.com/software/operating-systems/
 
 ## View OS
+
 ```shell
 cat /etc/os-release
 ```
 
 ## Check Linux Version
+
 ```shell
 lsb_release -a
 ```
 
 ## View Bit Size
+
 ```shell
 uname -m
+# Output Expected:
+# - aarch64 (64 bit)
+# - armv7l (32 bit)
 ```
-Output Expected:
-- aarch64 (64 bit)
-- armv7l (32 bit)
 
 # Update and Upgrade System
+
 ```shell
 sudo apt-get update && sudo apt-get upgrade
 ```
@@ -51,31 +56,27 @@ cat /sys/module/kernel/parameters/consoleblank
 ```
 
 # Install Docker
+
 [Docker Docs Source](https://docs.docker.com/desktop/install/debian/)
 
-**Install**
 ```shell
+# install
 apt install docker.io docker-compose
-```
 
-**Start Docker Service**
-```shell
+# start docker service
 sudo systemctl enable --now docker
-```
 
-**Test Docker**
-```shell
+# test docker
 sudo docker run --rm hello-world
 ```
 
 ## Troubleshoot
-Check status
-```shell
-systemctl status docker.service
-```
 
-Reboot Docker Service
 ```shell
+# Check status
+systemctl status docker.service
+
+# Reboot Docker Service
 systemctl status docker.service
 sudo systemctl stop docker
 sudo reboot
@@ -84,15 +85,18 @@ sudo systemctl start docker
 ```
 
 # Install Picamera
+
 - [source](https://picamera.readthedocs.io/en/release-1.13/install.html)
 
 Check (If no error, you’ve already got picamera installed)
+
 ```shell
 python -c "import picamera"
 python3 -c "import picamera"
 ```
 
 Install
+
 ```shell
 # install
 sudo apt-get update
@@ -119,10 +123,13 @@ sudo pip uninstall picamera
 ```
 
 # raspi-config
+
 Raspberry Pi Configurations through CLI
 
 ## Boot Raspberry Pi to Desktop GUI
-Open the Raspberry Pi configuration screen by running the following command:
+
+Open the Raspberry Pi configuration screen by running the following command.
+
 ```shell
 sudo raspi-config
 ```
@@ -139,6 +146,7 @@ Reboot after configuration changes submitted.
 
 ```shell
 sudo raspi-config
+
 # update configuration through interface
 sudo reboot
 ```
