@@ -42,17 +42,6 @@ def get_subnet(host:str=None, subnet_mask:str="255.255.255.0"):
     iface = ipaddress.ip_interface(f"{host}/{subnet_mask}")
     return iface.network  # 192.178.2.0/24 (given 192.178.2.10 with subnet 255.255.255.0)
 
-def udp_sender(subnet:str, message:str="ACK!"):
-    """
-    Sends UDP datagrams to all IP address in given subnet.
-    """
-    # TODO: provide blacklist of addresses to skip?
-    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
-        for ip in ipaddress.ip_network(subnet).hosts():
-            time.sleep(1)
-            print('+', end='')
-            sender.sendto(bytes(message, 'utf8'), (str(ip), 65212))
-
 def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
     """
     Display the communication between the local and remote machines to the console.
@@ -88,18 +77,21 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
             print(line)
     return results
 
-def scan_port(ip_address:str, port:int):
+def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False):
     """
     src: https://www.geeksforgeeks.org/python-simple-port-scanner-with-sockets/#
     src: https://www.geeksforgeeks.org/how-to-get-open-port-banner-in-python/
     """
     ip_address = socket.gethostbyname(socket.gethostname()) if ip_address is None else ip_address
+    packet = b"\x47\x45\x54\x20\x2f\x20\x48\x54\x54\x50\x2f\x31\x2e\x30\x2e\x2e\x2e\x2e"
     try:
         # create socket object with:
         #   - AF_INET -> using standard IPv4 address or hostname
         #   - SOCK_STREAM -> TCP client
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        if timeout is not None: s.settimeout(timeout)
         s.connect((ip_address, port))
+        if send_packet: s.send(packet)
 
         # try getting banner
         try:
@@ -108,8 +100,19 @@ def scan_port(ip_address:str, port:int):
         except:
             print (f"port {port} is open.")
     except:
+        print (f"port {port} is closed")
         pass
 
+def udp_sender(subnet:str, message:str="ACK!"):
+    """
+    Sends UDP datagrams to all IP address in given subnet.
+    """
+    # TODO: provide blacklist of addresses to skip?
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sender:
+        for ip in ipaddress.ip_network(subnet).hosts():
+            time.sleep(1)
+            print('+', end='')
+            sender.sendto(bytes(message, 'utf8'), (str(ip), 65212))
 
 if __name__ == '__main__':
     import sys
