@@ -125,7 +125,7 @@ def file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc
     - use_timestamp (bool): return timestamp value instead of datetime.
     """
     filename = filename if isinstance(filename, Path) else Path(filename)
-    if filename.exists() is False: return None
+    if not filename.exists() or not filename.is_file(): return None
     path_to_file = filename.resolve()
     file_timestamp = None
 
@@ -160,6 +160,24 @@ def file_modification_date(filename: Union[str, Path], timezone=datetime.timezon
     path_to_file = filename.resolve()
     t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
     return datetime.datetime.fromtimestamp(t, tz=timezone)
+
+def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list[Path]:
+    """
+    Iterates through given directory and returns a list of files recently  created.
+
+    Keyword arguments:
+    - directory_path: Path object of directory to search.
+    - within_hrs: number of hours to define to check when files are created. Defaults to 24 checking for files created within the past day.
+
+    Returns list of Path objects for files recently created.
+    """
+    results: list[Path] = []
+    assert directory_path.exists() and directory_path.is_dir()
+    for file in directory_path.iterdir():
+        # TODO: implement recursion of iterating directory files?
+        if is_file_recently_created(file, within_hrs):
+            results.append(file)
+    return results
 
 def is_file_recently_created(p:Path, within_hrs:int=24)->bool:
     now = datetime.datetime.utcnow()
