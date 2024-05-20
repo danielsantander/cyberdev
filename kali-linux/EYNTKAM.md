@@ -126,6 +126,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Decompress gunzip (GNU unzip)](#decompress-gunzip-gnu-unzip)
   - [hostname](#hostname)
   - [netcat](#netcat)
+    - [Netcat File Transfer Example](#netcat-file-transfer-example)
     - [Netcat Port Scanning Example](#netcat-port-scanning-example)
   - [shred](#shred)
   - [tar](#tar)
@@ -1888,25 +1889,60 @@ Allows users to read & write data over a network connection. Use it to execute r
 Usage, where host is either a numeric IP address or s symbolic hostname, and port is either a numeric port a service name
 
 Command Options
-| option    | type     | description        |
-|-----------|----------|--------------------|
-| -4        | protocol | Use IPv4 only      |
-| -6        | protocol | Use IPv6 only      |
-| -u, --udp | protocol | Use UDP connection |
+| option    | type     | description           |
+|-----------|----------|-----------------------|
+| -4        | protocol | Use IPv4 only         |
+| -6        | protocol | Use IPv6 only         |
+| -u, --udp | protocol | Use UDP connection    |
+| -l        |          | Listen for connection |
 
 ```shell
 # usage
 nc [<options>] <host> <port>
+
+# example -- listen on port 4444
+nc -l 4444
+```
+
+### Netcat File Transfer Example
+
+```shell
+# listen for connections
+netcat -l 4444 > received_file
+
+# on another machine create file and send
+echo "Hello, this is a file" > original_file
+netcat {host} 4444 < original_file
+
+# back to original host to read message
+cat received_file
+
+# Output
+Hello, this is a file
+```
+
+Transfer contents of entire directory by creating unnamed tarball file, then transferring it to remote system, and unpacking it into the remote directory.
+
+```shell
+# listen for file comming over that will need to be unzipped and extracted
+# (-) means that tar will operate on standard input
+netcat -l 4444 | tar xzvf -
+
+# on machine to send directory to transfer, pack into tarball and send to remote computer
+tar -czf - * | netcat {host} 4444
 ```
 
 ### Netcat Port Scanning Example
 
 [source](https://www.digitalocean.com/community/tutorials/how-to-use-netcat-to-establish-and-test-tcp-and-udp-connections)
 
-Use `-z` option to perform a scan instead of attempting to initiate a connection. Use `-v` for verbose.
+Use `-z` option to perform a scan instead of attempting to initiate a connection. Use `-v` for verbose. You can use `-n` to specify not to resolve IP address using DNS.
 
 ```shell
 netcat -z -v {host} 1-1000
+
+# redirect standard error using `2>&1`, then filter for `succeeded`
+nc -z -n -v {host} 1-1000 2>&1 | grep succeeded
 ```
 
 ## shred
