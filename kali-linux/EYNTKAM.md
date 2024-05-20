@@ -126,6 +126,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Decompress gunzip (GNU unzip)](#decompress-gunzip-gnu-unzip)
   - [hostname](#hostname)
   - [netcat](#netcat)
+    - [Netcat Port Scanning Example](#netcat-port-scanning-example)
   - [shred](#shred)
   - [tar](#tar)
     - [tar usage](#tar-usage)
@@ -1896,6 +1897,16 @@ Command Options
 ```shell
 # usage
 nc [<options>] <host> <port>
+```
+
+### Netcat Port Scanning Example
+
+[source](https://www.digitalocean.com/community/tutorials/how-to-use-netcat-to-establish-and-test-tcp-and-udp-connections)
+
+Use `-z` option to perform a scan instead of attempting to initiate a connection. Use `-v` for verbose.
+
+```shell
+netcat -z -v {host} 1-1000
 ```
 
 ## shred
