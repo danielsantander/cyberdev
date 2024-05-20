@@ -1900,8 +1900,11 @@ Command Options
 # usage
 nc [<options>] <host> <port>
 
-# example -- listen on port 4444
-nc -l 4444
+# example -- listen on port
+nc -l {port}
+
+# example -- send message to port
+echo "Hello There!" | netcat {host} {port}
 ```
 
 ### Netcat File Transfer Example
