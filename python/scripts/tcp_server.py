@@ -2,7 +2,7 @@
 #!/usr/bin/python3
 
 """
-Standard Mulit-Threaded TCP Server
+Standard Multi-Threaded TCP Server
 """
 
 import socket
