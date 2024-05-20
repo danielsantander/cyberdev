@@ -82,6 +82,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Scan Type Options](#scan-type-options)
     - [Examples](#examples)
     - [Output Results to File](#output-results-to-file)
+    - [Port Scanning](#port-scanning)
     - [nmap sources](#nmap-sources)
   - [OpenSSH](#openssh)
   - [PostgreSQL](#postgresql)
@@ -1286,12 +1287,34 @@ cat ResultsOpenMySQLPorts
 
 > TIP: `-oG` is deprecated, XML output format is far more powerful: `-oX` filespec (XML output)
 
+### Port Scanning
+
+```shell
+nmap {target}
+
+# more complex port scan
+nmap -p0- -v -A -T4 {target}
+```
+
+The second scan is modified with the following four options.
+
+- `-p0-` asks nmap to scan every possible TCP port
+- `-v` asks nmap to be verbose about it
+- `-A` enables aggressive tests such as remote OS detection, service/version detection, and the Nmap Scripting Engine (NSE).
+- `-T4` enables a more aggressive timing policy to speed up the scan.
+
+> The “discovered open port” lines provide as-it-happens notification of open ports so that the user can start banging on them before the scan even finishes.
+>
+> The “scan timing” line provides a completion time estimate. If you want the current time estimate while scanning, just press enter.
+>
+
 ### nmap sources
 
 - [nmap.org](https://nmap.org/)
   - [Port Scanning Techniques and Algorithms](https://nmap.org/book/scan-methods.html)
   - [Reference Guide](https://nmap.org/book/man.html)
 - [nmap wiki](https://en.wikipedia.org/wiki/Nmap)
+- [nmap port scanning tutorial](https://nmap.org/book/port-scanning-tutorial.html)
 
 ## OpenSSH
 Secure shell (SSH) is used to securely connect to a remote system, which enables:
@@ -1863,16 +1886,17 @@ Allows users to read & write data over a network connection. Use it to execute r
 
 Usage, where host is either a numeric IP address or s symbolic hostname, and port is either a numeric port a service name
 
-```shell
-nc [<options>] <host> <port>
-```
-
 Command Options
 | option    | type     | description        |
 |-----------|----------|--------------------|
 | -4        | protocol | Use IPv4 only      |
 | -6        | protocol | Use IPv6 only      |
 | -u, --udp | protocol | Use UDP connection |
+
+```shell
+# usage
+nc [<options>] <host> <port>
+```
 
 ## shred
 

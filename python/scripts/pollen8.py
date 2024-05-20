@@ -48,12 +48,10 @@ def get_args():
                         action='store_true',
                         default=DEBUG_MODE,
                         help=f'Debug mode. [{DEBUG_MODE}]')
-
     parser.add_argument('-p', '--port',
                         dest='port',
                         type=int,
                         action='store', help='Port value.')
-
     # nargs='+' takes 1 or more arguments, nargs='*' takes zero or more.
     parser.add_argument('--ssh-server',
                         dest='ssh_server',
@@ -95,11 +93,11 @@ def get_args():
     args = parser.parse_args()
     return args
 
-def setup_logger(name:str=None, debug_mode:bool=False):
+def setup_logger(name:str=None, use_verbose:bool=False):
     """
     setup logger
     """
-    lgr_lvl = logging.DEBUG if debug_mode else logging.INFO
+    lgr_lvl = logging.DEBUG if use_verbose else logging.INFO
     lgr_fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     lgr_name = name if name is not None else str(__file__).split("/")[-1].split(".")[0].upper()
     logger = logging.getLogger(lgr_name)
@@ -213,12 +211,13 @@ class ICMP:
         self.seq = header[4]
 
 class Scanner:
-    def __init__(self, host:str=None):
-        self._logger = setup_logger("scanner", debug_mode=DEBUG_MODE)
+    def __init__(self, host:str=None, use_verbose:bool=DEBUG_MODE):
+        self._logger = setup_logger("scanner", use_verbose=use_verbose)
         self.host = self.get_ip_address() if host is None else host
         self.subnet = self.get_subnet(self.host)
 
-        self._logger.info(f"Initializing scanner on subnet {self.subnet}...")
+        self._logger.debug(f"Initializing scanner on subnet {self.subnet} ...")
+
         socket_protocol = socket.IPPROTO_IP if (os.name=='nt') else socket.IPPROTO_ICMP
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
         self.socket.bind((self.host, 0))
@@ -226,7 +225,7 @@ class Scanner:
         # set sock option to include the IP header in the captured packets
         self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 
-        self._logger.debug('hitting promiscuous mode')
+        self._logger.debug('Hitting promiscuous mode.')
         if os.name == 'nt':
             self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
@@ -234,7 +233,7 @@ class Scanner:
     def get_ip_address(self):
         """ Retrieve IP address (eth0 address) by creating UDP socket."""
         # src: https://stackoverflow.com/a/30990617/14745606
-        # TODO: source to perhaps make socket into context manager:
+        # TODO: source to perhaps make socket into context manager
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         return s.getsockname()[0]
@@ -341,9 +340,41 @@ class Server(paramiko.ServerInterface):
         if (username == self._username) and (password == self._passwd):
             return paramiko.AUTH_SUCCESSFUL
 
+class Host:
+    _logger = setup_logger("Host")
+    def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
+        self.hostname: str = None
+        self.ip_address: str = None
+
+        # init
+        if use_verbose: self._logger.setLevel(logging.DEBUG)
+        self.__get_hostname()
+        self.__get_ip_address()
+
+    def __get_hostname(self)->str:
+        """ Get machine hostname via socket.gethostname() method. """
+        if self.hostname is not None: return self.hostname
+        self.hostname = socket.gethostname()
+        return self.hostname
+
+    def __get_ip_address(self)->str:
+        """ Retrieve IP address (eth0 address) by creating UDP socket. """
+        # src: https://stackoverflow.com/a/30990617/14745606
+        if self.ip_address is not None: return self.ip_address
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        self.ip_address = s.getsockname()[0]
+        return self.ip_address
+
+    def __str__(self) -> str:
+        return f"{self.hostname} - {self.ip_address}"\
+
 class Pollen8:
-    def __init__(self, **kwargs):
-        self.logger = setup_logger("Pollen8", debug_mode=DEBUG_MODE)
+    _logger = setup_logger("Pollen8")
+    def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
+        if use_verbose: self._logger.setLevel(logging.DEBUG)
+        self.host:Host = Host(use_verbose=use_verbose)
+        self.subnet:str = None
 
     """
     def reverse_forward_tunnel(self, server_port, remote_host, remote_port, transport):
