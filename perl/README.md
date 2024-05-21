@@ -13,6 +13,8 @@
   - [Examples](#examples)
     - [OS Version Detection Example](#os-version-detection-example)
     - [Build RegEx From Array](#build-regex-from-array)
+    - [Named Capture Groups](#named-capture-groups)
+    - [Positive Lookaheads](#positive-lookaheads)
 - [String Manipulation](#string-manipulation)
 - [Variables](#variables)
   - [Scalar Variables](#scalar-variables)
@@ -268,6 +270,47 @@ my $regex      = qr/$pattern/;
 if ($hostname =~ $regex) {
     # todo: stuff if subdomain found in hostname
 }
+```
+
+### Named Capture Groups
+
+[src](https://stackoverflow.com/a/288989)
+
+```perl
+# Version 5.10+ 
+# (?<NAME>pattern)
+$variable =~ /(?<count>\d+)/;
+print "Count is $+{count}";
+```
+
+```perl
+my %hash;
+@hash{"count", "something_else"} = $string =~ /(\d+)\s*,\s*(\S+)/;
+
+# Then you can do:
+$hash{"count"}
+$hash{"something_else"}
+```
+
+### Positive Lookaheads
+
+Useful for JSON data where data order doesn't matter:
+
+```perl
+my $data1 = '{"email": "jonh.doe@google.com",
+              "lastLoginTime": 1464205553139},
+              "firstName": "John"}';
+my $data2 = '{"lastLoginTime": 1464205553139,
+              "firstName": "John",
+              "email": "jonh.doe@google.com"}';
+my $regex = qr/(?=.*lastLoginTime[^\d]*(?<login>\d*))(?=.*email[\W:\s]*(?<email>.*@.*\.[^\W]+))/is
+my $auth_users_re = qr/results
+    (?:
+        (?=.*lastLoginTime[^\d]*(?<login>\d*))
+        (?=.*email[\W:\s]*(?<email>.*@.*\.[^\W]+))
+        (?=.*firstName[\W:\s]*(?<name>[^\W]+))
+    )
+    .*totalCount[^\d]*(?<count>\d)/xis;
 ```
 
 # String Manipulation
