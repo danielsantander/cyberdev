@@ -1745,9 +1745,11 @@ dig {domain} +noquestion
 # exclude stats (last section of the output)
 dig {domain} +nostats
 
-
 # include detailed answer -- turn off all results, then include answer
 dig {domain} +noall +answer
+
+# see the entire sequence of queries
+dig {domain} +trace
 ```
 
 ## find
