@@ -1,6 +1,9 @@
 - [Check Version](#check-version)
 - [Create Python Virtual Environment](#create-python-virtual-environment)
 - [Environment Variables](#environment-variables)
+- [Regular Expressions](#regular-expressions)
+  - [match vs search](#match-vs-search)
+  - [findall vs finditer](#findall-vs-finditer)
 - [Tips](#tips)
   - [Append Paths](#append-paths)
   - [Make script executable](#make-script-executable)
@@ -59,6 +62,70 @@ os.environ.setdefault("LINEUP", "develop")
 # retrieve OS environment variables
 LINEUP = os.environ.get('develop', 'some_default_value')
 ```
+
+# Regular Expressions
+
+Not needing to compile vs compiling.
+
+```python
+num = "..."
+m = re.match(num, input)
+
+# Versus compiling:
+num = re.compile("...")
+m = num.match(input)
+```
+
+> compiling allows you to separate definition of the regex from its use
+
+Ignore case sensitivity by passing `re.IGNORECASE` to the flags param of `search`, `match`, or `sub`.
+
+```python
+m = num.match(input, re.IGNORECASE)
+```
+
+## match vs search
+
+- `re.match()` searches for matches from the beginning of a string
+- `re.search()` searches for matches anywhere in the string.
+
+```python
+import re
+
+txt = 'Hello world!'
+
+print(re.search(r'world', txt).group())
+# => world
+
+print(re.match(r'world', txt))
+# => None
+
+print(re.search(r'Hello', txt).group())
+# => Hello
+
+print(re.match(r'Hello', txt).group())
+# => Hello
+```
+
+## findall vs finditer
+
+- `re.findall(pattern, string)` returns a list of matching strings.
+- `re.finditer(pattern, string)` returns an iterator over MatchObject objects.
+
+```python
+re.findall( r'all (.*?) are', 'all cats are smarter than dogs, all dogs are dumber than cats')
+# => ['cats', 'dogs']
+
+[x.group() for x in re.finditer( r'all (.*?) are', 'all cats are smarter than dogs, all dogs are dumber than cats')]
+# => ['all cats are', 'all dogs are']
+```
+
+---
+
+Python RegEx Sources:
+
+- [findall() vs finditer()](https://stackoverflow.com/a/4697884/14745606)
+- [match() vs search()](https://testdriven.io/tips/421e050b-176b-4a72-a8b5-6ad5f185b86a/#:~:text=match%20in%20Python%3F-,re.,matches%20anywhere%20in%20the%20string.)
 
 # Tips
 
