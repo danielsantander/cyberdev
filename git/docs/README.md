@@ -50,6 +50,8 @@ git config user.email "john.doe@email.com"
 # globally set email address
 git config --global user.email "jane@doe@email.com"
 
+# view logs of given filee
+git log --follow -- filename
 ```
 
 sources:
@@ -198,11 +200,22 @@ git checkout -- path/to/file/to/revert  # specify a file
 
 ## git checkout
 
-Reset specific file to last committed state (to discard uncommitted changes in a specific file):
+Undo changes with `git checkout`
 
 ```shell
+# recet file to last commited state (disgard uncommitted changes)
 git checkout ExampleFile.txt
 git checkout -- ExampleFile.txt
+
+
+# Revert files to number commit
+git checkout {has_commit_number} -- file1/to/restore file2/to/restore
+
+# Revert files to number of commits (N) before a given commit
+git checkout {has_commit_number}~N -- file1/to/restore file2/to/restore
+
+# example: revert files one commit before given commit
+git checkout {has_commit_number}~1 -- file1/to/restore file2/to/restore
 ```
 
 ## git clean
