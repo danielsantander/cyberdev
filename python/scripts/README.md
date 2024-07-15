@@ -5,7 +5,9 @@
 - [netcat.py](#netcatpy)
   - [Setup Lister and Client](#setup-lister-and-client)
 - [pollen8.py](#pollen8py)
-  - [Scanner](#scanner)
+  - [Pollen8 Usage](#pollen8-usage)
+  - [Module Examples](#module-examples)
+  - [Scan](#scan)
   - [Sniffer](#sniffer)
     - [Packet Sniffing](#packet-sniffing)
   - [SSH Commands](#ssh-commands)
@@ -23,7 +25,7 @@
 
 Will iterate through the given source directory to consolidate files into their own sub-directories, such as:
     - screenshots/
-    - <extension name>
+    - {extension name}/, such as:
       - PDFs/
       - PNG/
       - JPEG/
@@ -37,6 +39,7 @@ Example:
 ```
 
 # encryptPDF.py
+
 Python script for encrypting PDF files.
 
 Usage: `./encryptPDF [PDF file] [output location]`
@@ -47,7 +50,7 @@ Usage: `./encryptPDF [PDF file] [output location]`
 There should then be an encrypted PDF file located at `tests/sample_data/pdfs/HelloWorldENCRYPTED.pdf` (outputs in same directory as the input file).
 
 ```shell
-$ ./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf
+./encryptPDF.py tests/sample_data/pdfs/HelloWorld.pdf
 ```
 
 **Example**: Encrypt the same PDF file, but send output to the current directory.
@@ -112,7 +115,72 @@ CTRL-D
 
 Script that does some neat network stuff in Python.
 
-## Scanner
+## Pollen8 Usage
+
+```shell
+python3 pollen8.py -h
+usage: pollen8.py [-h] [-d] [-p PORT] [--ssh-server [IP PORT ...]] [--ssh-client [IP PORT ...]]
+                  [--ssh-cmd IP PORT [IP PORT ...]] [--sniff [IP_ADDRESS/CIDR ...]] [--scan]
+
+Pollen8 -- Script that does some neat network stuff.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -d, --debug           Debug mode. Defaults to False
+  -p PORT, --port PORT  Port value.
+  --ssh-server [IP PORT ...]
+                        Create SSH server. Input server ip address & port as arguments.
+  --ssh-client [IP PORT ...]
+                        Create SSH client. Input server IP address as argument.
+  --ssh-cmd IP PORT [IP PORT ...]
+                        Make connection to SSH server and run single command
+  --sniff [IP_ADDRESS/CIDR ...]
+                        Sniff network packet data.
+  --scan                Scan local network.
+
+Example:
+    --ssh-server <ip_address> <port_number>
+    --ssh-client <ip_address> <port_number>
+    --ssh-cmd <ip_address> <username> <command> <port_number>
+    --sniff
+    --scan
+```
+
+## Module Examples
+
+```python
+from pollen8 import Pollen8
+p = Pollen8()
+p.host.ip_address
+p.host.hostname
+p.subnet
+
+# Scan a target's port for banner
+# returns tuple (str,bool) => (True if port open else False, 'BANNER MESSAGE HERE, IF FOUND')
+p.check_port(ip_address=p.host.ip_address, port=80)
+
+# Scan multiple ports on target
+p.scan_target(ip_address=p.host.ip_address, port_list=[22, 80])
+
+# Send TCP message to target host and port
+p.tcp_client(target_host="192.168.0.10", port=22, message=b"GET / HTTP/1.1\r\n")
+
+# Start up a standard multi-threaded TCP server/listener
+p.tcp_server(port=4444, response_message=b'rgr')
+
+# Send UDP message to target host and port.
+# Will wait for response back (timeout defaults to 5s)
+p.udp_client(target_host="192.168.0.10", port=4444, message=b'ACK')
+
+# Connect to SSH server and run single command, returns list of responses.
+p.ssh_cmd('192.168.0.10', 'root', 'password123', 'whoami')
+['root\n']
+
+# Create SSH server for a client to connect to.
+p.ssh_server(port=2222)
+```
+
+## Scan
 
 Host discovery scan covering a whole subnet. Trigger with `--scan` option. Exit script loop with `^C`.
 
@@ -191,7 +259,7 @@ Windows will allow sniffing of all incoming packets regardless of protocol, wher
 
 ### Single Command
 
-USAGE: `./pollen8 --ssh-cmd {IP_ADDRESS} {USERNAME} {COMMAND} {PORT}`
+USAGE: `./pollen8.py --ssh-cmd {IP_ADDRESS} {USERNAME} {COMMAND} {PORT}`
 
 ```shell
 ./pollen8.py --ssh-cmd {IP_ADDRESS}
