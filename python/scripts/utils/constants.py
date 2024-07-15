@@ -30,6 +30,9 @@ RE_FILE_EXTENSION = r'\.(?P<extension>\w+$)'
 # IMG_XXXX.jpg
 RE_IPHONE_SCREEN_SHOT = r'^IMG\_(?P<image_id>\d+)(?P<extension>\.\w*)$'
 
+# IPv4
+RE_IP_ADDRESS = r'^(?P<address>(\d.)+\d+)(\/(?P<subnet_mask_cidr>\d+))?$'
+
 # Screen Shot YYYY-MM-DD at HH.MM.SS AM|PM.png
 RE_MAC_OS_SCREEN_SHOT = r'^Screen\sShot\s(?P<date>[0-9]{4}-[0-9]{2}-[0-9]{2})\sat\s(?P<time>[0-9]{1,2}.[0-9]{2}.[0-9]{2})\s(?P<meridiem>[A|P]M)(?P<extension>\.png)$'
 
