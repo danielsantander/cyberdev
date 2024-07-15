@@ -3,6 +3,8 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
 - [Tips](#tips)
   - [Change Shell](#change-shell)
   - [Check Linux Versions and Bit Size](#check-linux-versions-and-bit-size)
+  - [Dot Files](#dot-files)
+    - [bashrc vs bash\_profile](#bashrc-vs-bash_profile)
   - [Generate SSH Keys](#generate-ssh-keys)
   - [Install](#install)
     - [Kali for Raspberry Pi 4](#kali-for-raspberry-pi-4)
@@ -205,6 +207,14 @@ uname -a
 #                        /
 #   firmware revision --+
 ```
+
+## Dot Files
+
+### bashrc vs bash_profile
+
+[source](https://www.tutorialspoint.com/bashrc-vs-bash-profile-what-is-difference#:~:text=Bashrc%20is%20commonly%20used%20to,at%20start%20of%20your%20session.)
+
+Bashrc is commonly used to set aliases, define functions, and customize prompt. Bash_profile is commonly used to set PATH variable and to run commands that are needed only once at start of your session.
 
 ## Generate SSH Keys
 
