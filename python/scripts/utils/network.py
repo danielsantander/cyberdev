@@ -4,6 +4,7 @@
 import argparse
 import ipaddress
 import socket
+import struct
 import threading
 import time
 from typing import Union
@@ -17,6 +18,16 @@ from typing import Union
 #         ................................ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[.]^_`abcdefghijklmnopqrstuvwxyz{|}~..................................¡¢£¤¥¦§¨©ª«¬.®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
 HEX_FILTER = ''.join(
     [(len(repr(chr(i))) == 3) and chr(i) or '.' for i in range(256)])
+
+def ip2long(ip:str)->int:
+    packed = socket.inet_aton(ip)
+    lng = struct.unpack("!L", packed)[0]
+    return lng
+
+def long2ip(lng:int)->str:
+    packed = struct.pack("!L", lng)
+    ip = socket.inet_ntoa(packed)
+    return ip
 
 def get_ip_address():
     """
