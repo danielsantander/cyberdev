@@ -1054,6 +1054,9 @@ msf6> db_disconnect
 # start service
 service mysql start
 
+# restart service
+sudo systemctl restart mysql
+
 # login
 mysql -u {username} -p
 
@@ -1062,6 +1065,8 @@ sudo mysql -u {username} -p
 
 # example -- root user's default password configuration is empty, press "ENTER" upon the password prompt
 sudo mysql -u root -p
+
+sudo mysql -u root
 ```
 
 ### Commands
