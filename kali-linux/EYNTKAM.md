@@ -1,4 +1,4 @@
-EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
+EVERYTHING YOU NEED TO KNOW, AND MORE
 
 - [Tips](#tips)
   - [Change Shell](#change-shell)
@@ -94,6 +94,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE (EYNTKAM / EUN2K&M)
     - [Associate User with Database](#associate-user-with-database)
     - [Drop Tables](#drop-tables)
     - [Truncate Table](#truncate-table)
+  - [vim](#vim)
 - [Process Management](#process-management)
   - [ps](#ps)
   - [top](#top)
@@ -1412,6 +1413,14 @@ Truncate/remove data from table(s).
 
 ```sql
 TRUNCATE {TABLE_NAME}, {SECOND_TABLE_NAME}
+```
+
+## vim
+
+Install
+
+```shell
+sudo apt install vim
 ```
 
 # Process Management
