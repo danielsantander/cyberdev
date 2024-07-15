@@ -1,5 +1,5 @@
 *Table of Contents*
-- [Download Rasberry Pi OS](#download-rasberry-pi-os)
+- [Download Raspberry Pi OS](#download-raspberry-pi-os)
   - [View OS](#view-os)
   - [Check Linux Version](#check-linux-version)
   - [View Bit Size](#view-bit-size)
@@ -12,7 +12,9 @@
   - [Boot Raspberry Pi to Desktop GUI](#boot-raspberry-pi-to-desktop-gui)
   - [Disable Screen Blanking](#disable-screen-blanking)
 
-# Download Rasberry Pi OS
+---
+
+# Download Raspberry Pi OS
 
 Download Raspberry Pi Operating Systems here: https://www.raspberrypi.com/software/operating-systems/
 
@@ -33,8 +35,8 @@ lsb_release -a
 ```shell
 uname -m
 # Output Expected:
-# - aarch64 (64 bit)
-# - armv7l (32 bit)
+# - aarch64 (for 64 bit)
+# - armv7l (for 32 bit)
 ```
 
 # Update and Upgrade System
@@ -63,10 +65,10 @@ cat /sys/module/kernel/parameters/consoleblank
 # install
 apt install docker.io docker-compose
 
-# start docker service
+# Start Docker Service
 sudo systemctl enable --now docker
 
-# test docker
+# Test Docker
 sudo docker run --rm hello-world
 ```
 
@@ -88,9 +90,8 @@ sudo systemctl start docker
 
 - [source](https://picamera.readthedocs.io/en/release-1.13/install.html)
 
-Check (If no error, you’ve already got picamera installed)
-
 ```shell
+# Check if installed (if no errors, it's already installed).
 python -c "import picamera"
 python3 -c "import picamera"
 ```
@@ -98,7 +99,6 @@ python3 -c "import picamera"
 Install
 
 ```shell
-# install
 sudo apt-get update
 sudo apt-get install python-picamera python3-picamera
 
@@ -128,17 +128,15 @@ Raspberry Pi Configurations through CLI
 
 ## Boot Raspberry Pi to Desktop GUI
 
-Open the Raspberry Pi configuration screen by running the following command.
+Open the Raspberry Pi configuration screen by running the following command:
 
 ```shell
 sudo raspi-config
 ```
 
-Within the configurations screen, look for and select the option of **Enable Boot to Desktop/Scratch**.
-
-In the next screen, choose **Desktop Login as user 'Pi' at the graphical desktop**
-
-Reboot after configuration changes submitted.
+- Within the configurations screen, look for and select the option of **Enable Boot to Desktop/Scratch**.
+- In the next screen, choose **Desktop Login as user 'Pi' at the graphical desktop**
+- Reboot after configuration changes submitted.
 
 ## Disable Screen Blanking
 
