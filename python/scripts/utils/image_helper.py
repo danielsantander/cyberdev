@@ -86,10 +86,9 @@ def yt_download(video_url:str, output_path:Union[str,Path], quality:str="highest
 
     is_progressive = True
     order_by = "resolution"
-    file_extension = "mp4"
+    file_extension = "mp3" if is_mp3 else "mp4"
     try:
         if is_mp3:
-            file_extension = "mp3"
             # TODO: pass
             return
         if quality.lower() in ['high', 'highest']:
