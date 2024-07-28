@@ -114,6 +114,41 @@ def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False
         print (f"port {port} is closed")
         pass
 
+def ssh_command(ip, port, user, passwd, cmd):
+    """
+    Make connection to ssh sever and run single command.
+
+    Keyword arguments:
+    - ip: server ip address
+    - port: server port
+    - user: username
+    - passwd: user password
+    - cmd: command to run
+    """
+    import paramiko
+    #   - note: Paramiko also supports auth w/ keys instead of password auth
+    # TODO:
+    #   - utilize using keys
+    #   - modify to run multiple commands on SSH server
+    #   - run commands on multiple SSH servers.
+
+    client = paramiko.SSHClient()
+
+    # bc we control both ends of connection,
+    # set policy to accept SSH key for the SSH server we're connecting to and make connection
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    client.connect(ip, port=port, username=user, password=passwd)
+
+    # assuming connection is made, run command and print each line of the output
+    _, stdout, stderr = client.exec_command(cmd)
+    output = stdout.readlines() + stderr.readlines()
+    if output:
+        print('--- OUTPUT ---')
+        for line in output:
+            print(line.strip())
+    else: print ('--- NO OUTPUT ---')
+    return
+
 def udp_sender(subnet:str, message:str="ACK!"):
     """
     Sends UDP datagrams to all IP address in given subnet.
