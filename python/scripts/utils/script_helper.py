@@ -4,8 +4,8 @@
 
 import argparse
 
-def get_args(description:str="", debug_mode:bool=False)->argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description=description)
+def get_args(debug_mode:bool=False, **kwargs)->argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(**kwargs)
     parser.add_argument('-d','--debug',
         dest='debug',
         action='store_true',
