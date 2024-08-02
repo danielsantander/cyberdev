@@ -3,6 +3,7 @@
 
 import argparse
 import ipaddress
+import os
 import socket
 import struct
 import threading
@@ -113,6 +114,40 @@ def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False
     except:
         print (f"port {port} is closed")
         pass
+
+def sniffer(ip_address:str=None):
+    """
+    Packet sniffing on Windows and Linux machines.
+    Note: may need to run with sudo privileges
+
+    Keyword Arguments:
+    ip_address (str): ip address of machine to sniff
+
+    """
+    ip_address = ip_address or get_ip_address()
+    os_name = os.name
+    print(f"Starting packet sniffer on {ip_address} - {os_name}")
+    socket_protocol = socket.IPPROTO_IP if os_name == 'nt' else socket.IPPROTO_ICMP
+
+    sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
+    sniffer.bind((ip_address, 0))
+
+    # set sock option to include the IP header in the captured packets
+    sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
+
+    # enable promiscuous mode if on Windows by sending IOCTL to the network card driver
+    # (note: may be issues running on Windows on virtual machine, notification may be sent to user).
+    if os_name == 'nt':
+        sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
+
+    # return one packet
+    packet = sniffer.recvfrom(65565)
+    print(f"packet:\n{packet}")
+
+    # if on Windows, turn off promiscuous mode
+    if os_name == 'nt': sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
+    return packet
+
 
 def ssh_command(ip, port, user, passwd, cmd):
     """
