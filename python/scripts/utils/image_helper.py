@@ -79,6 +79,16 @@ def pdf_to_jpg(path:Union[str,Path], outPath:Union[str,Path]=None) -> None:
     return
 
 def yt_download(video_url:str, output_path:Union[str,Path], quality:str="highest", is_mp3:bool=False, title:str=None)->Path:
+    """
+    Download youtube videos using the pytube library.
+
+    Keyword Arguments:
+    - video_url (str): YouTube video URL
+    - output_path (str|Path): Directory to save the MP4 download
+    - quality (str): Quality to download, either 'high' or 'highest'.
+    - is_mp3 (bool): Set True to download MP3 of video.
+    - title (str): Define title of video file to save, else will be title of video from YouTube.
+    """
     out_path:Path = output_path if isinstance(output_path, Path) else Path(output_path)
     yt = YouTube(url=video_url)
     new_filename = yt.title if title is None else title
