@@ -85,3 +85,41 @@ XPATH_LIST = [
     "//video/source",
     "//video/source[@type='video/mp4']",
 ]
+
+MK_FINISHERS = {
+    "MK_11": {
+        # finisher nomenclature: name (location) : input
+        "shang_tsung": {
+            # FATALITIES
+            "Kondemned To The Damned (mid)": "BFDD2",
+            "Shokan Reborn (mid)": "BFB4",
+            "Stage Fatality (close)": "UUB2",
+            "Easy Stage Fatality (close)": "Hold block + 1",
+            # FRIENDSHIP
+            "Friendship (mid)": "BBDF4",
+            "Easy Friendship Fatality (close)": "Hold block + 2",
+        },
+        "sub_zero": {
+            # FATALITIES
+            "Ice-Cutioner": "BFB1",
+            "Frozen In Time (mid)": "FDF4",
+            "Stage Fatality": "DBD1",
+            # FRIENDSHIP
+            "Frosty Treats": "DDBF2",
+        },
+        "scorpion": {
+            # FATALITIES
+            "You're Next": "BDD2",
+            "Chain Reaction": "DFB1",
+            "Stage Fatality": "DFD2",
+            # FRIENDSHIP
+            "Teddy-ality": "FBFB4",
+        }
+    },
+    "MK_1": {
+        "shang_tsung": {
+            # name (location) : input
+            "": []
+        }
+    }
+}
