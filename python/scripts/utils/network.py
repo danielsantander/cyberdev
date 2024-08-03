@@ -279,6 +279,7 @@ if __name__ == '__main__':
             # 'udp_sender',
             'hexdump',
             'scan_port',
+            'sniffer',
         ]
         parser = argparse.ArgumentParser()
         parser.add_argument('-d','--debug',
@@ -313,12 +314,15 @@ if __name__ == '__main__':
         print (f"args ({type(args)}): {args} ")
         print (f"action: {action}")
         print (f"data: {data}")
+
     results = ""
     if action == 'get_ip_address':
         results = get_ip_address()
         print (f"\n{results}\n")
+
     elif action == 'hexdump':
         results = hexdump(data)
+
     elif action == 'scan_port':
         host_ip = get_ip_address()
         start_time = time.time()
@@ -328,7 +332,14 @@ if __name__ == '__main__':
             thread = threading.Thread(target=scan_port, args=[host_ip, i])
             thread.start()
         end_time = time.time()
+        print (f"To scan all ports it took {end_time-start_time} seconds")
 
-        print (f"To all scan all ports it took {end_time-start_time} seconds")
+    elif action == 'sniffer':
+        # may need to run with sudo
+        # sudo python3 ./network.py sniffer -d --data "192.168.0.207"
+        ip_address = data or get_ip_address()
+        sniffer(ip_address)
+
     else:
+        print("Unknown action.")
         sys.exit(1)
