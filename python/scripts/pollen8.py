@@ -20,6 +20,7 @@ import time
 from typing import Tuple
 # from ctypes import *
 from ctypes import Structure, c_ubyte, c_ushort, c_uint32
+from utils import network
 
 DEBUG_MODE = False
 CWD = os.path.dirname(os.path.realpath(__file__))
@@ -136,58 +137,6 @@ class IP_CTYPE(Structure):
         self.src_address = socket.inet_ntoa(struct.pack("<L", self.src))
         self.dst_address = socket.inet_ntoa(struct.pack("<L", self.dst))
 
-
-# Struct IP Model
-class IP:
-    """
-    IP class that can read a packet and parse the header into it's own separate fields (map the first 20 bytes of the received buffer into a friendly IP header).
-
-    Keyword Arguments:
-    - buff (string): packet data
-
-    Example:
-    mypacket = IP(buff)
-    print (f'{mypacket.src_address} -> {mypacket.dst_address}')
-    """
-    def __init__(self, buff=None):
-        # first char '<' specifies endianness of the data (order of bytes within binary number)
-        # B -> 1-byte unsigned char
-        # H -> 2-byte unsigned short
-        # s -> a byte array requiring byte-width specifications (4s means 4-byte string)
-        header = struct.unpack('<BBHHHBBH4s4s', buff)
-
-        # With first byte of header data:
-        # - assign version variable the high-order nybble by right-shifting the byte by four places (prepending four 9s to the front)
-        # - assign hdrlen variable (self.ihl) the lower-order nybble (last 4 bits of byte) by Using boolean AND with 0xF (00001111) - replacing first 4 bits with 0.
-        self.ver = header[0] >> 4
-        self.ihl = header[0] & 0xF
-
-        self.tos = header[1]
-        self.len = header[2]
-        self.id = header[3]
-        self.offset = header[4]
-        self.ttl = header[5]
-        self.protocol_num = header[6]
-        self.sum = header[7]
-        self.src = header[8]
-        self.dst = header[9]
-
-        # human readable IP addresses
-        self.src_address = ipaddress.ip_address(self.src)
-        self.dst_address = ipaddress.ip_address(self.dst)
-
-        self.protocol_map = { 1: "ICMP", 6: "TCP", 17: "UDP" }
-
-        try:
-            self.protocol = self.protocol_map[self.protocol_num]
-        except Exception as e:
-            err_msg = ("%s No protocol for %s" % (e,  self.protocol_num))
-            print(err_msg)
-            self.protocol = str(self.protocol_num)
-
-    def __str__(self) -> str:
-        return f"{self.src_address} -> {self.dst_address}"
-
 class ICMP:
     """
     ICMP class that can decode a packet and parse the header into it's own separate fields.
@@ -280,7 +229,7 @@ class Scanner:
                 self._logger.debug(f"received raw_buffer:\t{raw_buffer}") # debugging
 
                 # create IP header from the first 20 bytes
-                ip_header = IP(raw_buffer[0:20])
+                ip_header = network.IP(raw_buffer[0:20])
                 self._logger.debug(f"ip_header (protocol -- {ip_header.protocol}):\t{ip_header}") # debugging
 
                 if ip_header.protocol == "ICMP":
@@ -470,7 +419,7 @@ class Pollen8:
                 raw_buffer = sniffer.recvfrom(65535)[0]
 
                 # create IP header from the first 20 bytes
-                ip_header = IP(raw_buffer[0:20])
+                ip_header = network.IP(raw_buffer[0:20])
 
                 # if it's ICMP, we want it
                 if ip_header.protocol == "ICMP":

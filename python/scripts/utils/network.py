@@ -63,7 +63,7 @@ class IP:
         try:
             self.protocol = self.protocol_map[self.protocol_num]
         except Exception as e:
-            err_msg = ("%s No protocol for %s" % (e,  self.protocol_num))
+            err_msg = ("%s No protocol for %s" % (e, self.protocol_num))
             print(err_msg)
             self.protocol = str(self.protocol_num)
 
