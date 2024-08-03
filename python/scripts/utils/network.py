@@ -20,6 +20,56 @@ from typing import Union
 HEX_FILTER = ''.join(
     [(len(repr(chr(i))) == 3) and chr(i) or '.' for i in range(256)])
 
+class IP:
+    """
+    IP class that can read a packet and parse the header into it's own separate fields (map the first 20 bytes of the received buffer into a friendly IP header).
+
+    Keyword Arguments:
+    - buff (string): packet data
+
+    Example:
+    mypacket = IP(buff)
+    print (f'{mypacket.src_address} -> {mypacket.dst_address}')
+    """
+    def __init__(self,buff=None):
+        # first char '<' specifies endianness of the data (order of bytes within binary number)
+        # B -> 1-byte unsigned char
+        # H -> 2-byte unsigned short
+        # s -> a byte array requiring byte-width specifications (4s means 4-byte string)
+        header = struct.unpack('<BBHHHBBH4s4s', buff)
+
+        # With first byte of header data:
+        # - assign version variable the high-order nybble by right-shifting the byte by four places (prepending four 9s to the front)
+        # - assign hdrlen variable (self.ihl) the lower-order nybble (last 4 bits of byte) by Using boolean AND with 0xF (00001111) - replacing first 4 bits with 0.
+        self.ver = header[0] >> 4
+        self.ihl = header[0] & 0xF
+
+        self.tos = header[1]
+        self.len = header[2]
+        self.id = header[3]
+        self.offset = header[4]
+        self.ttl = header[5]
+        self.protocol_num = header[6]
+        self.sum = header[7]
+        self.src = header[8]
+        self.dst = header[9]
+
+        # human readable IP addresses
+        self.src_address = ipaddress.ip_address(self.src)
+        self.dst_address = ipaddress.ip_address(self.dst)
+
+        self.protocol_map = { 1: "ICMP", 6: "TCP", 17: "UDP" }
+
+        try:
+            self.protocol = self.protocol_map[self.protocol_num]
+        except Exception as e:
+            err_msg = ("%s No protocol for %s" % (e,  self.protocol_num))
+            print(err_msg)
+            self.protocol = str(self.protocol_num)
+
+    def __str__(self) -> str:
+        return f"{self.src_address} -> {self.dst_address}"
+
 def ip2long(ip:str)->int:
     packed = socket.inet_aton(ip)
     lng = struct.unpack("!L", packed)[0]
@@ -140,13 +190,15 @@ def sniffer(ip_address:str=None):
     if os_name == 'nt':
         sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
-    # return one packet
-    packet = sniffer.recvfrom(65565)
-    print(f"packet:\n{packet}")
-
-    # if on Windows, turn off promiscuous mode
-    if os_name == 'nt': sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
-    return packet
+    try:
+        while True:
+            raw_buffer = sniffer.recvfrom(65535)[0]
+            ip_header = IP(raw_buffer[0:20])
+            print(f"IP Header (protocol -- {ip_header.protocol}):\t{ip_header}")
+    except KeyboardInterrupt:
+        # if on Windows, turn off promiscuous mode
+        if os_name == 'nt': sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
+    return
 
 
 def ssh_command(ip, port, user, passwd, cmd):
