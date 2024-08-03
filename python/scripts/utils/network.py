@@ -212,7 +212,7 @@ def sniffer(ip_address:str=None):
             print(f"IP Header: {ip_header.protocol}\t{ip_header}")
             print(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
             if ip_header.protocol == 'ICMP':
-                # calculate where ICMP packet starts
+                # calculate the offset in the raw packet where ICMP body lives
                 offset = ip_header.ihl * 4
                 buf = raw_buffer[offset:offset + 8]
                 icmp_header = ICMP(buf)
