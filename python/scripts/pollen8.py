@@ -137,22 +137,6 @@ class IP_CTYPE(Structure):
         self.src_address = socket.inet_ntoa(struct.pack("<L", self.src))
         self.dst_address = socket.inet_ntoa(struct.pack("<L", self.dst))
 
-class ICMP:
-    """
-    ICMP class that can decode a packet and parse the header into it's own separate fields.
-
-    Keyword Arguments:
-    - buff (string): packet data
-    """
-    def __init__(self, buff):
-        # assign  1 byte to the first two attributes, and 2 bytes to the next three attributes
-        header = struct.unpack('<BBHHH', buff)
-        self.type = header[0]
-        self.code = header[1]
-        self.sum = header[2]
-        self.id = header[3]
-        self.seq = header[4]
-
 class Scanner:
     def __init__(self, host:str=None, use_verbose:bool=DEBUG_MODE):
         self._logger = setup_logger("scanner", use_verbose=use_verbose)
@@ -246,7 +230,7 @@ class Scanner:
                     self._logger.debug(f"buf val: {buf}")
 
                     # create ICMP struct
-                    icmp_header = ICMP(buf)
+                    icmp_header = network.ICMP(buf)
 
                     if icmp_header.code == 3 and icmp_header.type == 3:
                         if ipaddress.ip_address(ip_header.src_address) in ipaddress.IPv4Network(self.subnet):
@@ -433,7 +417,7 @@ class Pollen8:
                     buf = raw_buffer[offset:offset+8]
 
                     # create ICMP struct
-                    icmp_header = ICMP(buf)
+                    icmp_header = network.ICMP(buf)
                     print(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
 
         except KeyboardInterrupt:

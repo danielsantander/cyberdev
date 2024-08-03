@@ -70,6 +70,21 @@ class IP:
     def __str__(self) -> str:
         return f"{self.src_address} -> {self.dst_address}"
 
+class ICMP:
+    """
+    Class to decode ICMP messages and parse the header into it's own separate fields.
+
+    Keyword Arguments:
+    - buff (string) - ICMP body of packet
+    """
+    def __init__(self, buff):
+        header = struct.unpack('<BBHHH', buff)
+        self.type = header[0]
+        self.code = header[1]
+        self.sum = header[2]
+        self.id = header[3]
+        self.seq = header[4]
+
 def ip2long(ip:str)->int:
     packed = socket.inet_aton(ip)
     lng = struct.unpack("!L", packed)[0]
@@ -194,7 +209,15 @@ def sniffer(ip_address:str=None):
         while True:
             raw_buffer = sniffer.recvfrom(65535)[0]
             ip_header = IP(raw_buffer[0:20])
-            print(f"IP Header (protocol -- {ip_header.protocol}):\t{ip_header}")
+            print(f"IP Header: {ip_header.protocol}\t{ip_header}")
+            print(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
+            if ip_header.protocol == 'ICMP':
+                # calculate where ICMP packet starts
+                offset = ip_header.ihl * 4
+                buf = raw_buffer[offset:offset + 8]
+                icmp_header = ICMP(buf)
+                print(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
+
     except KeyboardInterrupt:
         # if on Windows, turn off promiscuous mode
         if os_name == 'nt': sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
