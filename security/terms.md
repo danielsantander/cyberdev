@@ -1,4 +1,5 @@
 - [CISA](#cisa)
+- [OSINT](#osint)
 - [SOC](#soc)
 - [Strict-Transport-Security](#strict-transport-security)
 
@@ -13,6 +14,10 @@ The agency began in 2007 as the DHS National Protection and Programs Directorate
 **Sources:**
 
 - [Wiki](https://en.wikipedia.org/wiki/Cybersecurity_and_Infrastructure_Security_Agency)
+
+# OSINT
+
+Open Source Intelligence
 
 # SOC
 
