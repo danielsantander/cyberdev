@@ -105,9 +105,11 @@ class Scanner:
     def sniff(self, message:str="ACK!"):
         """
         Similar to main sniffer method, but keeps track of which hosts are up.
+        Usually called after making UDP calls with same message -- with udp_sender().
+
         If the anticipated ICMP message is detected:
-            - check that the ICMP response is coming from within the target subnet
-            - has the message string in it
+            - check the ICMP response is coming from within the target subnet
+            - check the ICMP response contains the message
         """
         hosts_up = set([f'{str(self.host)} *'])
         try:
@@ -235,6 +237,8 @@ def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False
     except:
         print (f"port {port} is closed")
         pass
+    s.close()
+    return
 
 def sniffer(ip_address:str=None):
     """
