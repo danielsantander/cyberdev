@@ -212,17 +212,23 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
             print(line)
     return results
 
-def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False):
+def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False, **kwargs)->tuple[str,bool,str]:
     """
+    Makes socket connection to port.
+
+    Returns tuple with three values: asset scanned, if port is open, banner if found.
+    Example: ('10.0.0.10:22', True, 'SSH-2.0-OpenSSH_7.9p1 Raspbian-10+deb10u4\r\n')
+
     src: https://www.geeksforgeeks.org/python-simple-port-scanner-with-sockets/#
     src: https://www.geeksforgeeks.org/how-to-get-open-port-banner-in-python/
     """
     ip_address = socket.gethostbyname(socket.gethostname()) if ip_address is None else ip_address
     packet = b"\x47\x45\x54\x20\x2f\x20\x48\x54\x54\x50\x2f\x31\x2e\x30\x2e\x2e\x2e\x2e"
+    results: tuple[str,bool,str] = ()
     try:
         # create socket object with:
-        #   - AF_INET -> using standard IPv4 address or hostname
-        #   - SOCK_STREAM -> TCP client
+        #  - AF_INET     -> using standard IPv4 address or hostname
+        #  - SOCK_STREAM -> TCP client
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         if timeout is not None: s.settimeout(timeout)
         s.connect((ip_address, port))
@@ -231,14 +237,40 @@ def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False
         # try getting banner
         try:
             banner = s.recv(1024).decode()
-            print (f"port {port} is open with banner ({len(banner)}): {banner}")
-        except:
-            print (f"port {port} is open.")
+            # print (f"port {port} is open with banner ({len(banner)}): {banner}")
+            s.close()
+            results = (f"{ip_address}:{port}",True,banner)
+            kwargs.get("results", []).append(results)   # for threading purposes
+        except Exception as err:
+            # print (f"port {port} is open.")
+            s.close()
+            results = (f"{ip_address}:{port}",True,None)
+            kwargs.get("results", []).append(results)   # for threading purposes
     except:
-        print (f"port {port} is closed")
-        pass
-    s.close()
-    return
+        # print (f"port is closed.")
+        # print (f"port {port} is closed.")
+        results = (f"{ip_address}:{port}",False,None)
+        kwargs.get("results", []).append(results)   # for threading purposes
+    return results
+
+def scan_ports(ip_address:str, ports:list[int]=list(range(0, 100000)), timeout:int=None, send_packet:bool=False)->list[tuple[str,bool,str]]:
+    """
+    Utilizes threading to scan multiple ports.
+    """
+    threads = [None] * len(ports)
+    results: list[tuple[str,bool,str]] = []
+    for idx, i in enumerate(ports):
+        # print(f"scanning port {i}") # DEBUGGING PURPOSES
+        threads[idx] = threading.Thread(target=scan_port, kwargs={"ip_address": ip_address,"port": i, "results": results}) #args=[i])
+        threads[idx].start()
+
+    # wait for all thread to finish
+    for i in range(len(threads)):
+        threads[i].join()
+
+    # results: [('192.168.0.100:22', True, 'SSH-2.0-OpenSSH_7.9p1 Raspbian-10+deb10u4\r\n'), ('192.168.0.100:80', True, '')]
+    # print (f"results ({type(results)} -- {len(results)}):\n{results}\n\n")
+    return results
 
 def sniffer(ip_address:str=None):
     """
@@ -388,13 +420,37 @@ if __name__ == '__main__':
     elif action == 'scan_port':
         host_ip = get_ip_address()
         start_time = time.time()
+        params = {"ip_address": host_ip}
+        func = scan_port
+        results = None
 
-        # todo: if no port specified, scan all the ports
-        for i in range(0, 100000):
-            thread = threading.Thread(target=scan_port, args=[host_ip, i])
-            thread.start()
+        # validate data
+        if data:
+            # python3 network.py scan_port --data 10.0.0.10
+            import re
+            import constants
+            # TODO: update RE_IP_ADDRESS to accept port numbers and group the ip_address and port
+            # return both in params dictionary below:
+            if re.match(constants.RE_IP_ADDRESS, data):
+                # print(f"ip address found: {data}")
+                params["ip_address"] = data
+                params["ports"] = data.split("")[-1] if len(data.split(" ")) > 1 else list(range(0, 100000))
+                # print(f"params: {params}")
+                results = scan_ports(**params)
+            else:
+                params["ip_address"] = host_ip
+                params["port"] = int(data)
+                results = scan_port(**params)
+        else:
+            # if no ip address or port specified, scan all the ports on this machine
+            # for i in range(0, 100000):
+            #     thread = threading.Thread(target=scan_port, kwargs=params)#args=[host_ip, i])
+            #     thread.start()
+            results = scan_ports(host_ip, ports=list(range(0,100000)))
+        print ("results:\n")
+        print("\n".join([f"{x[0]}\t{x[1]}\t{x[2]}" for x in results]))
         end_time = time.time()
-        print (f"To scan all ports it took {end_time-start_time} seconds")
+        print (f"\nTo scan all ports it took {end_time-start_time} seconds.\n")
 
     elif action == 'sniffer':
         # sudo python3 ./network.py sniffer -d --data "192.168.0.207"
