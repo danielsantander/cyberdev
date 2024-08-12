@@ -371,9 +371,10 @@ if __name__ == '__main__':
             # 'udp_sender',
             'hexdump',
             'scanner',
-            'scan_port',
+            'scan_port', 'scan',
             'sniffer',
         ]
+        # TODO: add ip_address and port args, use instead of --data
         parser = argparse.ArgumentParser()
         parser.add_argument('-d','--debug',
             dest='debug',
@@ -404,6 +405,7 @@ if __name__ == '__main__':
     data = args.get('data')
     debug = args.get('debug', False)
     if debug:
+        print ("-"*50)
         print (f"args ({type(args)}): {args} ")
         print (f"action: {action}")
         print (f"data: {data}")
@@ -417,7 +419,7 @@ if __name__ == '__main__':
     elif action == 'hexdump':
         results = hexdump(data)
 
-    elif action == 'scan_port':
+    elif action == 'scan_port' or action == 'scan':
         host_ip = get_ip_address()
         start_time = time.time()
         params = {"ip_address": host_ip}
@@ -429,12 +431,9 @@ if __name__ == '__main__':
             # python3 network.py scan_port --data 10.0.0.10
             import re
             import constants
-            # TODO: update RE_IP_ADDRESS to accept port numbers and group the ip_address and port
-            # return both in params dictionary below:
-            if re.match(constants.RE_IP_ADDRESS, data):
-                # print(f"ip address found: {data}")
-                params["ip_address"] = data
-                params["ports"] = data.split("")[-1] if len(data.split(" ")) > 1 else list(range(0, 100000))
+            if match := re.match(constants.RE_IP_ADDRESS, data):
+                params["ip_address"] = match.groupdict().get('ip_address', host_ip)
+                params["ports"] = [int(match.groupdict().get('port'))] if match.groupdict().get('port') else list(range(0, 100000))
                 # print(f"params: {params}")
                 results = scan_ports(**params)
             else:
