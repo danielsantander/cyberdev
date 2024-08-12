@@ -9,7 +9,7 @@ import socket
 import struct
 import threading
 import time
-from typing import Union
+from typing import Union, List, Tuple
 
 DEBUG_MODE : bool = False
 
@@ -197,7 +197,7 @@ def get_subnet(host:str=None, subnet_mask:str="255.255.255.0"):
     iface = ipaddress.ip_interface(f"{host}/{subnet_mask}")
     return iface.network  # 192.178.2.0/24 (given 192.178.2.10 with subnet 255.255.255.0)
 
-def hexdump(data:Union[str,bytes], length:int=16, show:bool=False)->list[str]:
+def hexdump(data:Union[str,bytes], length:int=16, show:bool=False)->List[str]:
     """
     Display the communication between the local and remote machines to the console.
 
@@ -232,7 +232,7 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=False)->list[str]:
         if show: print(line)
     return results
 
-def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False, **kwargs)->tuple[str,bool,str]:
+def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False, **kwargs)->Tuple[str,bool,str]:
     """
     Makes socket connection to port.
 
@@ -244,7 +244,7 @@ def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False
     """
     ip_address = socket.gethostbyname(socket.gethostname()) if ip_address is None else ip_address
     packet = b"\x47\x45\x54\x20\x2f\x20\x48\x54\x54\x50\x2f\x31\x2e\x30\x2e\x2e\x2e\x2e"
-    results: tuple[str,bool,str] = ()
+    results: Tuple[str,bool,str] = ()
     try:
         # create socket object with:
         #  - AF_INET     -> using standard IPv4 address or hostname
@@ -273,12 +273,12 @@ def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False
         kwargs.get("results", []).append(results)   # for threading purposes
     return results
 
-def scan_ports(ip_address:str, ports:list[int]=list(range(0, 100000)), timeout:int=None, send_packet:bool=False)->list[tuple[str,bool,str]]:
+def scan_ports(ip_address:str, ports:List[int]=list(range(0, 100000)), timeout:int=None, send_packet:bool=False)->List[Tuple[str,bool,str]]:
     """
     Utilizes threading to scan multiple ports.
     """
     threads = [None] * len(ports)
-    results: list[tuple[str,bool,str]] = []
+    results: List[Tuple[str,bool,str]] = []
     for idx, i in enumerate(ports):
         logger.debug(f"scanning {ip_address}:{i}") # DEBUGGING PURPOSES
         threads[idx] = threading.Thread(target=scan_port, kwargs={"ip_address": ip_address,"port": i, "results": results}) #args=[i])
@@ -450,7 +450,8 @@ if __name__ == '__main__':
             # python3 network.py scan_port --data 10.0.0.10
             import re
             import constants
-            if match := re.match(constants.RE_IP_ADDRESS, data):
+            match = re.match(constants.RE_IP_ADDRESS, data)
+            if match:
                 params["ip_address"] = match.groupdict().get('ip_address', host_ip)
                 params["ports"] = [int(match.groupdict().get('port'))] if match.groupdict().get('port') else list(range(0, 100000))
                 # print(f"params: {params}")
