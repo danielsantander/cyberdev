@@ -281,7 +281,7 @@ def scan_ports(ip_address:str, ports:list[int]=list(range(0, 100000)), timeout:i
     results: list[tuple[str,bool,str]] = []
     for idx, i in enumerate(ports):
         logger.debug(f"scanning {ip_address}:{i}") # DEBUGGING PURPOSES
-        threads[idx] = threading.Thread(target=scan_port, kwargs={"ip_address": ip_address,"port": i, "results": results}) #args=[i])
+        threads[idx] = threading.Thread(target=scan_port, kwargs={"ip_address": ip_address,"port": i, "timeout": timeout, "results": results}) #args=[i])
         threads[idx].start()
 
     # wait for all thread to finish
@@ -444,6 +444,7 @@ if __name__ == '__main__':
         host_ip = get_ip_address()
         start_time = time.time()
         params = {"ip_address": host_ip}
+        params['timeout'] = 5 # seconds
 
         # validate data
         if data:
