@@ -3,12 +3,15 @@
 
 import argparse
 import ipaddress
+import logging
 import os
 import socket
 import struct
 import threading
 import time
 from typing import Union
+
+DEBUG_MODE : bool = False
 
 # HEX_FILTER string containing ASCII printable characters (if one exists) or a dot if representation does not exist.
 #   - the representation of the printable character has a length of 3
@@ -19,6 +22,22 @@ from typing import Union
 #         ................................ !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[.]^_`abcdefghijklmnopqrstuvwxyz{|}~..................................¡¢£¤¥¦§¨©ª«¬.®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ
 HEX_FILTER = ''.join(
     [(len(repr(chr(i))) == 3) and chr(i) or '.' for i in range(256)])
+
+def setup_logger(name:str=None, use_verbose:bool=DEBUG_MODE):
+    """
+    Setup console logger
+    """
+    lgr_lvl = logging.DEBUG if use_verbose else logging.INFO
+    lgr_fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    lgr_name = name if name is not None else str(__file__).split("/")[-1].split(".")[0].upper()
+    logger = logging.getLogger(lgr_name)
+    ch = logging.StreamHandler()
+    ch.setFormatter(lgr_fmt)
+    logger.addHandler(ch)
+    logger.setLevel(lgr_lvl)
+    return logger
+
+logger = setup_logger()
 
 class IP:
     """
@@ -64,7 +83,7 @@ class IP:
             self.protocol = self.protocol_map[self.protocol_num]
         except Exception as e:
             err_msg = ("%s No protocol for %s" % (e, self.protocol_num))
-            print(err_msg)
+            logger.error(err_msg)
             self.protocol = str(self.protocol_num)
 
     def __str__(self) -> str:
@@ -86,10 +105,11 @@ class ICMP:
         self.seq = header[4]
 
 class Scanner:
-    def __init__(self, host:str=None, subnet:str=None, verbose_mode:bool=False):
+    def __init__(self, host:str=None, subnet:str=None, verbose_mode:bool=False, **kwargs):
+        self.logger = kwargs.get('logger') or setup_logger("Scanner", verbose_mode)
         self.host = get_ip_address() if host is None else host
         self.subnet = get_subnet(self.host) if subnet is None else subnet
-        print(f"running scanner on host {self.host} ({self.subnet})")
+        logger.info(f"running scanner on host {self.host} ({self.subnet})")
 
         socket_protocol = socket.IPPROTO_IP if (os.name=='nt') else socket.IPPROTO_ICMP
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
@@ -98,7 +118,7 @@ class Scanner:
         # set sock option to include the IP header in the captured packets
         self.socket.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
 
-        print('Hitting promiscuous mode.')
+        logger.debug('Hitting promiscuous mode.')
         if os.name == 'nt':
             self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
 
@@ -132,7 +152,7 @@ class Scanner:
             if  os.name == 'nt':
                 self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
 
-            print('\nUser interrupted.')
+            self.logger.info('\nUser interrupted.')
             if hosts_up:
                 print(f'\n\nSummary: Hosts up on {self.subnet}')
             for host in sorted(hosts_up):
@@ -140,7 +160,7 @@ class Scanner:
             print('')
             sys.exit()
         except Exception as e:
-            print (f"ERROR: {e.__str__()}")
+            self.logger.error(f"ERROR: {e.__str__()}")
         return
 
 def ip2long(ip:str)->int:
@@ -177,7 +197,7 @@ def get_subnet(host:str=None, subnet_mask:str="255.255.255.0"):
     iface = ipaddress.ip_interface(f"{host}/{subnet_mask}")
     return iface.network  # 192.178.2.0/24 (given 192.178.2.10 with subnet 255.255.255.0)
 
-def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
+def hexdump(data:Union[str,bytes], length:int=16, show:bool=False)->list[str]:
     """
     Display the communication between the local and remote machines to the console.
 
@@ -207,9 +227,9 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=True)->list[str]:
         # - the hex value of the word
         # - and its printable representation
         results.append(f'{i:04x}  {hexa:<{hexwidth}} {printable}')
-    if show:
-        for line in results:
-            print(line)
+    for line in results:
+        logger.debug(line)
+        if show: print(line)
     return results
 
 def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False, **kwargs)->tuple[str,bool,str]:
@@ -260,7 +280,7 @@ def scan_ports(ip_address:str, ports:list[int]=list(range(0, 100000)), timeout:i
     threads = [None] * len(ports)
     results: list[tuple[str,bool,str]] = []
     for idx, i in enumerate(ports):
-        # print(f"scanning port {i}") # DEBUGGING PURPOSES
+        logger.debug(f"scanning {ip_address}:{i}") # DEBUGGING PURPOSES
         threads[idx] = threading.Thread(target=scan_port, kwargs={"ip_address": ip_address,"port": i, "results": results}) #args=[i])
         threads[idx].start()
 
@@ -283,7 +303,7 @@ def sniffer(ip_address:str=None):
     """
     ip_address = ip_address or get_ip_address()
     os_name = os.name
-    print(f"Starting packet sniffer on {ip_address} - {os_name}")
+    logger.info(f"Starting packet sniffer on {ip_address} - {os_name}")
     socket_protocol = socket.IPPROTO_IP if os_name == 'nt' else socket.IPPROTO_ICMP
 
     sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
@@ -301,14 +321,14 @@ def sniffer(ip_address:str=None):
         while True:
             raw_buffer = sniffer.recvfrom(65535)[0]
             ip_header = IP(raw_buffer[0:20])
-            print(f"IP Header: {ip_header.protocol}\t{ip_header}")
-            print(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
+            logger.debug(f"IP Header: {ip_header.protocol}\t{ip_header}")
+            logger.debug(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
             if ip_header.protocol == 'ICMP':
                 # calculate the offset in the raw packet where ICMP body lives
                 offset = ip_header.ihl * 4
                 buf = raw_buffer[offset:offset + 8]
                 icmp_header = ICMP(buf)
-                print(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
+                logger.info(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
 
     except KeyboardInterrupt:
         # if on Windows, turn off promiscuous mode
@@ -403,28 +423,27 @@ if __name__ == '__main__':
 
     action = args['action']
     data = args.get('data')
-    debug = args.get('debug', False)
+    debug = args.get('debug', DEBUG_MODE)
     if debug:
-        print ("-"*50)
-        print (f"args ({type(args)}): {args} ")
-        print (f"action: {action}")
-        print (f"data: {data}")
-        print ("-"*50 + "\n")
+        logger.setLevel(logging.DEBUG)
+        logger.debug("-"*50)
+        logger.debug(f"args ({type(args)}): {args} ")
+        logger.debug(f"action: {action}")
+        logger.debug(f"data: {data}")
+        logger.debug("-"*50 + "\n")
 
-    results = ""
+    results = None
     if action == 'get_ip_address':
         results = get_ip_address()
-        print (f"\n{results}\n")
+        print (f"{results}")
 
     elif action == 'hexdump':
-        results = hexdump(data)
+        results = hexdump(data, show=True)
 
     elif action == 'scan_port' or action == 'scan':
         host_ip = get_ip_address()
         start_time = time.time()
         params = {"ip_address": host_ip}
-        func = scan_port
-        results = None
 
         # validate data
         if data:
@@ -441,19 +460,13 @@ if __name__ == '__main__':
                 params["port"] = int(data)
                 results = scan_port(**params)
         else:
-            # if no ip address or port specified, scan all the ports on this machine
-            # for i in range(0, 100000):
-            #     thread = threading.Thread(target=scan_port, kwargs=params)#args=[host_ip, i])
-            #     thread.start()
             results = scan_ports(host_ip, ports=list(range(0,100000)))
-        print ("results:\n")
-        # print("\n".join([f"{x[0]}\t{x[1]}\t{x[2]}" for x in results]))
         print("\n".join([f"{x[0]}\t{x[1]}\t{x[2]}" for x in results if x[1]]))
         end_time = time.time()
-        print (f"\nTo scan all ports it took {end_time-start_time} seconds.\n")
+        logger.info(f"Time to finish scan (seconds) : {end_time-start_time}")
 
     elif action == 'sniffer':
-        # sudo python3 ./network.py sniffer -d --data "192.168.0.207"
+        # sudo python3 ./network.py sniffer -d --data "10.0.0.10"
         ip_address = data or get_ip_address()
         sniffer(ip_address)
 
