@@ -447,7 +447,8 @@ if __name__ == '__main__':
             #     thread.start()
             results = scan_ports(host_ip, ports=list(range(0,100000)))
         print ("results:\n")
-        print("\n".join([f"{x[0]}\t{x[1]}\t{x[2]}" for x in results]))
+        # print("\n".join([f"{x[0]}\t{x[1]}\t{x[2]}" for x in results]))
+        print("\n".join([f"{x[0]}\t{x[1]}\t{x[2]}" for x in results if x[1]]))
         end_time = time.time()
         print (f"\nTo scan all ports it took {end_time-start_time} seconds.\n")
 
