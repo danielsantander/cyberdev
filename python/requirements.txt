@@ -2,3 +2,4 @@ Django==3.2.10
 lxml==4.6.2
 paramiko==3.4.0
 PyAutoGUI==0.9.54
+scapy==2.5.0

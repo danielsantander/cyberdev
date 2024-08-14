@@ -4,8 +4,10 @@
 - [Regular Expressions](#regular-expressions)
   - [match vs search](#match-vs-search)
   - [findall vs finditer](#findall-vs-finditer)
+- [Libraries](#libraries)
+  - [scapy](#scapy)
 - [Tips](#tips)
-  - [Append Paths](#append-paths)
+  - [Append Sys Paths](#append-sys-paths)
   - [Make script executable](#make-script-executable)
   - [Pip Module](#pip-module)
   - [Print Numbers By Base](#print-numbers-by-base)
@@ -127,9 +129,44 @@ Python RegEx Sources:
 - [findall() vs finditer()](https://stackoverflow.com/a/4697884/14745606)
 - [match() vs search()](https://testdriven.io/tips/421e050b-176b-4a72-a8b5-6ad5f185b86a/#:~:text=match%20in%20Python%3F-,re.,matches%20anywhere%20in%20the%20string.)
 
+# Libraries
+
+## scapy
+
+Sniffer function:
+
+```python
+sniff(filter="", iface="any", prn=function, count=N)
+```
+
+Where:
+
+- `filter` is used to specify a Berkeley Packet Filter (BPF) to the packets sniffed, leaving blanks will sniff all packets.
+  - Example, to sniff all HTTP packets, use BPF filter of `tcp port 80`
+- `iface` is used to specify which network interface to sniff on. Leave blank to sniff on all interfaces.
+- `prn` specifies a callback function to be called for every packet object as it single parameter.
+- `count` specifies how many packets to sniff, if blank Scapy will sniff indefinitely.
+
+Berkeley Packet Filter (BPF) Syntax:
+
+| Expression | Description                   | Sample keywords      |
+|------------|-------------------------------|----------------------|
+| Descriptor | What your looking for         | host, net, port      |
+| Direction  | Direction of travel           | src, dst, src or dst |
+| Protocol   | Protocol used to send traffic | ip, ip6, tcp, udp    |
+
+> examples:
+> `src 10.0.0.100` specifies  a filter that captures only packets originating on machine 10.0.0.100
+>
+> `dst 10.0.0.100`, which captures only packets with a destination of 10.0.0.100
+>
+> `tcp port 110 or tcp port 25` specifies a filter that will pass only TCP packets coming from or going to port 110 or 25.
+>
+> `tcp port 21` to watch for FTP connections
+
 # Tips
 
-## Append Paths
+## Append Sys Paths
 
 ```python
 import os, sys

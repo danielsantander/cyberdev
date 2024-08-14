@@ -283,6 +283,54 @@ def hexdump(data:Union[str,bytes], length:int=16, show:bool=False)->List[str]:
         if show: print(line)
     return results
 
+def mail_sniffer():
+    """
+    Uses scapy to sniff packets focused on mail related ports.
+    """
+    from scapy.all import TCP, IP
+    bpf_common_mail_ports = "tcp port 110 or tcp port 25 or tcp port 143" # 110 (POP3), 143 (IMAP), 25 (SMTP)
+
+    def packet_callback(packet):
+        """
+        Callback function to be called for every packet. Checks for valid payload and if it contains USER or PASS mail command.
+        """
+        if packet[TCP].payload:
+            mypacket = str(packet[TCP].payload)
+            if 'user' in mypacket.lower() or 'pass' in mypacket.lower():
+                print(f"[*] Destination: {packet[IP].dst}")     # server sending the data to
+                print(f"[*] {str(packet[TCP].payload)}")        # actual data bytes of the packet
+    packet_sniffer(clb=packet_callback, bpf=bpf_common_mail_ports)
+
+def packet_sniffer(clb:function=None, bpf:str=None, count:int=None):
+    from scapy.all import sniff
+    """
+    Uses scapy to sniff packets.
+
+    Keyword Arguments:
+    clb (function): callback function to be called for every packet
+    bpf (str): packet filter using BPF (Berkeley Packet Filter) syntax
+    count (int): how many packets to sniff, defaults to 1
+    """
+
+    # some packet filters:
+    bpf_common_mail_ports = "tcp port 110 or tcp port 25 or tcp port 143" # 110 (POP3), 143 (IMAP), 25 (SMTP)
+    bpf_ftp = "tcp port 21"
+
+    def packet_callback(packet):
+        """
+        Callback function to be called for every packet.
+        """
+        print(packet.show())
+
+    # setup params for sniffing
+    params = {}
+    params["prn"] = packet_callback if clb is None else clb
+    if count: params["count"] = count
+    if bpf:
+        params["filter"] = bpf
+        params["store"] = 0     # ensure packets are not kept in memory. (Good to use when running sniffer for long-term, so will not be consuming as much RAM)
+    sniff(**params)
+
 def scan_port(ip_address:str, port:int, timeout:int=None, send_packet:bool=False, **kwargs)->Tuple[str,bool,str]:
     """
     Makes socket connection to port.
@@ -372,8 +420,8 @@ def sniffer(ip_address:str=None):
         while True:
             raw_buffer = sniffer.recvfrom(65535)[0]
             ip_header = IP(raw_buffer[0:20])
-            logger.debug(f"IP Header: {ip_header.protocol}\t{ip_header}")
-            logger.debug(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
+            logger.info(f"IP Header: {ip_header.protocol}\t{ip_header}")
+            logger.info(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
             if ip_header.protocol == 'ICMP':
                 # calculate the offset in the raw packet where ICMP body lives
                 offset = ip_header.ihl * 4
