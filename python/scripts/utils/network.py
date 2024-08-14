@@ -7,6 +7,7 @@ import logging
 import os
 import socket
 import struct
+import sys
 import threading
 import time
 from typing import Union, List, Tuple
@@ -89,6 +90,41 @@ class IP:
     def __str__(self) -> str:
         return f"{self.src_address} -> {self.dst_address}"
 
+
+# IP class using ctype Struct Model
+from ctypes import Structure, c_ubyte, c_ushort, c_uint32
+class IP_CTYPE(Structure):
+    """
+    IP class that can read a packet and parse the header into it's own separate fields.
+    Class maps C data types to the IP header.
+    """
+
+    # ctypes.Structure requires a '_fields_' variable.
+    # Fields defining parts of IP header,each field takes three args:
+        # 1. name of field
+        # 2. type of value it takes
+        # 3. width in bits for the field
+    _fields_ = [
+        ("ihl",          c_ubyte,  4),    # 4 bit unsigned char
+        ("version",      c_ubyte,  4),    # 4 bit unsigned char
+        ("tos",          c_ubyte,  8),    # 1 byte char
+        ("len",          c_ushort, 16),   # 2 byte unsigned short
+        ("id",           c_ushort, 16),   # 2 byte unsigned short
+        ("offset",       c_ushort, 16),   # 2 byte unsigned short
+        ("ttl",          c_ubyte,  8),    # 1 byte char
+        ("protocol_num", c_ubyte,  8),    # 1 byte char
+        ("sum",          c_ushort, 16),   # 2 byte unsigned short
+        ("src",          c_uint32, 32),   # 4 byte unsigned int
+        ("dst",          c_uint32, 32)    # 4 byte unsigned int
+    ]
+    def _new_ (cls, socket_buffer=None):
+        return cls.from_buffer_copy(socket_buffer)
+
+    def __init__(self, socket_buffer=None):
+        # human readable IP addresses
+        self.src_address = socket.inet_ntoa(struct.pack("<L", self.src))
+        self.dst_address = socket.inet_ntoa(struct.pack("<L", self.dst))
+
 class ICMP:
     """
     Class to decode ICMP messages and parse the header into it's own separate fields.
@@ -124,7 +160,7 @@ class Scanner:
 
     def sniff(self, message:str="ACK!"):
         """
-        Similar to main sniffer method, but keeps track of which hosts are up.
+        Network sniffer that keeps track of which hosts are up.
         Usually called after making UDP calls with same message -- with udp_sender().
 
         If the anticipated ICMP message is detected:
@@ -135,13 +171,27 @@ class Scanner:
         try:
             while True:
                 print('.',end='')
-                raw_buffer = self.socket.recvfrom(65535)[0]
+                raw_buffer = self.socket.recvfrom(65535)[0] # read packet
+                self.logger.debug(f"received raw_buffer: {raw_buffer}")
+
+                # create IP header from the first 20 bytes
                 ip_header = IP(raw_buffer[0:20])
+                self.logger.debug(f"ip_header (protocol -- {ip_header.protocol}):\t{ip_header}")
                 if ip_header.protocol == "ICMP":
+                    # debugging print statements:
+                    # print the detected protocol and hosts:
+                    # print(f"Protocol: {ip_header.protocol} {ip_header.src_address} -> {ip_header.dst_address}")
+                    # print(f"Version: {ip_header.ver}")
+                    # print(f"Header Length: {ip_header.ihl} TTL: {ip_header.ttl}")
+
+                    # calculate offset in raw packet where ICMP body starts
+                    # header length indicates number of 32-bit words (4 byte chunks) -- multiply by 4 to know the size of IP header, and next network layer ICMP begins
                     offset = ip_header.ihl * 4
                     buf = raw_buffer[offset:offset + 8]
-                    icmp_header = ICMP(buf)
+                    self.logger.debug(f"buf value: {buf}")
 
+                    # create ICMP struct
+                    icmp_header = ICMP(buf)
                     if icmp_header.code == 3 and icmp_header.type == 3:
                         if ipaddress.ip_address(ip_header.src_address) in ipaddress.IPv4Network(self.subnet):
                             if raw_buffer[len(raw_buffer) - len(message): ] == bytes(message, 'utf-8'):
@@ -149,6 +199,7 @@ class Scanner:
                                 print(f"Host Up: {str(ip_header.src_address)}")
         # handle CTRL-C
         except KeyboardInterrupt:
+            # disable promiscuous mode if on Windows, before exiting script
             if  os.name == 'nt':
                 self.socket.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
 
@@ -335,7 +386,6 @@ def sniffer(ip_address:str=None):
         if os_name == 'nt': sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
     return
 
-
 def ssh_command(ip, port, user, passwd, cmd):
     """
     Make connection to ssh sever and run single command.
@@ -383,7 +433,6 @@ def udp_sender(subnet:str, message:str="ACK!"):
             sender.sendto(bytes(message, 'utf8'), (str(ip), 65212))
 
 if __name__ == '__main__':
-    import sys
     def get_args():
         list_of_choices = [
             'get_ip_address',
@@ -476,7 +525,7 @@ if __name__ == '__main__':
         # sudo python3 network.py scanner
         ip_address = data or get_ip_address()
         message : str = sys.argv[2] if len(sys.argv) >= 3 else 'ACK!'
-        print (f"using message: {message}")
+        # print (f"using message: {message}")
         scanner = Scanner(ip_address, verbose_mode=debug)
         time.sleep(10)
         t = threading.Thread(target=udp_sender, args=[scanner.subnet,message])

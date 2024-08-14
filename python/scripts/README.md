@@ -163,17 +163,17 @@ p.check_port(ip_address=p.host.ip_address, port=80)
 p.scan_target(ip_address=p.host.ip_address, port_list=[22, 80])
 
 # Send TCP message to target host and port
-p.tcp_client(target_host="192.168.0.10", port=22, message=b"GET / HTTP/1.1\r\n")
+p.tcp_client(target_host="10.0.0.10", port=22, message=b"GET / HTTP/1.1\r\n")
 
 # Start up a standard multi-threaded TCP server/listener
 p.tcp_server(port=4444, response_message=b'rgr')
 
 # Send UDP message to target host and port.
 # Will wait for response back (timeout defaults to 5s)
-p.udp_client(target_host="192.168.0.10", port=4444, message=b'ACK')
+p.udp_client(target_host="10.0.0.10", port=4444, message=b'ACK')
 
 # Connect to SSH server and run single command, returns list of responses.
-p.ssh_cmd('192.168.0.10', 'root', 'password123', 'whoami')
+p.ssh_cmd('10.0.0.10', 'root', 'password123', 'whoami')
 ['root\n']
 
 # Create SSH server for a client to connect to.
@@ -189,58 +189,40 @@ Host discovery scan covering a whole subnet. Trigger with `--scan` option. Exit 
 ```shell
 sudo python3 pollen8.py --scan
 Password:
-2024-02-04 20:20:05,675 [INFO] scanner: Initializing scanner on subnet 192.168.0.0/24...
-.++.+++++.+.+++Host Up: 192.168.0.11
-^C
-.++++.+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+2024-08-13 23:41:38,940 [INFO] NETWORK: running scanner on host 10.0.0.10 (10.0.0.0/24)
+.++++++++++.+++++.+++++.++++++++++++.++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++Host Up: 10.0.0.100
+^C2024-08-13 23:51:15,561 [INFO] Scanner:
 User interrupted.
+.++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-Summary: Hosts up on 192.168.0.0/24
-192.168.0.1
-192.168.0.2 *
+Summary: Hosts up on 10.0.0.0/24
+10.0.0.10 *
+10.0.0.100
 ```
 
 ## Sniffer
 
-Uses raw sockets to read low level network data:
-
-- Internet Protocol (IP) headers
-- Internet Control Message Protocol (ICMP) headers
-
-> TODO: decode Ethernet information. Use Ethernet frames and their use, such as:
->
-> - ARP poisoning
-> - wireless assessment tools
-
-Run:
+Uses raw sockets to read low level network data (IP/ICMP headers). Run with the following command:
 
 ```shell
 python3 pollen8.py --sniff
-2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on {host_ip_address} . . .
 ```
 
-In another terminal, ping google:
+To test, within another terminal ping google `ping google.com`, then in the original terminal, see the  decoded IP headers from the captured packets:
 
 ```shell
-ping google.com
-```
-
-In the original terminal, see the  decoded IP headers from the captured packets:
-
-```shell
-2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on {host_ip_address} . . .
-Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+2024-01-31 01:13:28,498 [INFO] Pollen8: Starting sniffer on 10.0.0.10 . . .
+Protocol: ICMP 142.251.116.138 -> 10.0.0.10
 Version: 4
 Header Length: 5 TTL: 105
 ICMP -> Type: 0 Code: 0
 
-Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Protocol: ICMP 142.251.116.138 -> 10.0.0.10
 Version: 4
 Header Length: 5 TTL: 105
 ICMP -> Type: 0 Code: 0
 
-Protocol: ICMP 142.251.116.138 -> {host_ip_address}
+Protocol: ICMP 142.251.116.138 -> 10.0.0.10
 Version: 4
 Header Length: 5 TTL: 105
 ICMP -> Type: 0 Code: 0
@@ -250,10 +232,7 @@ ICMP -> Type: 0 Code: 0
 
 Windows machines require additional flags for socket input/output control (IOCTL) to enable promiscuous mode on the network interface.
 
-**Input/Output Control (IOCTL)** means for user spce programs to communicate with kernel mode components [src](http://en.wikipedia.org/wiki/Ioctl).
-
 Windows will allow sniffing of all incoming packets regardless of protocol, whereas Linux requires sniffing of ICMP packets.
-
 
 ## SSH Commands
 
