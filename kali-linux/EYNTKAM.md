@@ -581,7 +581,7 @@ sudo dhclient eth0
 ifconfig {interface} {new_ip_address}
 
 # Example
-ifconfig eth0 192.168.180.115
+ifconfig eth0 10.0.0.115
 ```
 
 ## Map IP Address To Host File
@@ -594,7 +594,7 @@ Configure the `/etc/hosts` file for mapping to determine which IP address the br
 vi /etc/hosts
 127.0.0.1       localhost
 127.0.1.1       custom-domain-name
-192.168.181.100	linux.org
+10.0.0.100	linux.org
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
@@ -1286,7 +1286,7 @@ nmap -sT {IP/CIDR} -p 3306
 nmap -O {IP/CIDR/HOST}
 
 # OS Detection -- add -sV option to enable version detection, interrogating open ports.
-nmap -sV -O -v 129.128.X.XX
+nmap -sV -O -v 10.0.0.100
 
 ```
 
@@ -1296,7 +1296,7 @@ nmap -sV -O -v 129.128.X.XX
 nmap {SCAN_TYPE} {IP/CIDR} {PORT} > /dev/null -oG {OUTPUT_FILE}
 
 # example
-nmap -sT 192.168.x.x/16 -p 3306 > /dev/null -oG ResultsMySQLScan
+nmap -sT 10.10.0.0/16 -p 3306 > /dev/null -oG ResultsMySQLScan
 
 # read 'open' results
 cat ResultsMySQLScan | grep open > ResultsOpenMySQLPorts
@@ -1752,7 +1752,7 @@ linux.org.              300     IN      A       104.21.31.121
 linux.org.              300     IN      A       172.67.176.128
 
 ;; Query time: 50 msec
-;; SERVER: 192.168.1.1#53(192.168.1.1)
+;; SERVER: 10.0.0.1#53(10.0.0.1)
 ;; WHEN: Tue Sep 07 01:21:31 CDT 2021
 ;; MSG SIZE  rcvd: 70
 ```
@@ -1819,7 +1819,8 @@ find . -name ".log"
 find / -user root -perm -4000
 ```
 
-**Options**
+Options
+
 | options                       | description                                                               |
 |-------------------------------|---------------------------------------------------------------------------|
 | -atime {NUMBER_OF_DAYS}       | file was accessed a given number of days ago                              |
@@ -1830,6 +1831,7 @@ find / -user root -perm -4000
 | -delete                       | Delete found files and/or directories. Always returns True                |
 
 ### Find File Based on Content
+
 Execute `grep` command for every file that satisfies the conditions. Print matches to console.
 
 ```shell
@@ -1951,7 +1953,7 @@ Hello, this is a file
 Transfer contents of entire directory by creating unnamed tarball file, then transferring it to remote system, and unpacking it into the remote directory.
 
 ```shell
-# listen for file comming over that will need to be unzipped and extracted
+# listen for file coming over that will need to be unzipped and extracted
 # (-) means that tar will operate on standard input
 netcat -l 4444 | tar xzvf -
 
