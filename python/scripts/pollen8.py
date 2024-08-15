@@ -95,7 +95,7 @@ def setup_logger(name:str=None, use_verbose:bool=False):
     lgr_name = name if name is not None else str(__file__).split("/")[-1].split(".")[0].upper()
     logger = logging.getLogger(lgr_name)
     ch = logging.StreamHandler()
-    ch.setLevel(lgr_lvl)
+    # ch.setLevel(lgr_lvl)
     ch.setFormatter(lgr_fmt)
     logger.addHandler(ch)
     # TODO: add RotatingFileHandler?
@@ -119,61 +119,23 @@ class Server(paramiko.ServerInterface):
             return paramiko.AUTH_SUCCESSFUL
 
 class Host:
-    _logger = setup_logger("Host")
     def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
-        self.hostname: str = None
-        self.ip_address: str = None
-
-        # init
-        if use_verbose: self._logger.setLevel(logging.DEBUG)
-        self.__get_hostname()
-        self.__get_ip_address()
-
-    def __get_hostname(self)->str:
-        """ Get machine hostname via socket.gethostname() method. """
-        if self.hostname is not None: return self.hostname
-        self.hostname = socket.gethostname()
-        return self.hostname
-
-    def __get_ip_address(self)->str:
-        """ Retrieve IP address (eth0 address) by creating UDP socket. """
-        # src: https://stackoverflow.com/a/30990617/14745606
-        if self.ip_address is not None: return self.ip_address
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        self.ip_address = s.getsockname()[0]
-        return self.ip_address
+        self.hostname: str = socket.gethostname()
+        self.ip_address: str = network.get_ip_address()
+        self._logger = setup_logger("Host", use_verbose)
 
     def __str__(self) -> str:
-        return f"{self.hostname} - {self.ip_address}"\
+        return f"{self.hostname} - {self.ip_address}"
 
 class Pollen8:
-    _logger = setup_logger("Pollen8")
     def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
         if use_verbose: self._logger.setLevel(logging.DEBUG)
-        self.host:Host = Host(use_verbose=use_verbose)
-        self.subnet:str = None
-
-        self.__get_subnet()
+        self.host : Host = Host(use_verbose=use_verbose)
+        self.subnet : str = network.get_subnet(self.host)
+        self._logger = setup_logger("Pollen8",use_verbose)
 
     def __str__(self)->str:
         return f"{self.host.hostname} - {self.host.ip_address}"
-
-    def __get_subnet(self, host_ip_address:str=None, subnet_mask:str="255.255.255.0", force:bool=False)->str:
-        """
-        Retrieve subnet for given host and mask.
-
-        Keyword arguments:
-        - host_ip_address (string): ip address of host
-        - subnet_mask (string): defaults to 255.255.255.0
-
-        src: https://stackoverflow.com/a/50867508/14745606
-        """
-        if self.subnet is not None and force is False: return self.subnet
-        host_ip_address = self.host.ip_address if host_ip_address is None else host_ip_address
-        iface = ipaddress.ip_interface(f"{host_ip_address}/{subnet_mask}")
-        self.subnet = iface.network.__str__()
-        return self.subnet
 
     def check_port(self, ip_address:str, port:int, use_ipv4:bool=True, use_tcp:bool=True)->Tuple[bool,str]:
         """
@@ -215,7 +177,7 @@ class Pollen8:
             t.run()
         return
 
-    def sniff(self, host_ip:str=None):#,subnet:str=None):
+    def sniff(self, host_ip:str=None):
         """
         Sniffer for Windows and Linux machines.
 
@@ -223,7 +185,6 @@ class Pollen8:
 
         Keyword Arguments:
         - host_ip (string): ip address/cidr
-        # - subnet (string): subnet to sniff
         """
 
         # host_ip = socket.gethostbyname('localhost')   # 127.0.0.1
@@ -569,8 +530,8 @@ def main():
 
     # sniffer on local network
     elif args.sniff is not None:
-        target:str = args.sniff[0] if len(args.sniff) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
-        diablo.sniff(host_ip=target)
+        # target:str = args.sniff[0] if len(args.sniff) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
+        diablo.sniff()
 
     # scan subnet
     elif args.scan is not None:
