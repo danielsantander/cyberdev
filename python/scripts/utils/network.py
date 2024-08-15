@@ -301,7 +301,7 @@ def mail_sniffer():
                 print(f"[*] {str(packet[TCP].payload)}")        # actual data bytes of the packet
     packet_sniffer(clb=packet_callback, bpf=bpf_common_mail_ports)
 
-def packet_sniffer(clb:function=None, bpf:str=None, count:int=None):
+def packet_sniffer(clb=None, bpf:str=None, count:int=None):
     from scapy.all import sniff
     """
     Uses scapy to sniff packets.
