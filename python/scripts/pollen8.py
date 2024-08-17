@@ -18,7 +18,7 @@ import threading
 import time
 
 from typing import Tuple
-from utils import network
+from utils import network, custom_logging
 
 DEBUG_MODE = False
 CWD = os.path.dirname(os.path.realpath(__file__))
@@ -86,22 +86,6 @@ def get_args():
     args = parser.parse_args()
     return args
 
-def setup_logger(name:str=None, use_verbose:bool=False):
-    """
-    setup logger
-    """
-    lgr_lvl = logging.DEBUG if use_verbose else logging.INFO
-    lgr_fmt = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
-    lgr_name = name if name is not None else str(__file__).split("/")[-1].split(".")[0].upper()
-    logger = logging.getLogger(lgr_name)
-    ch = logging.StreamHandler()
-    # ch.setLevel(lgr_lvl)
-    ch.setFormatter(lgr_fmt)
-    logger.addHandler(ch)
-    # TODO: add RotatingFileHandler?
-    logger.setLevel(lgr_lvl)
-    return logger
-
 class Server(paramiko.ServerInterface):
     def __init__(self, _username:str='root', _passwd:str='fairbanks'):
         self.event = threading.Event()
@@ -122,7 +106,8 @@ class Host:
     def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
         self.hostname: str = socket.gethostname()
         self.ip_address: str = network.get_ip_address()
-        self._logger = setup_logger("Host", use_verbose)
+        log_lvl = logging.DEBUG if use_verbose else logging.INFO
+        self._logger = custom_logging.create_console_logger(name="Host",level=log_lvl)
 
     def __str__(self) -> str:
         return f"{self.hostname} - {self.ip_address}"
@@ -131,8 +116,9 @@ class Pollen8:
     def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
         if use_verbose: self._logger.setLevel(logging.DEBUG)
         self.host : Host = Host(use_verbose=use_verbose)
-        self.subnet : str = network.get_subnet(self.host)
-        self._logger = setup_logger("Pollen8",use_verbose)
+        self.subnet : str = network.get_subnet(self.host.ip_address)
+        log_lvl = logging.DEBUG if use_verbose else logging.INFO
+        self._logger = custom_logging.create_console_logger(name="Pollen8", level=log_lvl)
 
     def __str__(self)->str:
         return f"{self.host.hostname} - {self.host.ip_address}"
@@ -483,8 +469,8 @@ def main():
     global DEBUG_MODE
 
     args = get_args()
-    DEBUG_MODE = args.debug is True or DEBUG_MODE
-    diablo = Pollen8()
+    debug_mode = args.debug is True or DEBUG_MODE
+    diablo = Pollen8(use_verbose=debug_mode)
 
     # setup SSH server
     if args.ssh_server is not None:
@@ -535,6 +521,7 @@ def main():
 
     # scan subnet
     elif args.scan is not None:
+        # sudo python3 python/scripts/pollen8.py --scan
         from utils.network import Scanner, udp_sender
         scanner = Scanner()
         time.sleep(10)
