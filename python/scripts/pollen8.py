@@ -180,7 +180,10 @@ class Pollen8:
                     ssh_session.send(cmd_output or 'okay')
                 except Exception as e:
                     ssh_session.send(str(e))
-            client.close()
+                except KeyboardInterrupt:
+                    client.close()
+                    return
+        client.close()
         return
 
     def ssh_server(self, server:str=None, port:int=2222, rsa_key_file:Union[str,Path]=None):
@@ -405,7 +408,7 @@ def main():
         passwd = getpass.getpass()
         # TODO: continue
         ip_address = args.ip_address or input(f'SSH Server IP Address to connect to: ')
-        port = args.port or int(input("Port [2222]: ")) or 2222
+        port = int(args.port or (input("Port [2222]: ") or 2222))
         assert (ip_address and port)
         # command = input('Enter command: ')
         command = 'ClientConnected'
