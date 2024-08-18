@@ -17,12 +17,13 @@ import sys
 import threading
 import time
 
-from typing import Tuple
+from pathlib import Path
+from typing import Tuple, Union
 from utils import network, custom_logging
 
 DEBUG_MODE = False
-CWD = os.path.dirname(os.path.realpath(__file__))
-EPILOG = """\
+CWD = os.path.dirname(os.path.realpath(__file__))   # python/scripts/
+SCRIPT_EPILOG = """\
 Example:
     --ssh-server <ip_address> <port_number>
     --ssh-client <ip_address> <port_number>
@@ -30,61 +31,6 @@ Example:
     --sniff
     --scan
 """
-
-# debug paramiko
-logging.getLogger("paramiko").setLevel(logging.DEBUG)
-
-def get_args():
-    import textwrap
-    parser = argparse.ArgumentParser(
-        description="Pollen8 -- Script that does some neat network stuff.",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=textwrap.dedent(EPILOG))
-    parser.add_argument('-d', '--debug',
-                        dest='debug',
-                        action='store_true',
-                        default=DEBUG_MODE,
-                        help=f'Debug mode. Defaults to {DEBUG_MODE}')
-    parser.add_argument('-p', '--port',
-                        dest='port',
-                        type=int,
-                        action='store', help='Port value.')
-    # nargs='+' takes 1 or more arguments, nargs='*' takes zero or more.
-    parser.add_argument('--ssh-server',
-                        dest='ssh_server',
-                        metavar="IP PORT",
-                        nargs="*",
-                        action='store',
-                        required=False,
-                        help='Create SSH server. Input server ip address & port as arguments.')
-    parser.add_argument('--ssh-client',
-                        dest='ssh_client',
-                        metavar="IP PORT",
-                        nargs="*",
-                        action='store',
-                        required=False,
-                        help='Create SSH client. Input server IP address as argument.')
-    parser.add_argument('--ssh-cmd',
-                        dest='ssh_cmd',
-                        metavar="IP PORT",
-                        nargs="+",
-                        action='store',
-                        required=False,
-                        help='Make connection to SSH server and run single command')
-    parser.add_argument('--sniff',
-                        dest='sniff',
-                        metavar="IP_ADDRESS/CIDR",
-                        nargs="*",
-                        action="store",
-                        required=False,
-                        help="Sniff network packet data.")
-    parser.add_argument('--scan',
-                        dest='scan',
-                        action='store_true',
-                        default=False,
-                        help=f'Scan local network.')
-    args = parser.parse_args()
-    return args
 
 class Server(paramiko.ServerInterface):
     def __init__(self, _username:str='root', _passwd:str='fairbanks'):
@@ -163,67 +109,6 @@ class Pollen8:
             t.run()
         return
 
-    def sniff(self, host_ip:str=None):
-        """
-        Sniffer for Windows and Linux machines.
-
-        IMPORTANT: need to run using sudo
-
-        Keyword Arguments:
-        - host_ip (string): ip address/cidr
-        """
-
-        # host_ip = socket.gethostbyname('localhost')   # 127.0.0.1
-        host_ip = self.host.ip_address if host_ip is None else host_ip
-
-        os_name = os.name
-        self._logger.info(f"Starting sniffer on {host_ip} - {os_name} . . .")
-        socket_protocol = socket.IPPROTO_IP if (os_name == 'nt') else socket.IPPROTO_ICMP
-        sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
-        sniffer.bind((host_ip, 0))
-
-        # set sock option to include the IP header in the captured packets
-        sniffer.setsockopt(socket.IPPROTO_IP, socket.IP_HDRINCL, 1)
-
-        # enable promiscuous mode if on Windows by sending an IOCTL to the network card driver
-        # (note may be issues running Windows on virtual machine, notification may be sent to user).
-        if os_name == 'nt':
-            sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_ON)
-
-        # read one packet -- print out entire raw back w/o decoding
-        # print(sniffer.recvfrom(65565))
-        self._logger.info(f"raw packet (w/o decoding):\n{sniffer.recvfrom(65565)}")
-
-        # continually read in and print out packets (read in the packet and  pass in the first 20 bytes)
-        try:
-            while True:
-                # read packet
-                raw_buffer = sniffer.recvfrom(65535)[0]
-
-                # create IP header from the first 20 bytes
-                ip_header = network.IP(raw_buffer[0:20])
-
-                # if it's ICMP, we want it
-                if ip_header.protocol == "ICMP":
-                    # print the detected protocol and hosts:
-                    print(f"Protocol: {ip_header.protocol} {ip_header.src_address} -> {ip_header.dst_address}")
-                    print(f"Version: {ip_header.ver}")
-                    print(f"Header Length: {ip_header.ihl} TTL: {ip_header.ttl}")
-
-                    # calculate offset in raw packet where ICMP body starts
-                    offset = ip_header.ihl * 4 # header length indicates number of 32-bit words (4 byte chunks) -- multiply by 4 to know the size of IP header, and next network layer ICMP begins
-                    buf = raw_buffer[offset:offset+8]
-
-                    # create ICMP struct
-                    icmp_header = network.ICMP(buf)
-                    print(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
-
-        except KeyboardInterrupt:
-            # Disable promiscuous mode if on Windows, before exiting script.
-            if os_name == 'nt':
-                sniffer.ioctl(socket.SID_RCVALL, socket.RCVALL_OFF)
-            sys.exit()
-
     def ssh_cmd(self, server:str, user:str, passwd:str, cmd:str, port:int=22)->list:
         """
         Make connection to ssh server and run single command.
@@ -298,21 +183,26 @@ class Pollen8:
             client.close()
         return
 
-    def ssh_server(self, server:str=None, port:int=2222, host_key:paramiko.RSAKey=None):
+    def ssh_server(self, server:str=None, port:int=2222, rsa_key_file:Union[str,Path]=None):
         """
         Create SSH server for client to connect to.
 
         Keyword arguments:
         - server: Server IP address [defaults to host ip address]
         - port: Server port [defaults to 2222]
-        - host_key: paramiko.RSAKey [defaults to using `.ssh/id_sa` in home directory]
+        - rsa_key_file: RSAKey [defaults to using `.ssh/id_sa` in home directory]
         """
         server = self.host.ip_address if server is None else server
-        if host_key is None:
-            # TODO: use home directory instead of CWD
-            host_key = paramiko.RSAKey(filename=os.path.join(CWD, '.ssh/id_rsa'))
-        self._logger.info(f'ssh_server: starting SSH server on {server}:{port}...')
+
+        # RSA Key
+        if not rsa_key_file:
+            rsa_key_file = Path().home() / '.ssh' / 'id_rsa'
+        else: rsa_key_file = rsa_key_file if isinstance(rsa_key_file, Path) else Path(rsa_key_file)
+        assert(rsa_key_file.exists())
+        rsa_key = paramiko.RSAKey(filename=rsa_key_file)
+
         try:
+            self._logger.info(f'ssh_server: starting SSH server on {server}:{port}...')
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             sock.bind((server, port))
@@ -328,7 +218,7 @@ class Pollen8:
 
         self._logger.debug('ssh_server: starting paramiko transport server for client connected')
         transport_session = paramiko.Transport(client)
-        transport_session.add_server_key(host_key)
+        transport_session.add_server_key(rsa_key)
         server = Server()
         transport_session.start_server(server=server)
 
@@ -342,18 +232,18 @@ class Pollen8:
         chan.send('Welcome to Pollen8 SHH server.')
         try:
             while True:
-                command = input('Enter command: ')
+                command = input('Enter command: ').strip()
                 if command != 'exit':
                     chan.send(command)
                     r = chan.recv(8192)
-                    # self._logger.info(r.decode())
                     print(f'--- OUTPUT ---\n{r.decode()}\n')
                 else:
-                    self._logger.info('exiting')
+                    self._logger.info('exiting ...')
                     chan.send('exit')
                     break
         except KeyboardInterrupt:
             transport_session.close()
+            print ("\n")
         return
 
     def tcp_client(self, target_host:str, port:int=9998, timeout:int=5, message:bytes=b"GET / HTTP/1.1\r\nHost: google.com\r\n\r\n")->str:
@@ -466,40 +356,99 @@ class Pollen8:
     """
 
 def main():
-    global DEBUG_MODE
+    def get_args():
+        import textwrap
+        parser = argparse.ArgumentParser(
+            description="Pollen8 -- Script that does some neat network stuff.",
+            formatter_class=argparse.RawDescriptionHelpFormatter,
+            epilog=textwrap.dedent(SCRIPT_EPILOG))
+        list_of_choices = ['scan','sniff','ssh_client','ssh_server']
+        parser.add_argument('action',
+                choices=list_of_choices,
+                action='store',
+                type=str,
+                help='Action to perform.')
+        parser.add_argument('-v', '--verbose',
+                            dest='verbose',
+                            action='store_true',
+                            default=DEBUG_MODE,
+                            help=f'Debug mode. Defaults to {DEBUG_MODE}')
+        parser.add_argument('-p','--port',
+                            dest='port',
+                            type=int,
+                            action='store', help='Port value.')
+        parser.add_argument('-i','--ip',
+                            dest='ip_address',
+                            type=str,
+                            action='store', help='Host ip address.')
+        args = parser.parse_args()
+        return args
 
-    args = get_args()
-    debug_mode = args.debug is True or DEBUG_MODE
-    diablo = Pollen8(use_verbose=debug_mode)
+    def do_scan():
+        """
+        Scan subnet. Run: sudo python3 python/scripts/pollen8.py scan
+        """
+        from utils.network import Scanner, udp_sender
+        scanner = Scanner()
+        time.sleep(10)
+        t = threading.Thread(target=udp_sender, args=(scanner.subnet,))
+        t.start()
+        scanner.sniff()
 
-    # setup SSH server
-    if args.ssh_server is not None:
-        assert (isinstance(args.ssh_server, list))
-        if len(args.ssh_server) == 0:
-            server = input('Enter server IP: ')
-            assert(server)
-            port = input('Enter port [2222]: ') or 2222
-        else:
-            server , port = (args.ssh_server[0], int(args.ssh_server[1])) if len(args.ssh_server) == 2 else (args.ssh_server[0], 2222)
-        diablo.ssh_server(server=server, port=int(port))
+    def do_ssh_client():
+        """
+        Create SSH client to connect to SSH server. Run: python3 python/scripts/pollen8.py ssh_client --ip=192.168.0.100 --port 2222
+        """
 
-    # setup SSH client
-    elif args.ssh_client is not None:
         cur_user = getpass.getuser()
-        in_user = input(f'User [{cur_user}]: ')
-        user = in_user or cur_user
+        user = input(f'User [{cur_user}]: ') or cur_user
         passwd = getpass.getpass()
-        if len(args.ssh_client) == 0:
-            server = input('Enter server IP: ')
-            assert(server)
-            port = input('Enter port [2222]: ') or 2222
-        else:
-            server , port = (args.ssh_client[0], args.ssh_client[1]) if len(args.ssh_client) == 2 else (args.ssh_client[0], '2222')
-
+        # TODO: continue
+        ip_address = args.ip_address or input(f'SSH Server IP Address to connect to: ')
+        port = args.port or int(input("Port [2222]: ")) or 2222
+        assert (ip_address and port)
         # command = input('Enter command: ')
         command = 'ClientConnected'
+        diablo.ssh_rcmd(server=ip_address, port=port, user=user, passwd=passwd, command=command)
+        return
 
-        diablo.ssh_rcmd(server=server, port=port, user=user, passwd=passwd, command=command)
+    def do_ssh_server():
+        ip_address = args.ip_address or diablo.host.ip_address
+        server = ip_address or input('Enter server IP: ')
+        port = args.port if args.port else input('Enter port [2222]: ') or 2222
+        print(f"starting ssh server on: {server}:{port} ...")
+        diablo.ssh_server(server=server, port=int(port)) # TODO: move ssh_server() method to network util library
+        return
+
+    ###########
+    # MAIN
+    ###########
+    logging.getLogger("paramiko").setLevel(logging.DEBUG) # debug paramiko
+
+    # args
+    args = get_args()
+    debug_mode = args.verbose is True or DEBUG_MODE
+    diablo = Pollen8(use_verbose=debug_mode)
+
+    # scan subnet
+    if 'scan' == args.action: do_scan()
+
+    # sniffer on local network
+    elif 'sniff' == args.action: network.sniffer()
+
+    # setup SSH server
+    elif 'ssh_server' == args.action: do_ssh_server()
+
+    # create SSH client
+    elif 'ssh_client' == args.action: do_ssh_client()
+
+    else: sys.exit()
+    return
+
+    ######################################################
+    ######################################################
+
+    if True: pass
 
     # Single command through SSH
     elif args.ssh_cmd is not None and len(args.ssh_cmd) >= 1:
@@ -513,22 +462,6 @@ def main():
         cmd = args.ssh_cmd[2] if len(args.ssh_cmd) >= 3 else input('command: ')
         port = args.ssh_cmd[3] if len(args.ssh_cmd) >=4 else 22
         diablo.ssh_cmd(ip=args.ssh_cmd[0], port=int(port), user=user, passwd=passwd, cmd=cmd)
-
-    # sniffer on local network
-    elif args.sniff is not None:
-        # target:str = args.sniff[0] if len(args.sniff) >= 1 else (input("Enter IP address/CIDR: [127.0.0.0/8]: ") or '127.0.0.0/8')
-        diablo.sniff()
-
-    # scan subnet
-    elif args.scan is not None:
-        # sudo python3 python/scripts/pollen8.py --scan
-        from utils.network import Scanner, udp_sender
-        scanner = Scanner()
-        time.sleep(10)
-        t = threading.Thread(target=udp_sender, args=(scanner.subnet,))
-        t.start()
-        scanner.sniff()
-
 
     else:
         print("no action, exiting . . .")

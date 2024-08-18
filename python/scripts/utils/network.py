@@ -224,15 +224,23 @@ def long2ip(lng:int)->str:
     ip = socket.inet_ntoa(packed)
     return ip
 
-def get_ip_address():
+def get_ip_address()->str:
     """
     Creates UDP socket to retrieve IP (eth0) address.
 
-    src: https://stackoverflow.com/a/30990617/14745606
+    sources:
+        - https://stackoverflow.com/a/30990617/14745606
+        - https://pythontic.com/modules/socket/gethostname
     """
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    s.connect(("8.8.8.8", 80))
-    return s.getsockname()[0] or None
+    ip_address = None
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip_address = s.getsockname()[0]
+    except:
+        hostname = socket.gethostname()
+        ip_address = socket.gethostbyname(hostname)
+    return ip_address
 
 def get_subnet(host:str=None, subnet_mask:str="255.255.255.0"):
     """
@@ -393,16 +401,14 @@ def scan_ports(ip_address:str, ports:List[int]=list(range(0, 100000)), timeout:i
 
 def sniffer(ip_address:str=None):
     """
-    Packet sniffing on Windows and Linux machines.
-    Note: may need to run with sudo privileges
+    Packet sniffing on Windows and Linux machines. Need to run with sudo.
 
     Keyword Arguments:
     ip_address (str): ip address of machine to sniff
-
     """
     ip_address = ip_address or get_ip_address()
     os_name = os.name
-    logger.info(f"Starting packet sniffer on {ip_address} - {os_name}")
+    logger.info(f"Starting packet sniffer on {ip_address} ({os_name})")
     socket_protocol = socket.IPPROTO_IP if os_name == 'nt' else socket.IPPROTO_ICMP
 
     sniffer = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket_protocol)
@@ -419,19 +425,20 @@ def sniffer(ip_address:str=None):
     try:
         while True:
             raw_buffer = sniffer.recvfrom(65535)[0]
+            logger.debug(f"raw_buffer: {raw_buffer}")
             ip_header = IP(raw_buffer[0:20])
-            logger.info(f"IP Header: {ip_header.protocol}\t{ip_header}")
-            logger.info(f'Version: {ip_header.ver} Header Length: {ip_header.ihl}  TTL: {ip_header.ttl}')
+            packet_info = {"Protocol": ip_header.protocol,"Version":ip_header.ver,"Header Length":ip_header.ihl,"TTL":ip_header.ttl}
             if ip_header.protocol == 'ICMP':
                 # calculate the offset in the raw packet where ICMP body lives
                 offset = ip_header.ihl * 4
                 buf = raw_buffer[offset:offset + 8]
                 icmp_header = ICMP(buf)
-                logger.info(f"ICMP -> Type: {icmp_header.type} Code: {icmp_header.code}\n")
-
+                packet_info["ICMP"] = {"Type":icmp_header.type,"Code":icmp_header.code}
+            logger.info(f"{ip_header}: {packet_info}")
     except KeyboardInterrupt:
         # if on Windows, turn off promiscuous mode
         if os_name == 'nt': sniffer.ioctl(socket.SIO_RCVALL, socket.RCVALL_OFF)
+        print("")
     return
 
 def ssh_command(ip, port, user, passwd, cmd):
