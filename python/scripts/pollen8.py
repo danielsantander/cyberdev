@@ -365,7 +365,7 @@ def main():
             description="Pollen8 -- Script that does some neat network stuff.",
             formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog=textwrap.dedent(SCRIPT_EPILOG))
-        list_of_choices = ['scan','sniff','ssh_client','ssh_server']
+        list_of_choices = ['scan','sniff','ssh_client','ssh_cmd','ssh_server']
         parser.add_argument('action',
                 choices=list_of_choices,
                 action='store',
@@ -415,6 +415,19 @@ def main():
         diablo.ssh_rcmd(server=ip_address, port=port, user=user, passwd=passwd, command=command)
         return
 
+    def do_ssh_cmd():
+        """ Send single command through SSH.
+        """
+        cur_user = getpass.getuser()
+        ip_address = args.ip_address or input(f'IP Address to connect to: ')
+        port = int(args.port or (input("Port [22]: ") or 22))
+        user = input(f'User [{cur_user}]: ') or cur_user
+        passwd = getpass.getpass()
+        cmd = input('command: ')
+        assert (ip_address and port and cmd)
+        diablo.ssh_cmd(server=ip_address, port=port, user=user, passwd=passwd, cmd=cmd)
+        return
+
     def do_ssh_server():
         ip_address = args.ip_address or diablo.host.ip_address
         server = ip_address or input('Enter server IP: ')
@@ -423,9 +436,9 @@ def main():
         diablo.ssh_server(server=server, port=int(port)) # TODO: move ssh_server() method to network util library
         return
 
-    ###########
+    ######################################################
     # MAIN
-    ###########
+    ######################################################
     logging.getLogger("paramiko").setLevel(logging.DEBUG) # debug paramiko
 
     # args
@@ -445,30 +458,11 @@ def main():
     # create SSH client
     elif 'ssh_client' == args.action: do_ssh_client()
 
+    # run ssh command
+    elif 'ssh_cmd' == args.action: do_ssh_cmd()
+
     else: sys.exit()
     return
-
-    ######################################################
-    ######################################################
-
-    if True: pass
-
-    # Single command through SSH
-    elif args.ssh_cmd is not None and len(args.ssh_cmd) >= 1:
-        # expected ssh_cmd arg input: [ip, user, cmd, port]
-        if str(args.ssh_cmd[0]).lower() == 'usage':
-            print('\n\tUSAGE: ./pollen8 --ssh-cmd \{IP_ADDRESS\} {USERNAME} {COMMAND} {PORT}\n')
-            sys.exit(1)
-
-        user = args.ssh_cmd[1] if len(args.ssh_cmd) >=2 else input('User: ')
-        passwd = getpass.getpass()
-        cmd = args.ssh_cmd[2] if len(args.ssh_cmd) >= 3 else input('command: ')
-        port = args.ssh_cmd[3] if len(args.ssh_cmd) >=4 else 22
-        diablo.ssh_cmd(ip=args.ssh_cmd[0], port=int(port), user=user, passwd=passwd, cmd=cmd)
-
-    else:
-        print("no action, exiting . . .")
-        sys.exit()
 
 if __name__ == '__main__':
     main()
