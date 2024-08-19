@@ -109,39 +109,6 @@ class Pollen8:
             t.run()
         return
 
-    def ssh_cmd(self, server:str, user:str, passwd:str, cmd:str, port:int=22)->list:
-        """
-        Make connection to ssh server and run single command.
-
-        Keyword arguments:
-        - ip: Server IP address
-        - user: Server username
-        - passwd: Username's password
-        - cmd: command to run
-        - port: port to connect to [defaults to 22]
-
-        Returns list of output lines returned by the SSH server.
-        """
-        # TODO:
-        #   - utilize using keys
-        #   - modify to run multiple commands on SSH server
-        #   - run commands on multiple SSH servers.
-        client = paramiko.SSHClient()
-
-        # bc we control both ends of connection, set policy to accept SSH key for the SSH server we're connecting to and make connection
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        client.connect(server, port=port, username=user, password=passwd)
-
-        # assuming connection is made, run command and print each line of the output
-        self._logger.info(f"starting SSH command: \"{cmd}\" ")
-        _, stdout, stderr = client.exec_command(cmd)
-        output = stdout.readlines() + stderr.readlines()
-        if output:
-            print('\n--- OUTPUT FROM SSH SERVER ---')
-            for line in output:
-                print(line.strip())
-        return output
-
     def ssh_rcmd(self, server:str, port:str, user:str, passwd:str, command:str):
         import shlex
         import subprocess
@@ -416,7 +383,7 @@ def main():
         return
 
     def do_ssh_cmd():
-        """ Send single command through SSH.
+        """ Send single command through SSH. Run: python3 python/scripts/pollen8.py ssh_cmd
         """
         cur_user = getpass.getuser()
         ip_address = args.ip_address or input(f'IP Address to connect to: ')
@@ -425,7 +392,7 @@ def main():
         passwd = getpass.getpass()
         cmd = input('command: ')
         assert (ip_address and port and cmd)
-        diablo.ssh_cmd(server=ip_address, port=port, user=user, passwd=passwd, cmd=cmd)
+        network.ssh_command(ip_address,port,user,passwd,cmd)
         return
 
     def do_ssh_server():
