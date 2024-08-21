@@ -1,0 +1,1 @@
+alias get_ubuntu_users="awk -F'[/:]' '{if ($3 >= 1000 && $3 != 65534) print $1}' /etc/passwd"; # retrieve users from Ubuntu using ':' as a delimeter, if user ID is larger than 1000 and not 65534 (reserved for 'nobody')
