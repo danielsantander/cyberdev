@@ -12,6 +12,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Print Random Line From File](#print-random-line-from-file)
   - [Script Shebang](#script-shebang)
   - [Update \& Upgrade](#update--upgrade)
+  - [Update User Password](#update-user-password)
 - [PCAP Files](#pcap-files)
   - [Generate PCAP Files](#generate-pcap-files)
   - [Quickly Read PCAP Files](#quickly-read-pcap-files)
@@ -260,6 +261,32 @@ Script files will begin with the shebang: `#!/bin/bash`
 
 ```shell
 sudo apt-get update && sudo apt-get upgrade
+```
+
+## Update User Password
+
+Log into instance (using Ubuntu for this example), then perform the following.
+
+```shell
+# switch to root user
+sudo su -
+
+# update password for 'ubuntu' user
+passwd ubuntu
+
+# update sshd_config file to allow password authenticatio
+sudo vi /etc/ssh/sshd_config
+# Find the line with the PasswordAuthentication parameter and change its value from no to yes 
+# If you want to set up root login, find the PermitRootLogin parameter and change its value from prohibit-password to yes 
+
+# restart ssh service
+sudo service ssh restart
+
+# go back to ubuntu user
+sudo su ubuntu
+
+# or if logged out log back in with user
+ssh ubuntu@ip_address
 ```
 
 # PCAP Files
