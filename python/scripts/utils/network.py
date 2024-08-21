@@ -5,14 +5,18 @@ import argparse
 import ipaddress
 import logging
 import os
+import paramiko
 import socket
 import struct
 import sys
 import threading
 import time
+from pathlib import Path
 from typing import Union, List, Tuple
 
 DEBUG_MODE : bool = False
+DEFAULT_USER : str = 'root'
+DEFAULT_PASSWORD : str = 'fairbanks'
 
 # HEX_FILTER string containing ASCII printable characters (if one exists) or a dot if representation does not exist.
 #   - the representation of the printable character has a length of 3
@@ -213,6 +217,22 @@ class Scanner:
         except Exception as e:
             self.logger.error(f"ERROR: {e.__str__()}")
         return
+
+class Server(paramiko.ServerInterface):
+    def __init__(self, _username:str=DEFAULT_USER, _passwd:str=DEFAULT_PASSWORD):
+        self.event = threading.Event()
+        self._username = _username
+        self._passwd = _passwd
+
+    def check_channel_request(self, kind, chanid):
+        if kind == 'session':
+            return paramiko.OPEN_SUCCEEDED
+        return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
+
+    def check_auth_password(self, username, password):
+        # credentials when connecting to server
+        if (username == self._username) and (password == self._passwd):
+            return paramiko.AUTH_SUCCESSFUL
 
 def ip2long(ip:str)->int:
     packed = socket.inet_aton(ip)
@@ -452,12 +472,11 @@ def ssh_command(ip, port, user, passwd, cmd):
     - passwd: user password
     - cmd: command to run
     """
-    import paramiko
-    #   - note: Paramiko also supports auth w/ keys instead of password auth
     # TODO:
     #   - utilize using keys
     #   - modify to run multiple commands on SSH server
     #   - run commands on multiple SSH servers.
+    #   - note: Paramiko also supports auth w/ keys instead of password auth
 
     client = paramiko.SSHClient()
 
@@ -475,6 +494,69 @@ def ssh_command(ip, port, user, passwd, cmd):
             print(line.strip())
     else: print ('--- NO OUTPUT ---')
     return
+
+def ssh_server(server:str=None, port:int=2222, rsa_key_file:Union[str,Path]=None, **kwargs):
+        """
+        Create SSH server for client to connect to.
+
+        Keyword arguments:
+        - server: Server IP address [defaults to host ip address]
+        - port: Server port [defaults to 2222]
+        - rsa_key_file: RSAKey [defaults to using `.ssh/id_sa` in home directory]
+        """
+        lgr = kwargs.get('logger', logger)
+        server = server if server else get_ip_address()
+
+        # RSA Key
+        if not rsa_key_file:
+            rsa_key_file = Path().home() / '.ssh' / 'id_rsa'
+        else: rsa_key_file = rsa_key_file if isinstance(rsa_key_file, Path) else Path(rsa_key_file)
+        assert(rsa_key_file.exists())
+        rsa_key = paramiko.RSAKey(filename=rsa_key_file)
+
+        try:
+            lgr.info(f'starting SSH server on {server}:{port}...')
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            sock.bind((server, port))
+            sock.listen(100)
+            lgr.info('[+] Listening for connection ...')
+            client, addr = sock.accept()
+        except Exception as e:
+            lgr.error(f'[-] Listen failed, exiting. Error returned: {e.__str__()}')
+            sys.exit(1)
+        else:
+            msg = f'[+] Got a connection! {client} {addr}'
+            lgr.info(msg)
+
+        lgr.debug('[+] Starting paramiko transport with connected client ...')
+        transport_session = paramiko.Transport(client)
+        transport_session.add_server_key(rsa_key)
+        server = Server()
+        transport_session.start_server(server=server)
+
+        chan = transport_session.accept(20)
+        if chan is None:
+            lgr.warning('[-] No channel, exiting...')
+            sys.exit(1)
+
+        lgr.info(f'[+] Authenticated. Received message: \'{chan.recv(1024).decode()}\'')
+        chan.send('Welcome to Pollen8 SHH server.')
+        try:
+            while True:
+                command = input('Enter command: ').strip()
+                if command != 'exit':
+                    chan.send(command)
+                    r = chan.recv(8192)
+                    print(f'--- OUTPUT ---\n{r.decode()}\n')
+                else:
+                    lgr.info('[+] successfully quit, exiting ...')
+                    transport_session.close()
+                    break
+        except KeyboardInterrupt:
+            transport_session.close()
+        print ("\n")
+        return
 
 def udp_sender(subnet:str, message:str="ACK!"):
     """

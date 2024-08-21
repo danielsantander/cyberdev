@@ -32,22 +32,6 @@ Example:
     --scan
 """
 
-class Server(paramiko.ServerInterface):
-    def __init__(self, _username:str='root', _passwd:str='fairbanks'):
-        self.event = threading.Event()
-        self._username = _username
-        self._passwd = _passwd
-
-    def check_channel_request(self, kind, chanid):
-        if kind == 'session':
-            return paramiko.OPEN_SUCCEEDED
-        return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
-
-    def check_auth_password(self, username, password):
-        # credentials when connecting to server
-        if (username == self._username) and (password == self._passwd):
-            return paramiko.AUTH_SUCCESSFUL
-
 class Host:
     def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
         self.hostname: str = socket.gethostname()
@@ -60,7 +44,6 @@ class Host:
 
 class Pollen8:
     def __init__(self, use_verbose:bool=DEBUG_MODE, **kwargs):
-        if use_verbose: self._logger.setLevel(logging.DEBUG)
         self.host : Host = Host(use_verbose=use_verbose)
         self.subnet : str = network.get_subnet(self.host.ip_address)
         log_lvl = logging.DEBUG if use_verbose else logging.INFO
@@ -146,74 +129,11 @@ class Pollen8:
                     cmd_output = subprocess.check_output(shlex.split(cmd), shell=True)
                     ssh_session.send(cmd_output or 'okay')
                 except Exception as e:
-                    ssh_session.send(str(e))
-                except KeyboardInterrupt:
-                    client.close()
-                    return
-        client.close()
-        return
-
-    def ssh_server(self, server:str=None, port:int=2222, rsa_key_file:Union[str,Path]=None):
-        """
-        Create SSH server for client to connect to.
-
-        Keyword arguments:
-        - server: Server IP address [defaults to host ip address]
-        - port: Server port [defaults to 2222]
-        - rsa_key_file: RSAKey [defaults to using `.ssh/id_sa` in home directory]
-        """
-        server = self.host.ip_address if server is None else server
-
-        # RSA Key
-        if not rsa_key_file:
-            rsa_key_file = Path().home() / '.ssh' / 'id_rsa'
-        else: rsa_key_file = rsa_key_file if isinstance(rsa_key_file, Path) else Path(rsa_key_file)
-        assert(rsa_key_file.exists())
-        rsa_key = paramiko.RSAKey(filename=rsa_key_file)
-
-        try:
-            self._logger.info(f'ssh_server: starting SSH server on {server}:{port}...')
-            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            sock.bind((server, port))
-            sock.listen(100)
-            self._logger.info('[+] Listening for connection ...')
-            client, addr = sock.accept()
-        except Exception as e:
-            self._logger.exception(f'[-] Listen failed: {e}')
-            sys.exit(1)
-        else:
-            msg = f'[+] Got a connection! {client} {addr}'
-            self._logger.info(msg)
-
-        self._logger.debug('ssh_server: starting paramiko transport server for client connected')
-        transport_session = paramiko.Transport(client)
-        transport_session.add_server_key(rsa_key)
-        server = Server()
-        transport_session.start_server(server=server)
-
-        chan = transport_session.accept(20)
-        if chan is None:
-            self._logger.warning('*** No channel, exiting...')
-            sys.exit(1)
-
-        self._logger.info('[+] Authenticated')
-        self._logger.info(chan.recv(1024).decode())
-        chan.send('Welcome to Pollen8 SHH server.')
-        try:
-            while True:
-                command = input('Enter command: ').strip()
-                if command != 'exit':
-                    chan.send(command)
-                    r = chan.recv(8192)
-                    print(f'--- OUTPUT ---\n{r.decode()}\n')
-                else:
-                    self._logger.info('exiting ...')
-                    chan.send('exit')
+                    self._logger.error(f"EXCEPTION: {e.__str__()}")
                     break
-        except KeyboardInterrupt:
-            transport_session.close()
-            print ("\n")
+                except KeyboardInterrupt:
+                    break
+        client.close()
         return
 
     def tcp_client(self, target_host:str, port:int=9998, timeout:int=5, message:bytes=b"GET / HTTP/1.1\r\nHost: google.com\r\n\r\n")->str:
@@ -398,9 +318,9 @@ def main():
     def do_ssh_server():
         ip_address = args.ip_address or diablo.host.ip_address
         server = ip_address or input('Enter server IP: ')
-        port = args.port if args.port else input('Enter port [2222]: ') or 2222
+        port = args.port if args.port else int(input('Enter port [2222]: ') or 2222)
         print(f"starting ssh server on: {server}:{port} ...")
-        diablo.ssh_server(server=server, port=int(port)) # TODO: move ssh_server() method to network util library
+        network.ssh_server(server,port,logger=logger)
         return
 
     ######################################################
@@ -412,6 +332,7 @@ def main():
     args = get_args()
     debug_mode = args.verbose is True or DEBUG_MODE
     diablo = Pollen8(use_verbose=debug_mode)
+    logger = logging.getLogger('Pollen8')
 
     # scan subnet
     if 'scan' == args.action: do_scan()
