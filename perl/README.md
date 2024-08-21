@@ -176,6 +176,7 @@ Sources:
 | s       | Treat the string as single line. That is, change "." to match any character whatsoever, even a newline, which normally it would not match. |
 | i       | Do case-insensitive pattern matching. For example, "A" will match "a" under /i |
 | g       | Globally match the pattern repeatedly in the string |
+| x       | Permit whitespace and comments (will need to escape them). |
 
 ## Word Matching
 
