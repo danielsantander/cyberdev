@@ -233,6 +233,15 @@ ssh-keygen -b 2048 -t rsa
 ssh-keygen -y -f .ssh/id_rsa
 ```
 
+Update necessary SSH configs
+
+```shell
+sudo vi /etc/ssh/sshd_config
+
+# restart ssh service
+sudo service ssh restart
+```
+
 ## Install
 
 ### Kali for Raspberry Pi 4
