@@ -29,7 +29,6 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [ICMP Header](#icmp-header)
   - [Check Wireless Network Devices](#check-wireless-network-devices)
   - [Assign IP Address](#assign-ip-address)
-    - [Troubleshoot](#troubleshoot)
   - [Change IP Address](#change-ip-address)
   - [Map IP Address To Host File](#map-ip-address-to-host-file)
   - [Change Network Mask and Broadcast](#change-network-mask-and-broadcast)
@@ -598,7 +597,7 @@ dhclient eth0
 dhclient wlan0
 ```
 
-### Troubleshoot
+**Troubleshooting**
 
 ```shell
 # ERROR:
