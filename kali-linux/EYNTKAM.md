@@ -36,6 +36,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Change DNS](#change-dns)
     - [Regenerate resolvconf](#regenerate-resolvconf)
     - [Install resolvconf service](#install-resolvconf-service)
+  - [DNS Zone Transfer](#dns-zone-transfer)
   - [Ports](#ports)
 - [Proxy Servers](#proxy-servers)
   - [proxychains](#proxychains)
@@ -711,6 +712,14 @@ systemctl start resolvconf.service
 # check status
 systemctl status resolvconf.service
 ```
+
+## DNS Zone Transfer
+
+[https://en.wikipedia.org/wiki/DNS_zone_transfer](wiki)
+
+DNS zone transfer is a type of DNS transaction and a mechanism available for admins to replicate DNS databases across a set of DNS servers.
+
+DNS zone transfer uises the Transmission Control Protocl (TCP) for transport, and takes the form of a client-server transaction. The client requesting a zone transfer may be a secondary server requesting data from a primary server. The portion replicated is *zone*.
 
 ## Ports
 
