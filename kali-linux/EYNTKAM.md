@@ -717,9 +717,13 @@ systemctl status resolvconf.service
 
 [https://en.wikipedia.org/wiki/DNS_zone_transfer](wiki)
 
-DNS zone transfer is a type of DNS transaction and a mechanism available for admins to replicate DNS databases across a set of DNS servers.
+A type of DNS transaction and a mechanism available for admins to replicate DNS databases across a set of DNS servers.
 
 DNS zone transfer uses the Transmission Control Protocl (TCP) for transport, and takes the form of a client-server transaction. The client requesting a zone transfer may be a secondary server requesting data from a primary server. The portion replicated is *zone*.
+
+DNS zone Transfer is the process of replicating or copying a DNS database or the zone file from a primary DNS server to a secondary DNS server. The correspnding DNS query or record is the axfr record. The zone file contains all the DNS names that are defined for that particular DNS server. The zone file also contains all the ip address of servers and hosts, as a results this can be useful for an attacker as they can find import information such as the internal network.
+
+> This does not give anything important in regards of explotation.
 
 ## Ports
 
