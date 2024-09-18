@@ -57,6 +57,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
 - [Applications](#applications)
   - [Apache Web Server (apache2)](#apache-web-server-apache2)
     - [Configure Web Server](#configure-web-server)
+    - [Enable/Disable Sites](#enabledisable-sites)
   - [Docker](#docker)
     - [Check Storage](#check-storage)
     - [System Prune](#system-prune)
@@ -935,6 +936,25 @@ Update index page `/var/www/html/index.html`.
 ```
 
 > If the page is not updating, try restarting the Apache2 service with `sudo service apache2 restart`
+
+
+### Enable/Disable Sites
+
+```shell
+# View sites-enabled:
+sudo ls /etc/apache2/sites-enabled/
+000-default.conf  test.conf
+
+# disable site
+sudo a2dissite 000-default.conf
+
+# enable site
+sudo a2ensite test.conf
+
+# reload service
+sudo systemctl reload apache2
+```
+
 
 ## Docker
 
