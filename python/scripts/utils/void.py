@@ -17,6 +17,7 @@ from typing import Union
 def afk():
     import pyautogui as pag
     # note: may need to upgrade numpy -> python3 -m pip install --upgrade numpy
+    pag.FAILSAFE = False
     try:
         while True:
             x = random.randint(600,700)
