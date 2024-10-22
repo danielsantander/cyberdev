@@ -28,7 +28,7 @@ from utils import custom_exceptions
 
 class TestInvalidDirectory(unittest.TestCase):
     def setUp(self)->None:
-        self.test_dir:Path = CURRENT_DIR_PATH / 'sample_data'
+        self.test_dir : Path = CURRENT_DIR_PATH / 'sample_test_data'
 
     def test_valid_directory(self):
         self.assertTrue(self.test_dir.exists() and self.test_dir.is_dir())

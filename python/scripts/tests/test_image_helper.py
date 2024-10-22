@@ -26,8 +26,7 @@ from utils.image_helper import jpg_to_gif, pdf_to_jpg
 class TestJpgToGif(unittest.TestCase):
     def setUp(self) -> None:
         self.cur_dir_path = CUR_DIR_PATH
-        self.sample_data_dir = CUR_DIR_PATH / 'sample_data'
-        self.image_dir_path = CUR_DIR_PATH / 'sample_data' / '20210314_NASA_EPIC'
+        self.image_dir_path = CUR_DIR_PATH / 'sample_test_data' / '20210314_NASA_EPIC'
         self.test_dir_path = CUR_DIR_PATH / 'TestDirectory'
         if not self.test_dir_path.exists(): self.test_dir_path.mkdir()
 

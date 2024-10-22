@@ -29,3 +29,6 @@ python/api/nasa/
 
 # local files
 /local/
+
+# local data
+sample_data/
