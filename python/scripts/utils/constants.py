@@ -28,7 +28,7 @@ RE_APPLE_SCREEN_SHOT = r'^((?P<phone_screenshot>IMG\_(?P<image_id>\d+))|(?P<mac_
 RE_FILE_EXTENSION = r'\.(?P<extension>\w+$)'
 
 # IMG_XXXX.jpg
-RE_IPHONE_SCREEN_SHOT = r'^IMG\_(?P<image_id>\d+)(?P<extension>\.\w*)$'
+RE_IPHONE_SCREEN_SHOT = r'^IMG\_(?P<image_id>\d+\s?(?P<dupe>\d)?)(?P<extension>\.\w*)$'
 
 # IPv4
 # RE_IP_ADDRESS = r'^(?P<address>(?:\d+\.)+\d+)(\/(?P<subnet_mask_cidr>\d+))?$'
