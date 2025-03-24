@@ -1,6 +1,3 @@
-#!/usr/bin/env python
-#!/usr/bin/python3
-
 """ Unique methods to handle navigating through the operating system. """
 import logging
 import shutil

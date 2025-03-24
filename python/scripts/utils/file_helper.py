@@ -11,12 +11,11 @@ import sys
 from pathlib import Path
 from typing import Union, List
 
-import PyPDF2 # python3 -m pip install PyPDF2
-from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
 from utils.custom_exceptions import InvalidDirectory
 
 
 def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_name:str="Times-Roman", font_size:int=18)->Path:
+    from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
     if isinstance(name, str):
         if name == '':
             now = datetime.datetime.utcnow()                      # utc time
@@ -52,12 +51,14 @@ def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_nam
 
 
 def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
-    """ Combines all PDFs in the given directory into a single PDF document.
+    """
+    Combines all PDFs in the given directory into a single PDF document.
 
     Keyword arguments:
     inputDir -- path of directory holding the PDFs to combine
     outputDir -- path to output the combined PDF [defaults to the given inputDir]
     """
+    import PyPDF2  # python3 -m pip install PyPDF2
     inputDir = inputDir if isinstance(inputDir, Path) else Path(inputDir)
 
     if (outputDir == '' or outputDir is None): outputDir = inputDir
@@ -85,13 +86,15 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
 
 
 def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None)->Path:
-    """ Encrypt a given PDF file.
+    """
+    Encrypt a given PDF file.
 
     Keyword arguments:
     path -- path of the PDF file to encrypt
     pw -- password for the file to encrypt with [defaults to 'fairbanks']
     outpath -- outpath of encrypted file to be extracted [defaults to same directory as given input path]
     """
+    import PyPDF2  # python3 -m pip install PyPDF2
     file = path if isinstance(path, Path) else Path(path)
     outpath = outpath if outpath is not None else file.parent
     pw = 'fairbanks' if (pw == '' or pw is None) else pw
@@ -117,49 +120,34 @@ def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None)->Path:
     except OSError as err:
         raise err
 
-def extract_media_from_url(url:str, filename:Path, request_timeout:int=120, headers:dict={}):
-    parent_dir = filename.parent
-    if not parent_dir.exists(): parent_dir.mkdir(parents=True, exist_ok=True)
-    assert parent_dir.exists() and parent_dir.is_dir()
-    s = requests.session()
-    chunk_size = 256
-    file_stat_info = None
-    is_success = False
-    try:
-        resp = s.get(url=url, stream=True, timeout=request_timeout, headers=headers)
-        print (f"extract_media_from_url resp ({resp.status_code}): {resp.url}")
-        resp.raise_for_status()
-        with open(filename, 'wb') as sf:
-            for chunk in resp.iter_content(chunk_size=chunk_size):
-                sf.write(chunk)
-        assert filename.exists()
-        file_stat_info = os.stat(filename.resolve())
-        if filename.exists() and resp.ok: is_success = True
-        else:
-            is_success = False
-            print (f"extract_media_from_url -- unable to save media {filename.name} from {url}")
-    except requests.exceptions.HTTPError as err:
-        if '400 Client Error' in err.__str__():
-            print (f"extract_media_from_url -- 400 Client Error -- {err.__str__()}")
-        elif '404' in err.__str__():
-            print (f"extract_media_from_url -- Media not found -- {err.__str__()}")
-        else:
-            print (f"extract_media_from_url -- Unknown Error -- {err.__str__()}")
-        is_success = False
-        file_stat_info = None
-    return is_success, file_stat_info
 
-
-def file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->datetime.datetime:
+def file_modification_date(filename: Union[str, Path], timezone=datetime.timezone.utc)->datetime.datetime:
     """
-    Returns datetime of file creation date.
+    Returns datetime of file modification date.
+
+    Keyword arguments:
+    - filepath (str, Path): path of file to retrieve modification date.
+    - timezone [datetime.timezone.utc]: timezone of returned datetime
+    """
+    # source: https://stackoverflow.com/a/1526089/14745606
+    filename = filename if isinstance(filename, Path) else Path(filename)
+    if filename.exists() is False: return None
+    path_to_file = filename.resolve()
+    t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
+    return datetime.datetime.fromtimestamp(t, tz=timezone)
+
+
+def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->datetime.datetime:
+    """
+    Returns datetime (from timestamp) of file creation date.
+
     Keyword arguments:
     - filepath (str, Path): path of file to retrieve date created.
     - timezone
     - use_timestamp (bool): return timestamp value instead of datetime.
     """
     filename = filename if isinstance(filename, Path) else Path(filename)
-    if not filename.exists() or not filename.is_file(): return None
+    if not filename.exists() or not filename.is_file() or filename.name.startswith('.'): return None
     path_to_file = filename.resolve()
     file_timestamp = None
 
@@ -179,22 +167,6 @@ def file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc
             file_timestamp = stat.st_mtime
     if use_timestamp: return file_timestamp
     return datetime.datetime.fromtimestamp(file_timestamp, tz=timezone)
-
-
-def file_modification_date(filename: Union[str, Path], timezone=datetime.timezone.utc)->datetime.datetime:
-    """
-    Returns datetime of file modification date.
-
-    Keyword arguments:
-    - filepath (str, Path): path of file to retrieve modification date.
-    - timezone [datetime.timezone.utc]: timezone of returned datetime
-    """
-    # source: https://stackoverflow.com/a/1526089/14745606
-    filename = filename if isinstance(filename, Path) else Path(filename)
-    if filename.exists() is False: return None
-    path_to_file = filename.resolve()
-    t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
-    return datetime.datetime.fromtimestamp(t, tz=timezone)
 
 
 def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list[Path]:
@@ -218,7 +190,7 @@ def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list[Pat
 
 def is_file_recently_created(p:Path, within_hrs:int=24)->bool:
     now = datetime.datetime.utcnow()
-    created_date = file_creation_date(p)
+    created_date = get_file_creation_date(p)
     return bool(now-datetime.timedelta(hours=within_hrs) <= created_date <= now+datetime.timedelta(hours=within_hrs)) if created_date else False
 
 
@@ -242,7 +214,8 @@ def iterate_directory(directory_path:Union[str,Path], excludeHiddenFiles:bool=Tr
 
 
 def open_json_from_file(filepath:Union[str,Path]):
-    """ Open JSON from filepath and return as dictionary object.
+    """
+    Open JSON from filepath and return as dictionary object.
 
     Keyword arguments:
     filepath -- JSON filepath to open (required)
@@ -255,7 +228,8 @@ def open_json_from_file(filepath:Union[str,Path]):
 
 
 def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool=False)->Path:
-    """Renames (moves) a directory or file path given a new name.
+    """
+    Renames (moves) a directory or file path given a new name.
     If renaming a directory, new_name must be a directory Path object or a string name else NotADirectoryError is raised.
 
     Keyword arguments:
@@ -284,7 +258,8 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
 
 
 def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
-    """ Write dictionary object to file as JSON.
+    """
+    Write dictionary object to file as JSON.
 
     Keyword arguments:
     filename -- name or path of file to write json to (required)

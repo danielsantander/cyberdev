@@ -7,8 +7,9 @@ from os import times
 import pytz
 from pytz.tzinfo import DstTzInfo
 from typing import Union
+from utils.constants import DEFAULT_DATETIME_FMT_LONG
 
-def timestamp_to_date_string(timestamp: int=datetime.datetime.utcnow().timestamp(), str_format: str="%Y%m%d%H%M%S")->str:
+def timestamp_to_date_string(timestamp: int=datetime.datetime.utcnow().timestamp(), str_format: str=DEFAULT_DATETIME_FMT_LONG)->str:
     """ Returns datetime string representation of given timestamp with format 'YYYYMMDDHHMMSS'.
 
     Keyword arguments:

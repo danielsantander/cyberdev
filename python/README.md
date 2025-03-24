@@ -1,6 +1,4 @@
-- [Check Version](#check-version)
-- [Create Python Virtual Environment](#create-python-virtual-environment)
-- [Environment Variables](#environment-variables)
+
 - [Regular Expressions](#regular-expressions)
   - [match vs search](#match-vs-search)
   - [findall vs finditer](#findall-vs-finditer)
@@ -13,10 +11,15 @@
   - [scapy](#scapy)
 - [Tips](#tips)
   - [Append Sys Paths](#append-sys-paths)
+  - [Environment Variables](#environment-variables)
   - [Make script executable](#make-script-executable)
   - [Pip Module](#pip-module)
   - [Print Numbers By Base](#print-numbers-by-base)
   - [Upgrade Python distribution](#upgrade-python-distribution)
+- [API](#api)
+  - [NASA](#nasa)
+  - [RedditAPI](#redditapi)
+- [Tests](#tests)
 
 ---
 
@@ -36,19 +39,11 @@ More Docs:
 
 ---
 
-# Check Version
-
-Enter into terminal:
-
 ```shell
+# check version
 python --version
-```
 
-# Create Python Virtual Environment
-
-```shell
-
-# create environment
+# create virtual environment
 python3 -m venv {environment_name}
 
 # activate environment
@@ -56,18 +51,6 @@ source virtual_environment_directory/bin/activate
 
 # exit environment
 deactivate
-```
-
-# Environment Variables
-
-```python
-import os
-
-# set environment variable
-os.environ.setdefault("LINEUP", "develop")
-
-# retrieve OS environment variables
-LINEUP = os.environ.get('develop', 'some_default_value')
 ```
 
 # Regular Expressions
@@ -120,6 +103,7 @@ print(re.match(r'Hello', txt).group())
 - `re.finditer(pattern, string)` returns an iterator over MatchObject objects.
 
 ```python
+import re
 re.findall( r'all (.*?) are', 'all cats are smarter than dogs, all dogs are dumber than cats')
 # => ['cats', 'dogs']
 
@@ -175,7 +159,15 @@ Python RegEx Sources:
 Sniffer function:
 
 ```python
+from scapy.all import sniff
+
+def print_packet(packet):
+  print (packet)
+  return packet
+
 sniff(filter="", iface="any", prn=function, count=N)
+>>> sniff(filter="tcp port 80", prn=print_packet)
+>>> sniff(filter="tcp port 443", prn=print_packet)
 ```
 
 Where:
@@ -183,7 +175,7 @@ Where:
 - `filter` is used to specify a Berkeley Packet Filter (BPF) to the packets sniffed, leaving blanks will sniff all packets.
   - Example, to sniff all HTTP packets, use BPF filter of `tcp port 80`
 - `iface` is used to specify which network interface to sniff on. Leave blank to sniff on all interfaces.
-- `prn` specifies a callback function to be called for every packet object as it single parameter.
+- `prn` specifies a callback function to be called for every packet object with a single parameter.
 - `count` specifies how many packets to sniff, if blank Scapy will sniff indefinitely.
 
 Berkeley Packet Filter (BPF) Syntax:
@@ -217,6 +209,22 @@ for path in src_paths:
 
         # insert at beginning
         # sys.path.insert(0, path)
+```
+
+## Environment Variables
+
+```python
+import os
+
+# set environment variable
+os.environ.setdefault("LINEUP", "develop")
+
+# retrieve OS environment variables
+lineup_env_var = os.environ.get('LINEUP', 'local')
+
+# retrieve a "list" environment variable
+import json
+env_list = json.loads(os.environ.get('env_list', '["default_value_one", "default_value_two"]'))
 ```
 
 ## Make script executable
@@ -273,3 +281,111 @@ Print binary: `{number}:{width}{base}`
 # for linux:
 sudo apt-get upgrade python3
 ```
+
+# API
+
+## NASA
+
+Before using the `nasa.py` script, enter your `NASA_API_KEY` within the `.env` file and run `. .env`.
+
+Saved files will be located in the same directory at:  `./api_data/nasa/`
+
+```shell
+usage: ./nasa.py [data]
+
+# example: retrieve data from EPIC satellite
+python3 nasa.py epic
+Use enhanced images (Y/N)?: Y
+
+# example to retrieve data from Mars Curiosity rover.
+# (earth date in format: YYYY-MM-DD)
+python3 nasa.py curiosity
+Query by 'martian_sol' or 'earth_date': sol
+Enter Sol date [1000]: 1001
+```
+
+## RedditAPI
+
+Purposes: Utilize the Reddit API to retrieve and save media.
+
+Setup:
+
+- Visit [here](https://www.reddit.com/prefs/apps/) to generate client creds.
+- Enter creds into the environment file `.env` (copied from `.dev.env`). Run `. .env` so script can read new variables.
+
+Importing as module.
+
+```python
+import RedditAPI
+from pathlib import Path
+
+save_directory_path = Path("/some/save/directory/path/")
+
+reddit = RedditAPI(
+  client_id="enter_client_id_here",
+  client_secret="enter_cilent_secret_here",
+  username="enter_username_here",
+  password="enter_password_here"
+  save_dir=save_directory_path,
+  use_verbose=True,)
+
+# retrieve user's saved posts data, returns dictionary of data
+saved_data = reddit.get_saved_data()
+
+# unsave a given post, returns the response
+resp = reddit.unsave_post(post_dict)
+```
+
+When using interactively through the shell, ensure the environment variables are set within `.env` (copied from `.dev.env`) and run `. .env` for the script to pick up the credentials. Then proceed.
+
+Some Examples:
+
+```shell
+# get_saved: get user's saved data and save to a given directory
+./reddit.py -a get_saved -u -d -o /some/path/to/save_data_directory/
+# where:
+# - a: action
+# - u: update (call API for fresh save data)
+# - d: debug/verbose mode
+# - o: output directory
+
+# consolidate: retrieve past saved data and compile into a new file named "YYYYMMDDHHMMSS--consolidated_saved_data.json"
+./reddit.py -a consolidate -o api_data/
+
+# sanitize: retrieve and move files found within a provided list of blacklisted subs
+./reddit.py -a sanitize -d -o api_data/
+```
+
+> excluding the output directory will save all api data within directory `api_data/`
+
+# Tests
+
+```shell
+# Run all tests found in directory
+python3 -m unittest discover <test_directory>
+
+# Run a single test
+python3 test_api.py
+
+# run code coverage while running unittesting in discovery mode:
+python3 -m coverage run -m unittest discover <test_directory>
+
+# Run with code coverage
+coverage run --source="." test_api.py
+
+# get coverage report
+coverage report
+
+# save coverage files
+mkdir coverage_files/
+coverage annotate -d coverage_files/
+```
+
+Generated Text Annotation Prefix Values:
+
+| Character | Meaning                |
+|-----------|------------------------|
+| :---      | ---:                   |
+| >         | executed               |
+| !         | missing (not executed) |
+| -         | excluded               |
