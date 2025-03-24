@@ -25,7 +25,7 @@ venv.bak/
 notes.md
 
 # NASA media files
-python/api/nasa/
+python/api/api_data/
 
 # local files
 /local/

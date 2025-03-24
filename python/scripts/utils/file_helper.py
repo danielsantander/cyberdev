@@ -6,16 +6,16 @@ import json
 import re
 import os
 import platform
+import requests
 import sys
 from pathlib import Path
 from typing import Union, List
 
-import PyPDF2 # python3 -m pip install PyPDF2
-from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
 from utils.custom_exceptions import InvalidDirectory
 
 
 def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_name:str="Times-Roman", font_size:int=18)->Path:
+    from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
     if isinstance(name, str):
         if name == '':
             now = datetime.datetime.utcnow()                      # utc time
@@ -51,12 +51,14 @@ def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_nam
 
 
 def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
-    """ Combines all PDFs in the given directory into a single PDF document.
+    """
+    Combines all PDFs in the given directory into a single PDF document.
 
     Keyword arguments:
     inputDir -- path of directory holding the PDFs to combine
     outputDir -- path to output the combined PDF [defaults to the given inputDir]
     """
+    import PyPDF2  # python3 -m pip install PyPDF2
     inputDir = inputDir if isinstance(inputDir, Path) else Path(inputDir)
 
     if (outputDir == '' or outputDir is None): outputDir = inputDir
@@ -84,13 +86,15 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
 
 
 def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None)->Path:
-    """ Encrypt a given PDF file.
+    """
+    Encrypt a given PDF file.
 
     Keyword arguments:
     path -- path of the PDF file to encrypt
     pw -- password for the file to encrypt with [defaults to 'fairbanks']
     outpath -- outpath of encrypted file to be extracted [defaults to same directory as given input path]
     """
+    import PyPDF2  # python3 -m pip install PyPDF2
     file = path if isinstance(path, Path) else Path(path)
     outpath = outpath if outpath is not None else file.parent
     pw = 'fairbanks' if (pw == '' or pw is None) else pw
@@ -116,16 +120,34 @@ def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None)->Path:
     except OSError as err:
         raise err
 
-def file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->datetime.datetime:
+
+def file_modification_date(filename: Union[str, Path], timezone=datetime.timezone.utc)->datetime.datetime:
     """
-    Returns datetime of file creation date.
+    Returns datetime of file modification date.
+
+    Keyword arguments:
+    - filepath (str, Path): path of file to retrieve modification date.
+    - timezone [datetime.timezone.utc]: timezone of returned datetime
+    """
+    # source: https://stackoverflow.com/a/1526089/14745606
+    filename = filename if isinstance(filename, Path) else Path(filename)
+    if filename.exists() is False: return None
+    path_to_file = filename.resolve()
+    t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
+    return datetime.datetime.fromtimestamp(t, tz=timezone)
+
+
+def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->datetime.datetime:
+    """
+    Returns datetime (from timestamp) of file creation date.
+
     Keyword arguments:
     - filepath (str, Path): path of file to retrieve date created.
     - timezone
     - use_timestamp (bool): return timestamp value instead of datetime.
     """
     filename = filename if isinstance(filename, Path) else Path(filename)
-    if not filename.exists() or not filename.is_file(): return None
+    if not filename.exists() or not filename.is_file() or filename.name.startswith('.'): return None
     path_to_file = filename.resolve()
     file_timestamp = None
 
@@ -146,20 +168,6 @@ def file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc
     if use_timestamp: return file_timestamp
     return datetime.datetime.fromtimestamp(file_timestamp, tz=timezone)
 
-def file_modification_date(filename: Union[str, Path], timezone=datetime.timezone.utc)->datetime.datetime:
-    """
-    Returns datetime of file modification date.
-
-    Keyword arguments:
-    - filepath (str, Path): path of file to retrieve modification date.
-    - timezone [datetime.timezone.utc]: timezone of returned datetime
-    """
-    # source: https://stackoverflow.com/a/1526089/14745606
-    filename = filename if isinstance(filename, Path) else Path(filename)
-    if filename.exists() is False: return None
-    path_to_file = filename.resolve()
-    t = os.path.getmtime(path_to_file)  # os.stat(filename).st_mtime
-    return datetime.datetime.fromtimestamp(t, tz=timezone)
 
 def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list[Path]:
     """
@@ -179,10 +187,12 @@ def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list[Pat
             results.append(file)
     return results
 
+
 def is_file_recently_created(p:Path, within_hrs:int=24)->bool:
     now = datetime.datetime.utcnow()
-    created_date = file_creation_date(p)
+    created_date = get_file_creation_date(p)
     return bool(now-datetime.timedelta(hours=within_hrs) <= created_date <= now+datetime.timedelta(hours=within_hrs)) if created_date else False
+
 
 def iterate_directory(directory_path:Union[str,Path], excludeHiddenFiles:bool=True, raise_exception:bool=True)->List[Path]:
     """
@@ -204,7 +214,8 @@ def iterate_directory(directory_path:Union[str,Path], excludeHiddenFiles:bool=Tr
 
 
 def open_json_from_file(filepath:Union[str,Path]):
-    """ Open JSON from filepath and return as dictionary object.
+    """
+    Open JSON from filepath and return as dictionary object.
 
     Keyword arguments:
     filepath -- JSON filepath to open (required)
@@ -215,8 +226,10 @@ def open_json_from_file(filepath:Union[str,Path]):
         data = json.load(f)
     return data
 
+
 def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool=False)->Path:
-    """Renames (moves) a directory or file path given a new name.
+    """
+    Renames (moves) a directory or file path given a new name.
     If renaming a directory, new_name must be a directory Path object or a string name else NotADirectoryError is raised.
 
     Keyword arguments:
@@ -243,8 +256,10 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
         raise err
     return path
 
+
 def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
-    """ Write dictionary object to file as JSON.
+    """
+    Write dictionary object to file as JSON.
 
     Keyword arguments:
     filename -- name or path of file to write json to (required)
@@ -259,4 +274,3 @@ def write_json_to_file(filename:Union[str,Path], dic_obj:dict):
     with open(p.absolute(), "w") as f:
         # json.dump(dict, f, indent=2)  # should work as well
         f.write(json.dumps(dic_obj, indent=2))
-

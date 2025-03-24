@@ -9,6 +9,7 @@
 
 
 # Writing Tests
+
 Create a test case by subclassing `unittest.TestCase`
 
 Each individual test is defined with methods whose names begin with "test".
@@ -37,6 +38,7 @@ class TestCaseNameHere(unittest.TestCase):
 ```
 
 ## Assert Methods
+
 | Syntax                   | Description         |
 | :---                     | ---:                |
 | assertEqual(a,b)         | a == b              |
@@ -53,6 +55,7 @@ class TestCaseNameHere(unittest.TestCase):
 | assertNotIsInstance(a,b) | not isinstance(a,b) |
 
 Extra assert methods:
+
 | Syntax                    | Description         |
 | :---                      | ---:                |
 | assertAlmostEqual(a,b)    | round(a-b,7) == 0   |
@@ -68,6 +71,7 @@ Extra assert methods:
 # Running Tests
 
 ## As an executable inside main
+
 Utilize the `unittest.main()` method in the test file's main method.
 ```python
 import unittest
@@ -86,6 +90,7 @@ if __name__ == '__main__':
 ## Through CLI
 
 Run a tests from the command line interface:
+
 ```shell
 
 # run multiple test modules
@@ -112,6 +117,7 @@ $ python -m unittest discover
 > Test Discovery will find all test modules by recursing into subdirectories.
 
 # Code Coverage
+
 Code coverage is the degree to which the source code of a program is executed (covered) by automated tests.
 
 Measured by a percentage, where higher percentage of coverage has more of its source doe executed during testing.
@@ -119,6 +125,7 @@ Measured by a percentage, where higher percentage of coverage has more of its so
 Code coverage determines which statements in a body of code have been executed through a test run, anc which statements have not.
 
 ## coverage.py
+
 Python library containing code analysis tools and tracing hooks to determine which lines are executable, and which have been executed.
 
 > python -m pip install coverage
@@ -126,11 +133,13 @@ Python library containing code analysis tools and tracing hooks to determine whi
 Usage: `coverage run <program>`
 
 **Coverage Options**
+
 - `source`: specify source to measure, only source inside given directories or packages will be measured
 - `include`: specify files matching the given patterns to be measured
 - `omit`: specify files matching the given patterns not to be measured
 
-**Example**:: Use coverage to run program and gather data
+**Example** : Use coverage to run program and gather data
+
 ```bash
 # run coverage on test_encryption program
 $ coverage run --source="." test_encryption.py
@@ -150,7 +159,8 @@ $ python -m coverage run -m unittest discover <test_directory>
 ```
 
 Output should look similar to the following
-```
+
+```txt
 Name                 Stmts   Miss  Cover
 ----------------------------------------
 encryption.py           21      2    90%
@@ -160,6 +170,7 @@ TOTAL                   46      2    96%
 ```
 
 Generated Text Annotation Prefix Values:
+
 | Character | Meaning                |
 | :---      | ---:                   |
 | >         | executed               |

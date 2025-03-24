@@ -49,7 +49,6 @@ RE_SCAN_FILE = r'scan_(?P<date>\d{4}\d{2}\d{2})(?P<time>\d{2}\d{2}\d{2})\.(?P<ex
 # Screen Shot YYYY-MM-DD at H.MM.SS MERIDIEM(AM/PM).png
 RE_SCREENSHOT_FILENAME = r'Screen Shot (?P<date>\d{4}-\d{2}-\d{2}) at (?P<time>\d{1,2}\.\d{1,2}\.\d{1,2})\s?(?P<meridiem>\w{2})\.(?P<extension>\w+)$'
 
-
 DESKTOP_USER_AGENT_LIST = [
     # Windows 10-based PC using Edge browser
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246",
@@ -70,14 +69,6 @@ DESKTOP_USER_AGENT_LIST = [
     "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1",
 ]
 
-# Media directory names
-MEDIA_DIR_NAMES = [
-    'images',
-    # 'pics',
-    'videos',
-    # 'vids'
-]
-
 XPATH_LIST = [
     "video"
     "video/source[@src and @type='video/mp4']",
@@ -85,42 +76,5 @@ XPATH_LIST = [
     "//video/source[@src]",
     "//video/source",
     "//video/source[@type='video/mp4']",
+    "//meta[@property=\'og:video\']",
 ]
-
-MK_FINISHERS = {
-    "MK_11": {
-        # finisher nomenclature: name (location) : input
-        "shang_tsung": {
-            # FATALITIES
-            "Kondemned To The Damned (mid)": "BFDD2",
-            "Shokan Reborn (mid)": "BFB4",
-            "Stage Fatality (close)": "UUB2",
-            "Easy Stage Fatality (close)": "Hold block + 1",
-            # FRIENDSHIP
-            "Friendship (mid)": "BBDF4",
-            "Easy Friendship Fatality (close)": "Hold block + 2",
-        },
-        "sub_zero": {
-            # FATALITIES
-            "Ice-Cutioner": "BFB1",
-            "Frozen In Time (mid)": "FDF4",
-            "Stage Fatality": "DBD1",
-            # FRIENDSHIP
-            "Frosty Treats": "DDBF2",
-        },
-        "scorpion": {
-            # FATALITIES
-            "You're Next": "BDD2",
-            "Chain Reaction": "DFB1",
-            "Stage Fatality": "DFD2",
-            # FRIENDSHIP
-            "Teddy-ality": "FBFB4",
-        }
-    },
-    "MK_1": {
-        "shang_tsung": {
-            # name (location) : input
-            "": []
-        }
-    }
-}

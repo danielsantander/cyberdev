@@ -13,9 +13,6 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Script Shebang](#script-shebang)
   - [Update \& Upgrade](#update--upgrade)
   - [Update User Password](#update-user-password)
-- [PCAP Files](#pcap-files)
-  - [Generate PCAP Files](#generate-pcap-files)
-  - [Quickly Read PCAP Files](#quickly-read-pcap-files)
 - [Permissions](#permissions)
   - [Change File Ownership](#change-file-ownership)
   - [Permission Levels](#permission-levels)
@@ -27,6 +24,8 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Networking](#networking)
     - [IP Header](#ip-header)
     - [ICMP Header](#icmp-header)
+  - [Network Monitoring](#network-monitoring)
+    - [PCAPs](#pcaps)
   - [Check Wireless Network Devices](#check-wireless-network-devices)
   - [Assign IP Address](#assign-ip-address)
   - [Change IP Address](#change-ip-address)
@@ -63,6 +62,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [System Prune](#system-prune)
     - [Delete](#delete)
     - [Reboot Docker Services](#reboot-docker-services)
+  - [Homebrew for MacOS](#homebrew-for-macos)
   - [Metasploit](#metasploit)
     - [PostgreSQL (postgres)](#postgresql-postgres)
     - [Start Metasploit](#start-metasploit)
@@ -160,7 +160,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Partitions](#partitions)
   - [List Block Devices (lsblk)](#list-block-devices-lsblk)
   - [Mounting Devices (mount)](#mounting-devices-mount)
-  - [Unmounting Devices (unmount)](#unmounting-devices-unmount)
+  - [Unmounting Devices (umount)](#unmounting-devices-umount)
   - [Filesystem Checks](#filesystem-checks)
 - [Logging](#logging)
   - [Configuration](#configuration)
@@ -218,7 +218,7 @@ uname -a
 
 [source](https://www.tutorialspoint.com/bashrc-vs-bash-profile-what-is-difference#:~:text=Bashrc%20is%20commonly%20used%20to,at%20start%20of%20your%20session.)
 
-Bashrc is commonly used to set aliases, define functions, and customize prompt. Bash_profile is commonly used to set PATH variable and to run commands that are needed only once at start of your session.
+`bashrc` is commonly used to set aliases, define functions, and customize prompt while `bash_profile` is commonly used to set PATH variable and to run commands that are needed only once at start of your session.
 
 ## Generate SSH Keys
 
@@ -301,26 +301,6 @@ sudo su ubuntu
 
 # or if logged out log back in with user
 ssh ubuntu@ip_address
-```
-
-# PCAP Files
-
-## Generate PCAP Files
-
-```shell
-tcpdump -s 0 -w server_request.pcap {target_IP}
-
-# example: tcpdump -s 0 -w request_server.pcap 10.1.2.3
-```
-
-## Quickly Read PCAP Files
-
-```shell
-tcpdump -qns 0 -X -r server_request.pcap
-
-# or
-
-rcpdump -qns 0 -A -r server_request.pcap
 ```
 
 # Permissions
@@ -581,6 +561,41 @@ Type & code fields notify the receiving host what type of ICMP message is arrivi
     </tr>
   </tbody>
 </table>
+
+## Network Monitoring
+
+### PCAPs
+
+```shell
+# capture packets
+tcpdump -i {interface, en0 is ethernet, en1 is wireless}
+tcpdump -i en0
+
+# generate pcap file
+tcpdump -s 0 -w server_request.pcap {target_IP}
+tcpdump -s 0 -w request_server.pcap 10.1.2.3
+
+# writing packet captures file (pcap)
+tcpdump -i {interface} -s 65535 -w {file}      # truncate packets to 68 or 96 bytes
+tcpdump -i en0 -c100 -nn -w output_file.pcap
+tcpdump -i en0 -c100 -nn > output_file.txt     # use conventional means to read output file
+
+# read pcap file
+tcpdump -r output_file.pcap
+tcpdump -qns 0 -X -r server_request.pcap
+tcpdump -qns 0 -A -r server_request.pcap
+```
+
+| tcpdump options                            | desc.                                                                                                                                                                                                                                                                                          |
+|--------------------------------------------|                                                                                                                                                                                                                                                                                                |
+| `-s snaplen` , `--snapshot-length=snaplen` | bytes of data from each packet rather than the default of 262144 bytes. Limit value to the smallest number that will capture the protocol information interested in. Setting snaplen to 0 sets it to the default of 262144, for backwards compatibility with recent older versions of tcpdump. |
+| `-w file`                                  | Write the raw packets to file rather than parsing and printing them out. (can bp printed with `r` option).                                                                                                                                                                                     |
+| `-r file`                                  | Read packets from a file (which was created with the `-w` option)                                                                                                                                                                                                                              |
+| `-X`                                       | When parsing and printing, print the data of each packet including in hex and ASCII. Very handy for analyzing new protocols.                                                                                                                                                                   |
+| `-A`                                       | Print each packet in ASCII. Handy for capturing web pages.                                                                                                                                                                                                                                     |
+| `-n`                                       | Don't convert addresses (iee., host addresses, port numbers, etc.) to names.                                                                                                                                                                                                                   |
+| `-q`                                       | Quick (quiet?) output. Print less protocol information so output lines are shorter.                                                                                                                                                                                                            |
+| `-c`                                       | Exit after receiving or displaying num of packets.                                                                                                                                                                                                                                             |
 
 ## Check Wireless Network Devices
 
@@ -1018,6 +1033,16 @@ sudo reboot
 
 # sudo systemctl enable docker
 sudo systemctl start docker
+```
+
+## Homebrew for MacOS
+
+Change python install version links.
+
+```shell
+brew unlink python@3.9
+brew unlink python@3.8
+brew link --force python@3.9
 ```
 
 ## Metasploit
@@ -2368,28 +2393,28 @@ NAME   MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 
 A storage device must be both physically and logically attached to the filesystem for the data to be available to the operating system.
 
-Mount pionts are locations in the directory tree where the devices area attached to. Two main mount opints in Linux are:
+Mount points are locations in the directory tree where the devices area attached to. Two main mount points in Linux are:
 
 1. `/mnt`: Usually used to mount internal hard drives.
 2. `/media`: Usually used to mount external USB devices (flash drives) and external USB hard drives.
 
 > The filesystems that are mounted on a system are kept in a file at `/etc/fstab/` (filesystem table) which is read by the system at every bootup.
 
-Example of mouning hard drive.
+Example of mounting hard drive.
 
 ```shell
 # mount a sbd1 hard drive to the /mnt directory, to access its content
 mount /dev/sdb1 /mnt
 ```
 
-## Unmounting Devices (unmount)
+## Unmounting Devices (umount)
 
 "Eject" a device to keep from causing damage to the files stored on the device.
-> Can not unmount a device that is busy, that is if the system is busy reading or writing data to the storage device.
+> Can not umount a device that is busy, that is if the system is busy reading or writing data to the storage device.
 
 ```shell
 # usage:
-unmount {file_entry_of_device}
+umount {file_entry_of_device}
 ```
 
 ## Filesystem Checks

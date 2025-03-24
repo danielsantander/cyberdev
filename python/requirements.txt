@@ -1,5 +1,14 @@
-Django==3.2.10      # webb development
+requests==2.32.3
 lxml==4.6.2
+Django==3.2.10      # web development
 paramiko==3.4.0     # netowrk scanning
 PyAutoGUI==0.9.54   # afk
 scapy==2.5.0        # network scanning
+PyPDF2              # to combine PDFs
+reportlab           # Canvas to create PDFs
+
+# nasa api
+imageio==2.37.0
+
+# unittesting
+coverage==7.7.0
