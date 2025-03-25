@@ -1,3 +1,4 @@
+- [Frequently Used](#frequently-used)
 - [Configuration](#configuration)
   - [Cache User Creds](#cache-user-creds)
   - [Store Creds](#store-creds)
@@ -16,20 +17,36 @@
 - [Log](#log)
 - [Stash](#stash)
 
+# Frequently Used
+
+```shell
+git commit --amend -m "my new commit message to replace old commit message"
+```
+
 # Configuration
 
 View settings
 
 ```shell
+# view git username
+git config user.name
+
+# view user email
+git config user.email
+
+# set user name and email
+git config user.name "Bruce Wayne"
+git config user.email bruce@wayne.ent"
+
+# set user name and email globally
+git config --global user.name "Bruce Wayne"
+git config --global user.email bruce@wayne.ent"
+
 # view all settings
 git config --list --show-origin
 
 # view global configurations
 git config --list --global
-
-# set username and email
-git config --global user.name "Bruce Wayne"
-git config --global user.email bruce@wayne.ent
 
 # set text editor
 git config --global core.editor <EDITOR_NAME_HERE>
@@ -191,8 +208,24 @@ git diff --name-status branch_name | grep "testFile[s]"
 # Log
 
 ```shell
-# list all commits for specific filepath -- a path which can be either a file and/or directory
+# logs for a given branch_name
+git log branch_name
+
+# logs of specified author
+git log --author="Jon"
+
+# logs committed by author Jonathan or Adam
+git log --author="\(Adam\)\|\(Jon\)"
+
+# simplified list of commits in one line each.
+git log --oneline
+
+# displays more detail (including which files changes)
+git log --stat
+
+# use `--follow` to list all commits for specific filepath -- a path which can be either a file and/or directory
 git log --follow <filepath>
+git log --follow -- filepath
 
 # list all commits for README.md file
 git log --oneline --follow git/docs/README.md
@@ -211,8 +244,17 @@ Stash changes made to the working copy while having the ability to come back to 
 # list stash files
 git stash list
 
+# show changes recorded in stash as diff
+git stash show               # show the files in stash
+git stash show -p            # show the changes in most recent stash
+git stash show -p stash@{1}  # show changes of named stash
+
+
 # stash changes and save with message.
 git stash save -m "<message>"
+
+# stash specified Files
+git stash push path/to/file
 
 # Pop (apply and remove from the list) the latest stashed change into the working directory.
 git stash pop
