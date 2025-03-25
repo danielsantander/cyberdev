@@ -91,7 +91,6 @@ python3 -m pip install {package_name}
 python3 -m pip install -r requirements.txt
 ```
 
-
 # Regular Expressions
 
 ```python
