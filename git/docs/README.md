@@ -19,7 +19,6 @@
 
 *Table of Contents*
 
-- [Configuration](configuration.md)
 - [Branching Strategy](branching_strategy.md)
 - [Diff Command](diff_command.md)
 - [Log Command](log_command.md)
