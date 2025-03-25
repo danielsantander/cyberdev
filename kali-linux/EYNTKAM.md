@@ -110,6 +110,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [rc](#rc)
   - [kill](#kill)
 - [Commands](#commands-1)
+  - [awk](#awk)
   - [bzip2 (compress)](#bzip2-compress)
   - [bunzip](#bunzip)
   - [compress](#compress)
@@ -1707,6 +1708,16 @@ Signal Value Options (optional)
 | SIGTERM | 15  | Termination signal (TERM): default kill signal               |
 
 # Commands
+
+## awk
+
+A scripting language used for text processing and manipulating data. Greatly used as a powerful filter.
+
+Search for pattern with `//`:
+
+```shell
+awk '/pattern/{print $0}' file
+```
 
 ## bzip2 (compress)
 
