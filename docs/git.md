@@ -14,6 +14,7 @@
   - [diff options](#diff-options)
     - [name status](#name-status)
 - [Log](#log)
+- [Stash](#stash)
 
 # Configuration
 
@@ -198,4 +199,33 @@ git log --oneline --follow git/docs/README.md
 
 # display commits that develop branch has but main branch does not.
 git log main..develop --oneline
+```
+
+# Stash
+
+Stash changes made to the working copy while having the ability to come back to "re-apply" those changes later.
+
+> `stash` will not stash new files in working copy that have not been staged, or files that have been ignored.
+
+```shell
+# list stash files
+git stash list
+
+# stash changes and save with message.
+git stash save -m "<message>"
+
+# Pop (apply and remove from the list) the latest stashed change into the working directory.
+git stash pop
+
+# apply the latest stashed changes into the working directory, and keep them in the stash list
+git stash apply
+
+# usage for specific stash
+git stash apply <stash_name>
+
+# remove specific stashes
+git stash drop <stash_name>
+
+# remove all stashes
+git stash clean
 ```
