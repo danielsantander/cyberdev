@@ -73,7 +73,7 @@ cat .git/config
 
 ## Update Remove URL
 
-If you have already been working in a project where the repository's remote url is for the default HTTPS url, you will need to update the projcet's `.git/config` file settings.
+If you have already been working in a project where the repository's remote url is for the default HTTPS url, you will need to update the project's `.git/config` file settings.
 
 Within the git project directory, update the remote url with the following command:
 
@@ -82,5 +82,9 @@ git remote set-url origin git@github.com:<username>/<repository>.git
 
 # check to see it is updated:
 $ cat .git/config
+...
+[remote "origin"]
+        url = git@github.com:<username>/<repository>.git
+        fetch = +refs/heads/*:refs/remotes/origin/*
 ```
 
