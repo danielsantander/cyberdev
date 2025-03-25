@@ -28,7 +28,6 @@ List Regions
 
 ```shell
 aws account list-regions --account-id <account_id_here>
-aws account list-regions --account-id <account_id_here>
 ```
 
 ## EC2
