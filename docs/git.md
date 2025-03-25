@@ -10,6 +10,9 @@
     - [Feature Branches](#feature-branches)
     - [Ticket Branches](#ticket-branches)
     - [Release Branches](#release-branches)
+- [Diff](#diff)
+  - [diff options](#diff-options)
+    - [name status](#name-status)
 
 # Configuration
 
@@ -162,3 +165,23 @@ Naming convention: `release-<release_number>`
 Creating new release branch example: `git checkout -b release-1.2.3.4`
 
 Same branching and merging convention as `feature` branch.
+
+# Diff
+
+The `diff` command runs a diff function on Git data sources such as: commits, branches, files, etc.
+
+## diff options
+
+### name status
+
+Show names and status of changed files.
+
+Usage: `git diff --name-status`
+
+```shell
+# Use the diff command to show all changed files on a given branch.
+git diff --name-status branch_name
+
+# use the same command but pipe with grep go search for changed files named "testFiles"
+git diff --name-status branch_name | grep "testFile[s]"
+```
