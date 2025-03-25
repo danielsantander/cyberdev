@@ -1,17 +1,9 @@
 
 - [Libraries](#libraries)
   - [scapy](#scapy)
-- [Tips](#tips)
-  - [Append Sys Paths](#append-sys-paths)
-  - [Environment Variables](#environment-variables)
-  - [Make script executable](#make-script-executable)
-  - [Pip Module](#pip-module)
-  - [Print Numbers By Base](#print-numbers-by-base)
-  - [Upgrade Python distribution](#upgrade-python-distribution)
 - [API](#api)
   - [NASA](#nasa)
   - [RedditAPI](#redditapi)
-- [Tests](#tests)
 
 ---
 
@@ -21,13 +13,6 @@ More Docs:
   - [Caesar Cipher](docs/ciphers.md#caesar-cipher)
     - [Encrypt Caesar Cypher](docs/ciphers.md#encrypt-caesar-cipher)
     - [Decrypt Caesar Cypher](docs/ciphers.md#decrypt-caesar-cipher)
-- [Unit Testing](docs/unittesting.md)
-  - [Writing Tests](docs/unittesting.md#writing-tests)
-  - [Running Tests](docs/unittesting.md#running-tests)
-  - [Code Coverage](docs/unittesting.md#code-coverage)
-- [Threading](docs/threading.md)
-  - [Daemon Threads](docs/threading.md#daemon-threads)
-  - [Join Threads](docs/threading.md#joining-threads)
 
 ---
 
@@ -73,93 +58,6 @@ Berkeley Packet Filter (BPF) Syntax:
 > `tcp port 110 or tcp port 25` specifies a filter that will pass only TCP packets coming from or going to port 110 or 25.
 >
 > `tcp port 21` to watch for FTP connections
-
-# Tips
-
-## Append Sys Paths
-
-```python
-import os, sys
-
-src_paths = ['/home/user/code/src', '/home/app']
-for path in src_paths:
-    if os.path.exists(path) and path not in sys.path:
-        sys.path.append(path)
-
-        # insert at beginning
-        # sys.path.insert(0, path)
-```
-
-## Environment Variables
-
-```python
-import os
-
-# set environment variable
-os.environ.setdefault("LINEUP", "develop")
-
-# retrieve OS environment variables
-lineup_env_var = os.environ.get('LINEUP', 'local')
-
-# retrieve a "list" environment variable
-import json
-env_list = json.loads(os.environ.get('env_list', '["default_value_one", "default_value_two"]'))
-```
-
-## Make script executable
-
-Enter the following into the terminal:
-
-```shell
-sudo chmod +x <python_file>
-
-# or
-sudo chmod 755 <python_file>
-```
-
-## Pip Module
-
-```shell
-# search if python package is installed
-python -m pip search {package_name}
-
-# install python packages
-python -m pip install {package_name}
-
-# install from packages from file
-python -m pip install -r requirements.txt
-```
-
-## Print Numbers By Base
-
-Print binary: `{number}:{width}{base}`
-
-```python
->>> num = 100
->>> width = 4
->>> base = 'b'
->>> bases = 'dXob'
->>> print ('{num:{width}{base}}'.format(num=num,width=width,base=base))
- 101
-
->>> num = 42
->>> bases = 'dXob'
->>> for base in bases:
-# ...     print ('{num:0{width}{base}}'.format(num=num,width=width,base=base))  # add '0' for leading zeros
-...     print ('{num:{width}{base}}'.format(num=num,width=width,base=base))
-...
-  42
-  2A
-  52
-101010
-```
-
-## Upgrade Python distribution
-
-```shell
-# for linux:
-sudo apt-get upgrade python3
-```
 
 # API
 
@@ -236,35 +134,3 @@ Some Examples:
 ```
 
 > excluding the output directory will save all api data within directory `api_data/`
-
-# Tests
-
-```shell
-# Run all tests found in directory
-python3 -m unittest discover <test_directory>
-
-# Run a single test
-python3 test_api.py
-
-# run code coverage while running unittesting in discovery mode:
-python3 -m coverage run -m unittest discover <test_directory>
-
-# Run with code coverage
-coverage run --source="." test_api.py
-
-# get coverage report
-coverage report
-
-# save coverage files
-mkdir coverage_files/
-coverage annotate -d coverage_files/
-```
-
-Generated Text Annotation Prefix Values:
-
-| Character | Meaning                |
-|-----------|------------------------|
-| :---      | ---:                   |
-| >         | executed               |
-| !         | missing (not executed) |
-| -         | excluded               |

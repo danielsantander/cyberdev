@@ -1,3 +1,6 @@
+- [Environment](#environment)
+- [OS Environment Variables](#os-environment-variables)
+- [Pip Module](#pip-module)
 - [Regular Expressions](#regular-expressions)
   - [match vs search](#match-vs-search)
   - [findall vs finditer](#findall-vs-finditer)
@@ -21,11 +24,31 @@
     - [Run Tests Through CLI](#run-tests-through-cli)
   - [Code Coverage](#code-coverage)
     - [Example Code Coverage](#example-code-coverage)
+- [Output](#output)
+  - [Print Numbers By Base](#print-numbers-by-base)
 
 ```shell
 # check version
 python --version
+```
 
+## Append Sys Paths
+
+```python
+import os, sys
+
+src_paths = ['/home/user/code/src', '/home/app']
+for path in src_paths:
+    if os.path.exists(path) and path not in sys.path:
+        sys.path.append(path)
+
+        # insert at beginning
+        # sys.path.insert(0, path)
+```
+
+# Environment
+
+```shell
 # create virtual environment
 python3 -m venv {environment_name}
 
@@ -35,6 +58,39 @@ source virtual_environment_directory/bin/activate
 # exit environment
 deactivate
 ```
+
+# OS Environment Variables
+
+```python
+import os
+
+# set environment variable
+os.environ.setdefault("LINEUP", "develop")
+
+# retrieve OS environment variables
+lineup_env_var = os.environ.get('LINEUP', 'local')
+
+# retrieve a "list" environment variable
+import json
+env_list = json.loads(os.environ.get('env_list', '["default_value_one", "default_value_two"]'))
+```
+
+# Pip Module
+
+```shell
+# search if python package is installed
+python3 -m pip search {package_name}
+
+# list installed packages
+python3 -m pip freeze
+
+# install python packages
+python3 -m pip install {package_name}
+
+# install from packages from file
+python3 -m pip install -r requirements.txt
+```
+
 
 # Regular Expressions
 
@@ -135,7 +191,6 @@ Find expression A where expression B does not precede: `(?<!B)A`
 - [Lookaheads And Lookbehinds](https://stackoverflow.com/a/2973495/14745606)
 
 # Threads
-
 
 Enable concurrent execution within a single process. A sequence of instructions within a program that can be executed independently of other code (a subset of a process).
 
@@ -452,4 +507,30 @@ Generated Text Annotation Prefix Values:
 | >         | executed               |
 | !         | missing (not executed) |
 | -         | excluded               |
+```
+
+# Output
+
+## Print Numbers By Base
+
+Print binary: `{number}:{width}{base}`
+
+```python
+>>> num = 100
+>>> width = 4
+>>> base = 'b'
+>>> bases = 'dXob'
+>>> print ('{num:{width}{base}}'.format(num=num,width=width,base=base))
+ 101
+
+>>> num = 42
+>>> bases = 'dXob'
+>>> for base in bases:
+# ...     print ('{num:0{width}{base}}'.format(num=num,width=width,base=base))  # add '0' for leading zeros
+...     print ('{num:{width}{base}}'.format(num=num,width=width,base=base))
+...
+  42
+  2A
+  52
+101010
 ```
