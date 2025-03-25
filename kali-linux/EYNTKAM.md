@@ -881,7 +881,9 @@ apt-get install {package-name}
 ```
 
 ### Updating Packages
+
 Update list of packages available for download from repository
+
 ```shell
 apt-get update
 ```
@@ -901,6 +903,7 @@ apt-get upgrade
 ```shell
 apt-get remove {package-name}
 ```
+
 > `remove` does not remove the configuration file. This allows future re-installation of the same package without then need of reconfiguring the settings.
 
 ### Remove Software and Configurations

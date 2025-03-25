@@ -1,12 +1,4 @@
 
-- [Regular Expressions](#regular-expressions)
-  - [match vs search](#match-vs-search)
-  - [findall vs finditer](#findall-vs-finditer)
-  - [Lookaheads And Lookbehinds](#lookaheads-and-lookbehinds)
-    - [Look Ahead Positive (?=)](#look-ahead-positive-)
-    - [Look ahead negative (?!)](#look-ahead-negative-)
-    - [Look behind positive (?\<=)](#look-behind-positive-)
-    - [Look behind negative (?\<!)](#look-behind-negative-)
 - [Libraries](#libraries)
   - [scapy](#scapy)
 - [Tips](#tips)
@@ -38,119 +30,6 @@ More Docs:
   - [Join Threads](docs/threading.md#joining-threads)
 
 ---
-
-```shell
-# check version
-python --version
-
-# create virtual environment
-python3 -m venv {environment_name}
-
-# activate environment
-source virtual_environment_directory/bin/activate
-
-# exit environment
-deactivate
-```
-
-# Regular Expressions
-
-Not needing to compile vs compiling.
-
-```python
-num = "..."
-m = re.match(num, input)
-
-# Versus compiling:
-num = re.compile("...")
-m = num.match(input)
-```
-
-> compiling allows you to separate definition of the regex from its use
-
-Ignore case sensitivity by passing `re.IGNORECASE` to the flags param of `search`, `match`, or `sub`.
-
-```python
-m = num.match(input, re.IGNORECASE)
-```
-
-## match vs search
-
-- `re.match()` searches for matches from the beginning of a string
-- `re.search()` searches for matches anywhere in the string.
-
-```python
-import re
-
-txt = 'Hello world!'
-
-print(re.search(r'world', txt).group())
-# => world
-
-print(re.match(r'world', txt))
-# => None
-
-print(re.search(r'Hello', txt).group())
-# => Hello
-
-print(re.match(r'Hello', txt).group())
-# => Hello
-```
-
-## findall vs finditer
-
-- `re.findall(pattern, string)` returns a list of matching strings.
-- `re.finditer(pattern, string)` returns an iterator over MatchObject objects.
-
-```python
-import re
-re.findall( r'all (.*?) are', 'all cats are smarter than dogs, all dogs are dumber than cats')
-# => ['cats', 'dogs']
-
-[x.group() for x in re.finditer( r'all (.*?) are', 'all cats are smarter than dogs, all dogs are dumber than cats')]
-# => ['all cats are', 'all dogs are']
-```
-
-## Lookaheads And Lookbehinds
-
-Given the string `foobarbarfoo`:
-
-```text
-bar(?=bar)     finds the 1st bar ("bar" which has "bar" after it)
-bar(?!bar)     finds the 2nd bar ("bar" which does not have "bar" after it)
-(?<=foo)bar    finds the 1st bar ("bar" which has "foo" before it)
-(?<!foo)bar    finds the 2nd bar ("bar" which does not have "foo" before it)
-```
-
-You can also combine them:
-
-```text
-(?<=foo)bar(?=bar)    finds the 1st bar ("bar" with "foo" before it and "bar" after it)
-```
-
-### Look Ahead Positive (?=)
-
-Find expression A where expression B follows: `A(?=B)`
-
-### Look ahead negative (?!)
-
-Find expression A where expression B does not follow: `A(?!B)`
-
-### Look behind positive (?<=)
-
-Find expression A where expression B precedes: `(?<=B)A`
-
-### Look behind negative (?<!)
-
-Find expression A where expression B does not precede: `(?<!B)A`
-
----
-
-Python RegEx Sources:
-
-- [findall() vs finditer()](https://stackoverflow.com/a/4697884/14745606)
-- [match() vs search()](https://testdriven.io/tips/421e050b-176b-4a72-a8b5-6ad5f185b86a/#:~:text=match%20in%20Python%3F-,re.,matches%20anywhere%20in%20the%20string.)
-- [Lookaheads And Lookbehinds](https://stackoverflow.com/a/2973495/14745606)
 
 # Libraries
 
@@ -187,7 +66,7 @@ Berkeley Packet Filter (BPF) Syntax:
 | Protocol   | Protocol used to send traffic | ip, ip6, tcp, udp    |
 
 > examples:
-> `src 10.0.0.100` specifies  a filter that captures only packets originating on machine 10.0.0.100
+> `src 10.0.0.100` specifies a filter that captures only packets originating on machine 10.0.0.100
 >
 > `dst 10.0.0.100`, which captures only packets with a destination of 10.0.0.100
 >
