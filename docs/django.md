@@ -2,6 +2,9 @@
 - [Manage Commands](#manage-commands)
   - [flush](#flush)
   - [migrations](#migrations)
+    - [Remove Migrations From SQL](#remove-migrations-from-sql)
+    - [Find and remove Migration Files](#find-and-remove-migration-files)
+    - [migrate fake-initial](#migrate-fake-initial)
   - [test](#test)
 - [Django Shell](#django-shell)
   - [Reset User Password](#reset-user-password)
@@ -72,18 +75,56 @@ django-admin flush
 
 ## migrations
 
-```shell
-# Create Empty Migration
-python3 manage.py makemigrations {APP_NAME} --name {MIGRATION_FILENAME} --empty
+[Django migrations source](https://docs.djangoproject.com/en/4.0/topics/migrations/)
 
-# create and run migrations
+Initial migrations are made for an app and create the first version of the app's tables.
+
+```shell
+# make migrations and apply migration
 python3 manage.py makemigrations
 python3 manage.py migrate
+
+# create empty Migration
+python3 manage.py makemigrations {APP_NAME} --name {MIGRATION_FILENAME} --empty
 
 # reverse all migrations for an app
 python3 manage.py migrate {APP_NAME} zero
 
+# reverse migration by passing migration number of the app
+python3 manage.py migrate {APP_NAME} 0005
 ```
+
+### Remove Migrations From SQL
+
+Access database: `psql -U <username> <database>`
+
+```sql
+-- turn pagination off
+\pset pager off
+
+-- list tables
+\dt
+
+-- list Django Migration records
+SELECT * FROM django_migrations;
+
+-- delete migration table rows for given app:
+DELETE FROM django_migrations WHERE app='<app_name>';
+
+-- Drop A Whole Table :)
+DROP TABLE <tablename>;
+```
+
+### Find and remove Migration Files
+
+```shell
+# Find and delete migration files for an app that are not named `__init__.py`.
+find src/app_directory/migrations -type f -not -name "__init__.py" -delete
+```
+
+### migrate fake-initial
+
+When `migrate --fake-initial` option is used, the initial migrations are treaded specially. Django checks that all tables already exist in the database and fake-applies the migration if so. Without `--fake-initial`, initial migrations are treated no differently from any other migration.
 
 ## test
 
