@@ -13,6 +13,7 @@
 - [Diff](#diff)
   - [diff options](#diff-options)
     - [name status](#name-status)
+- [Log](#log)
 
 # Configuration
 
@@ -184,4 +185,17 @@ git diff --name-status branch_name
 
 # use the same command but pipe with grep go search for changed files named "testFiles"
 git diff --name-status branch_name | grep "testFile[s]"
+```
+
+# Log
+
+```shell
+# list all commits for specific filepath -- a path which can be either a file and/or directory
+git log --follow <filepath>
+
+# list all commits for README.md file
+git log --oneline --follow git/docs/README.md
+
+# display commits that develop branch has but main branch does not.
+git log main..develop --oneline
 ```

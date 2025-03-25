@@ -19,7 +19,6 @@
 
 *Table of Contents*
 
-- [Log Command](log_command.md)
 - [Pull Command](pull_command.md)
 - [Stash Command](stash_command.md)
 - [Status Command](status_command.md)
