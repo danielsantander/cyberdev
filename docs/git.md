@@ -12,8 +12,6 @@
     - [Ticket Branches](#ticket-branches)
     - [Release Branches](#release-branches)
 - [Diff](#diff)
-  - [diff options](#diff-options)
-    - [name status](#name-status)
 - [Log](#log)
 - [Stash](#stash)
 
@@ -189,15 +187,10 @@ Same branching and merging convention as `feature` branch.
 
 The `diff` command runs a diff function on Git data sources such as: commits, branches, files, etc.
 
-## diff options
-
-### name status
-
-Show names and status of changed files.
-
-Usage: `git diff --name-status`
-
 ```shell
+# use `--name-status- to show names and status of changed files
+git diff --name-status
+
 # Use the diff command to show all changed files on a given branch.
 git diff --name-status branch_name
 
