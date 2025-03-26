@@ -1,3 +1,5 @@
+# set aliases, define functions, and customize prompt
+
 check_services() {
     if [ -f /etc/services ]; then
 
