@@ -15,6 +15,16 @@
 - [Log](#log)
 - [Revert](#revert)
 - [Stash](#stash)
+- [Undo Changes](#undo-changes)
+  - [git checkout](#git-checkout)
+  - [git clean](#git-clean)
+  - [git reset](#git-reset)
+- [Tips](#tips)
+  - [Ignore Already Tracked Files](#ignore-already-tracked-files)
+  - [List Branches By Order](#list-branches-by-order)
+  - [Pull In Files](#pull-in-files)
+  - [Update Branches](#update-branches)
+- [Sources](#sources)
 
 # Frequently Used
 
@@ -290,3 +300,133 @@ git stash drop <stash_name>
 # remove all stashes
 git stash clean
 ```
+
+# Undo Changes
+
+Quickly undo changes (staged & unstaged).
+
+```shell
+git reset HEAD  # unstage all changes
+git checkout .  # discard all changes
+
+# OR do the following
+
+git reset --hard  # undo all staged changes
+git clean -fd     # remove untracked files
+```
+
+Discard unstaged changes (restore files).
+
+```shell
+git restore .                       # for all unstaged files in current working dir
+git restore path/to/file/to/revert  # specify a file
+
+# before Git 2.23:
+git checkout -- .                       # for all unstaged files in current working dir
+git checkout -- path/to/file/to/revert  # specify a file
+```
+
+## git checkout
+
+Undo changes with `git checkout`
+
+```shell
+# revert file to last committed state (disregard uncommitted changes)
+git checkout ExampleFile.txt
+git checkout -- ExampleFile.txt
+
+# Revert files to number commit
+git checkout {has_commit_number} -- file1/to/restore file2/to/restore
+
+# Revert files to number of commits (N) before a given commit
+git checkout {has_commit_number}~N -- file1/to/restore file2/to/restore
+
+# example: revert files one commit before given commit
+git checkout {has_commit_number}~1 -- file1/to/restore file2/to/restore
+```
+
+## git clean
+
+```shell
+# remove untracked files
+git clean -df
+
+# use `-n` instead of `-f` to perform a dry run and list which files will be deleted
+git clean -dn
+```
+
+| Option        |  Description                                                  |
+| --------------|---------------------------------------------------------------|
+| -d            | with no <pathspec>, specify `-d`to recurse into directories   |
+| -f, --force   | enable to delete files or directories, otherwise will refuse  |
+| -n, --dry-run | don't remove anything,show what would be done                 |
+
+## git reset
+
+Reset entire repository to the last committed state
+
+```shell
+git reset --hard
+
+# if last commit has not been pushed, undo last commit (keep changes, reverts files back to staging)
+git reset --soft HEAD~
+```
+
+Use `git reset` without `--hard/--soft` to move `HEAD` to point to specified commit *without* changing the files. The following will undo a commit (if not yet pushed), but keep the changes. The head will now point to the previous commit.
+
+```shell
+# undo commit but keep changes, point head to previous commit:
+git reset HEAD^
+```
+
+# Tips
+
+## Ignore Already Tracked Files
+
+[src](https://stackoverflow.com/a/10755704/14745606)
+
+```shell
+# ignore and stop tracking a file
+git update-index --assume-unchanged [<file> ...]
+
+# start tracking file again
+git update-index --no-assume-unchanged [<file> ...]
+```
+
+## List Branches By Order
+
+```shell
+# List **local** branches in order from recent to oldest with the given format
+git for-each-ref --sort=-committerdate refs/heads/ --format='%(HEAD) %(color:yellow)%(committerdate) %(color:reset)%(refname:short) %(color:red)%(authorname)'
+
+# List **remote** branches in order from recent to oldest with the given format
+git for-each-ref --sort=-committerdate refs/remotes/origin --format='%(HEAD) %(color:yellow)%(committerdate) %(color:reset)%(refname:short) %(color:red)%(authorname)'
+```
+
+## Pull In Files
+
+```shell
+# pull in files from a specified commit
+git checkout develop
+git checkout <commit_hash> <path_to_file>
+git checkout <commit_hash> .               # pull in all files
+
+# pull files from localBranch into the currently checked out branch (develop)
+git checkout develop
+git checkout localbranch .
+```
+
+## Update Branches
+
+```shell
+# update remote branches
+git remote update origin --prune
+
+# update local branches
+git branch -vv | grep ': gone]' | awk '{print $1}' | xargs git branch -d
+```
+
+# Sources
+
+- [git reset](https://git-scm.com/docs/git-reset)
+- [git stash](https://git-scm.com/docs/git-stash)
