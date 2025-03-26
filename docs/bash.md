@@ -1,3 +1,6 @@
+- [Software](#software)
+  - [Upgrade](#upgrade)
+- [Make script executable](#make-script-executable)
 
 # Software
 
