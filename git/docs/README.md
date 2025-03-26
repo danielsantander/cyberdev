@@ -10,11 +10,6 @@
   - [git reset](#git-reset)
 - [Sources](#sources)
 
----
-
-*Table of Contents*
-
-- [Status Command](status_command.md)
 
 ---
 

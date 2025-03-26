@@ -13,11 +13,22 @@
     - [Release Branches](#release-branches)
 - [Diff](#diff)
 - [Log](#log)
+- [Revert](#revert)
 - [Stash](#stash)
 
 # Frequently Used
 
 ```shell
+show individual files in untracked directories
+git status -uall
+
+# show ignored files
+git status --ignored
+
+# show list of all files missing in the repository
+git status --uall --ignored
+
+# amend previous commit message
 git commit --amend -m "my new commit message to replace old commit message"
 ```
 
@@ -225,6 +236,21 @@ git log --oneline --follow git/docs/README.md
 
 # display commits that develop branch has but main branch does not.
 git log main..develop --oneline
+```
+
+# Revert
+
+Revert files in working directory by previous commits.
+
+```shell
+# revert to current head point
+git reset --hard HEAD
+
+# revert to previous head point
+git reset --hard HEAD^
+
+# revert to previous commit
+git reset --hard <SHA sum of commit>
 ```
 
 # Stash
