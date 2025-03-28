@@ -19,7 +19,9 @@ venv.bak/
 
 # python code coverage
 .coverage
+.coveragerc
 *,cover
+coverage_files/
 
 # misc
 notes.md
