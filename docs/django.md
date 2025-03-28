@@ -6,9 +6,11 @@
     - [Find and remove Migration Files](#find-and-remove-migration-files)
     - [migrate fake-initial](#migrate-fake-initial)
   - [test](#test)
+  - [custom management commands](#custom-management-commands)
 - [Django Shell](#django-shell)
   - [Reset User Password](#reset-user-password)
-  - [Print Model in JSON format](#print-model-in-json-format)
+  - [Serialize Out Data](#serialize-out-data)
+    - [Print Model in JSON format](#print-model-in-json-format)
 - [Settings](#settings)
   - [Django Sessions](#django-sessions)
     - [Session settings](#session-settings)
@@ -134,6 +136,42 @@ django-admin test [test_label [test_label ...]]
 python3 manange.py test [test_label [test_label ...]]
 ```
 
+## custom management commands
+
+Can create custom management commands and save within `app/management/commands/ensure_admin.py` then run with `python3 manage.py ensure_user`
+
+Following created by [Eugene Yarmash](https://stackoverflow.com/a/39745576/14745606)
+
+```python
+import os
+from django.contrib.auth import get_user_model
+from django.core.management.base import BaseCommand
+
+class Command(BaseCommand):
+    help = "Creates an admin user non-interactively if it doesn't exist"
+
+    def add_arguments(self, parser):
+        parser.add_argument('--username', help="Admin's username")
+        parser.add_argument('--email', help="Admin's email")
+        parser.add_argument('--password', help="Admin's password")
+        parser.add_argument('--no-input', help="Read options from the environment", action='store_true')
+
+    def handle(self, *args, **options):
+        User = get_user_model()
+
+        if options['no_input']:
+            options['username'] = os.environ['DJANGO_SUPERUSER_USERNAME']
+            options['email'] = os.environ['DJANGO_SUPERUSER_EMAIL']
+            options['password'] = os.environ['DJANGO_SUPERUSER_PASSWORD']
+
+        if not User.objects.filter(username=options['username']).exists():
+            User.objects.create_superuser(username=options['username'],
+                                          email=options['email'],
+                                          password=options['password'])
+```
+
+> run with: `python manage.py ensure_user --username=admin --email=admin@example.com --password=pass`
+
 # Django Shell
 
 ## Reset User Password
@@ -150,23 +188,31 @@ user.set_password('<enter_new_password>')
 user.save()
 ```
 
-## Print Model in JSON format
+## Serialize Out Data
+
+### Print Model in JSON format
 
 ```python
 import json
 from django.core.serializers import serializer
+from myproject.myapp.models import MyModel
 
-# Get your object
+# get the object
 my_object = MyModel.objects.get(pk=1)
 
-# Serialize the object to JSON
+# serialize the object to json
 json_data = serialize('json', [my_object])
 
-# Load the JSON data into a Python dictionary
+# load json data into a Python dictionary
 data = json.loads(json_data)
 
-# Print the JSON data
+# print json data
 print(json.dumps(data, indent=4))
+
+# save json data to file
+out = open("filename.json", "w")
+out.write(json_data)
+out.close
 ```
 
 # Settings
