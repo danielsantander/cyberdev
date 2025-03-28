@@ -33,4 +33,3 @@ let python_highlight_all = 1
 
 " Encoding
 set encoding=utf-8
-
