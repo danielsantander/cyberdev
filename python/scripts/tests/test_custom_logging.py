@@ -36,7 +36,7 @@ class TestCustomLogging(unittest.TestCase):
         self.assertTrue(console_logger.hasHandlers())
 
     def test_creating_rotational_logger(self):
-        master_logger_path:Path = self.log_dir / 'master_logger.log'
+        master_logger_path:Path = self.log_dir / 'TestLogger.log'
         self.assertFalse(master_logger_path.exists())
 
         logger =  custom_logging.create_logger(name='TestLogger', level=self.log_level, log_dir=self.log_dir)
