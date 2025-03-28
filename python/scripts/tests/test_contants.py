@@ -26,7 +26,6 @@ sys.path.insert(0, PARENT_DIR_NAME)
 from utils import constants
 
 
-
 class TestDefaultDatetimeFormat(unittest.TestCase):
     def setUp(self) -> None:
         self.now = datetime.datetime.utcnow()

@@ -20,6 +20,7 @@ def encrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->
     offset (int) -- number of characters in alphabet to shift (default = 3)   # TODO: make default shift random, 1-25.
     case_sensitive (bool) - True to enable case sensitivity. Defaults to False.
     """
+    if offset<0 or offset>25: raise Exception('invalid offset')
     offset = int(offset) % 26   # keep offset between 0-26
     word_list:List[str]= message.split() if case_sensitive else message.lower().split()
 

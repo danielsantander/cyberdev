@@ -3,6 +3,7 @@ from typing import List
 
 DEFAULT_DATETIME_FMT_SHORT = '%Y%m%d'
 DEFAULT_DATETIME_FMT_LONG = '%Y%m%d%H%M%S'
+DEFAULT_DATETIME_FMT = DEFAULT_DATETIME_FMT_LONG
 
 DEFAULT_LOG_FORMAT_STR = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
 DEFAULT_LOG_FORMAT = logging.Formatter(DEFAULT_LOG_FORMAT_STR)
