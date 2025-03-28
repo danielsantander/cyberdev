@@ -4,7 +4,6 @@
 - [Functions or Subroutines](#functions-or-subroutines)
   - [Passing Arguments](#passing-arguments)
 - [Loops](#loops)
-- [Operators](#operators)
 - [RegEx](#regex)
   - [Modifiers](#modifiers)
   - [Word Matching](#word-matching)
@@ -26,8 +25,6 @@
     - [Referencing Hashes](#referencing-hashes)
   - [Variable Context](#variable-context)
 - [sources](#sources)
-
----
 
 # Perl
 
@@ -119,7 +116,7 @@ Pass arguments to subroutines.
 
 sub area
 {
-    # passing argument
+    # get argument
     $side = $_[0];
     return ($side * $side);
 }
@@ -155,10 +152,6 @@ while (@keys) {
 }
 ```
 
-# Operators
-
-[src](https://www.tutorialspoint.com/perl/perl_operators.htm)
-
 # RegEx
 
 Sources:
@@ -171,12 +164,12 @@ Sources:
 
 [source](https://perldoc.perl.org/perlre#Modifiers)
 
-| modifer | description |
-|---------|-------------|
-| s       | Treat the string as single line. That is, change "." to match any character whatsoever, even a newline, which normally it would not match. |
-| i       | Do case-insensitive pattern matching. For example, "A" will match "a" under /i |
-| g       | Globally match the pattern repeatedly in the string |
-| x       | Permit whitespace and comments (will need to escape them). |
+| modifier | description                                                                                                                                |
+|----------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| s        | Treat the string as single line. That is, change "." to match any character whatsoever, even a newline, which normally it would not match. |
+| i        | Do case-insensitive pattern matching. For example, "A" will match "a"                                                                      |
+| g        | Globally match the pattern repeatedly in the string                                                                                        |
+| x        | Permit whitespace and comments (will need to escape them).                                                                                 |
 
 ## Word Matching
 
@@ -242,6 +235,7 @@ $x = "/usr/bin/perl";
 ```
 
 ## Examples
+
 ### OS Version Detection Example
 
 Use regex to match and retrieve OS version values.
@@ -278,7 +272,7 @@ if ($hostname =~ $regex) {
 [src](https://stackoverflow.com/a/288989)
 
 ```perl
-# Version 5.10+ 
+# Version 5.10+
 # (?<NAME>pattern)
 $variable =~ /(?<count>\d+)/;
 print "Count is $+{count}";
@@ -331,7 +325,6 @@ my $str = sprintf "0%.2f", $num;
 # input needed width "wd" or set default to 5, then can add as many zeros as wanted
 sprintf "%0${wd}.2f", $num;
 ```
-
 
 # Variables
 
