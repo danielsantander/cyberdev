@@ -1,6 +1,7 @@
 - [Build Container](#build-container)
 - [Enter Container Interactively](#enter-container-interactively)
 - [Example Build](#example-build)
+- [Prune and Delete](#prune-and-delete)
 
 # Build Container
 
@@ -65,4 +66,28 @@ docker exec <container_id> crond --help
 
 # list of crontabs
 docker exec <container_id> cat /etc/crontabs/root
+```
+
+# Prune and Delete
+
+```shell
+# remove all stopped containers, -f will not ask for confirmation (y/N)
+docker container prune -f
+
+# remove all docker images
+docker images prune
+
+# delete all containers including its volumes use, -f will force remove any running containers
+docker rm -vf $(docker ps -aq)
+
+# delete all the images
+docker rmi -f $(docker images -aq)
+
+# delete everything
+# - all stopped containers
+# - all networks  not used by at least one container
+# - all volumes not used by at least one container
+# - all images without at least one container associated with it
+# - all build cache
+docker system prune -a --volumes
 ```
