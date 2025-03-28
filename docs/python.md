@@ -485,6 +485,8 @@ coverage annotate -d coverage_files/
 
 # run code coverage while running unittesting in discovery mode:
 python -m coverage run -m unittest discover <test_directory>
+
+python3 -m coverage run --source="." -m unittest discover
 ```
 
 Output:
