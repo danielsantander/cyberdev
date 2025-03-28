@@ -13,7 +13,8 @@ DEFAULT_OFFSET:int = 3
 logging.basicConfig(format='%(asctime)s [%(levelname)s]: %(message)s', level=logging.INFO, datefmt='%m/%d/%Y %I:%M:%S %p')
 
 def encrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->str:
-    """ Encrypt message with the Caesar Cipher method.
+    """
+    Encrypt message with the Caesar Cipher method.
 
     Keyword arguments:
     message (str) -- message to encrypt (required)
@@ -38,10 +39,6 @@ def encrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->
             cipher_word += cipher_letter
         cipher_list.append(cipher_word)
     return ' '.join(cipher_list)
-
-def brute_decrypt(message:str)->str:
-    #TODO: create method that will brute force decrypt a caesar encrypted message.
-    pass
 
 def decrypt(message:str, offset:int=DEFAULT_OFFSET, case_sensitive:bool=False)->str:
     """ Decrypts Caesar Cipher message.

@@ -19,7 +19,7 @@ from pathlib import Path
 CURRENT_DIR_NAME = os.path.dirname(os.path.realpath(__file__))
 CURRENT_DIR_PATH = Path(CURRENT_DIR_NAME)
 PARENT_DIR_NAME = os.path.dirname(CURRENT_DIR_NAME)
-# UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
+UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
 
 sys.path.insert(0, PARENT_DIR_NAME)
 from utils.ciphers import caesar
@@ -48,5 +48,21 @@ class TestCaesarCipher(unittest.TestCase):
         self.assertRaises(Exception, caesar.encrypt, self.message, 26)
         self.assertRaises(Exception, caesar.decrypt, self.encrypted_msg, -1)
         self.assertRaises(Exception, caesar.decrypt, self.encrypted_msg, 26)
+
+    def test_main(self):
+        """Test main method"""
+        import subprocess
+
+        msg = 'BaTmAn'
+        offset = 8
+        expected_encrypted_msg = 'JiBuIv'
+
+        cipher_path = UTILS_DIR / 'ciphers' / 'caesar.py'
+        self.assertTrue(cipher_path.exists() and cipher_path.is_file())
+
+        cmd: subprocess.CompletedProcess = subprocess.run(["python3", f"{cipher_path.absolute()}",  msg, f"-o {offset}", "-c"], capture_output=True)
+        self.assertEqual(cmd.returncode, 0)
+        self.assertEqual(expected_encrypted_msg, cmd.stdout.decode('utf-8').replace("\n", ""))
+
 
 if __name__ == '__main__': unittest.main()
