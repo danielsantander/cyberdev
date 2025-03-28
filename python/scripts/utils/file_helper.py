@@ -13,6 +13,10 @@ from typing import Union, List
 
 from utils.custom_exceptions import InvalidDirectory
 
+# TODO:
+# - update deprecated libraries:
+#     - PyPDF2 is deprecated. Please move to the pypdf library instead.
+#     - DeprecationWarning: Starting with ImageIO v3 the behavior of this function will switch to that of iio.v3.imread. To keep the current behavior (and make this warning disappear) use `import imageio.v2 as imageio` or call `imageio.v2.imread` directly.
 
 def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_name:str="Times-Roman", font_size:int=18)->Path:
     from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
@@ -68,16 +72,16 @@ def combine_pdfs(inputDir: Union[str, Path], outputDir: Union[str, Path]=None):
     if not inputDir.is_dir(): raise InvalidDirectory()
 
     # loop through all PDFs to open each pdf, add each pdf, then save.
-    pdf_writer = PyPDF2.PdfFileWriter()
+    pdf_writer = PyPDF2.PdfWriter()
     for filepath in inputDir.iterdir():
         if not filepath.name.endswith(".pdf"): continue
         with open(filepath.as_posix(), 'rb') as pdf_file:
-            pdf_reader = PyPDF2.PdfFileReader(pdf_file)
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
             # loop through all the pages (except the first) and add them
-            # for page_num in range(1, pdf_reader.numPages):
-            for page_num in range(pdf_reader.numPages):
-                page = pdf_reader.getPage(page_num)
-                pdf_writer.addPage(page)
+            # for page_num in range(1, len(pdf_reader.pages)):
+            for page_num in range(len(pdf_reader.pages)):
+                page = pdf_reader.pages[page_num]
+                pdf_writer.add_page(page)
 
             # save combined PDF to a file.
             with open(outputPDF.absolute(), 'wb') as pdf_output:
@@ -101,16 +105,20 @@ def encrypt_pdf(path: Union[str,Path], pw:str='', outpath:Path=None)->Path:
 
     try:
         with open(file.absolute(), 'rb') as pdf_file:
-            pdf_reader = PyPDF2.PdfFileReader(pdf_file)
-            pdf_writer = PyPDF2.PdfFileWriter()
-            for page_num in range(pdf_reader.numPages):
-                pdf_writer.addPage(pdf_reader.getPage(page_num))
+            pdf_reader = PyPDF2.PdfReader(pdf_file)
+            pdf_writer = PyPDF2.PdfWriter()
+            for page_num in range(len(pdf_reader.pages)):
+                pdf_writer.add_page(pdf_reader.pages[page_num])
             pdf_writer.encrypt(pw)
             encrypt_file_path = outpath / f'{file.name[:-4]}ENCRYPTED.pdf'
             encrypted_pdf = open(encrypt_file_path.absolute(), 'wb')
             pdf_writer.write(encrypted_pdf)
             encrypted_pdf.close()
             return encrypt_file_path
+
+    # Empty file
+    except PyPDF2.errors.EmptyFileError as err:
+        raise err
 
     # PDF file not found.
     except FileNotFoundError as err:

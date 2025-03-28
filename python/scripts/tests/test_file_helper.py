@@ -105,8 +105,9 @@ class TestFileHelper(unittest.TestCase):
         self.assertRaises(FileNotFoundError, encrypt_pdf, self.pdf_file_dne)
 
     def test_encrypt_pdf_OSError(self):
+        import PyPDF2
         self.invalid_pdf_file.touch()
-        self.assertRaises(OSError, encrypt_pdf, self.invalid_pdf_file)
+        self.assertRaises(PyPDF2.errors.EmptyFileError, encrypt_pdf, self.invalid_pdf_file)
 
     def test_encrypt_pdf(self):
         valid_pdf_path = self.test_dir / 'valid.pdf'
