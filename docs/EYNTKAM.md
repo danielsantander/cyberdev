@@ -150,7 +150,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Shebang](#shebang)
   - [Exit Status Codes](#exit-status-codes)
   - [Make Script Executable](#make-script-executable)
-  - [Conditions](#conditions)
+  - [Conditionals](#conditionals)
     - [Check Number of Input Args](#check-number-of-input-args)
     - [Check If Variable Is Empty](#check-if-variable-is-empty)
   - [Useful Commands](#useful-commands)
@@ -2306,7 +2306,7 @@ Change the permissions of script file to execute. Give all perms for file owner 
 sudo chmod 755 {SCRIPT}
 ```
 
-## Conditions
+## Conditionals
 
 ### Check Number of Input Args
 
@@ -2322,12 +2322,20 @@ fi
 
 ### Check If Variable Is Empty
 
-Check if variable is non-defined/empty. Use `-z {string}` to return True if the length of string is zero.
+Check if variable is non-defined/empty. Use `-z {string}` to return True if the length of string is zero. Check for non-empty string with `! -z` or `-n`.
 
 ```shell
 # True if argument ($1) has zero length
 if [[ -z $1 ]]; then
-  do something
+  # variable is empty
+fi
+
+if [[ ! -z "$variable_name" ]]; then
+  # variable is not empty
+fi
+
+if [[ -n "$variable_name" ]]; then
+  # variable is not empty
 fi
 ```
 
