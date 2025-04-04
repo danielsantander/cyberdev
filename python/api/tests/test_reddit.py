@@ -193,6 +193,27 @@ class TestRedditAPI(TestTemplate):
         self.assertIsNotNone(search)
         self.assertEqual(search.group(), consolidated_file.name)
 
+    def test_parse_filename(self):
+        from utils.constants import DEFAULT_DATETIME_FMT_LONG
+        now = datetime.datetime.now(datetime.timezone.utc).strftime(DEFAULT_DATETIME_FMT_LONG)
+        subreddit = "DogSubreddit"
+        post_kind = "t3"
+        post_id = "1randm1"
+        extension = "jpeg"
+        post_filename = f"{self.reddit.username}_{now}_{subreddit}_{post_kind}_{post_id}.{extension}"
+        results = self.reddit.parse_filename(post_filename)
+        expected_results = {
+            'groups': (self.reddit.username, str(now), subreddit, post_kind, post_id, extension),
+            'filename': post_filename,
+            'username': self.reddit.username,
+            'date': str(now),
+            'subreddit': subreddit,
+            'post_kind': post_kind,
+            'post_id': post_id,
+            'extension': extension
+        }
+        for k,v in expected_results.items():
+            self.assertEqual(results[k], expected_results[k])
 
 
     #TODO: write tests for other methods, such as:
