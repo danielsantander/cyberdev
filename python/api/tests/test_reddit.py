@@ -6,6 +6,7 @@ import logging
 import re
 import sys
 import unittest
+from unittest import mock
 from unittest.mock import MagicMock, patch
 from requests import Session
 from test_template import TestTemplate, clean_dir, write_json_to_file, API_DIR
@@ -15,6 +16,62 @@ from reddit import RedditAPI
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+MOCK_SAVED_DATA = {
+    "kind": "t3",
+    "data": {
+        "subreddit": "MortalKombat",
+        "title": "FATALITY",
+        "subreddit_name_prefixed": "r/MortalKombat",
+        "name": "t3_1jctblb",
+        "created": 1742152810.0,
+        "id": "1jctblb",
+        "created_utc": 1742152810.0,
+        "media": {},
+        "is_video": True
+    }
+}
+
+MOCK_SAVED_DATA_RAW_RESP = {
+    "kind": "Listing",
+    "data": {
+        "after": "t3_1i5tplv",
+        "dist": 25,
+        "modhash": None,
+        "geo_filter": "",
+        "children": [MOCK_SAVED_DATA],
+        "before": None
+    }
+}
+
+def mocked_requests_get(*args, **kwargs):
+    # print(f"\n\nINSIDE mocked_requests -- args:{args};kwargs:{kwargs}")
+    class MockResponse:
+        def __init__(self, json_data={}, status_code=200, url=""):
+            self.json_data = json_data
+            self.status_code = status_code
+            self.ok = int(self.status_code) in [200, 201]
+            self.url = url
+
+        def json(self):
+            return self.json_data
+
+        def raise_for_status(self, status=None):
+            return status
+
+    if search_results := re.search('^.*user\/(?P<username>[^\/]+)\/saved\/?$',args[0]):
+        url = search_results.group()
+        username = search_results.group(1)
+        params = kwargs.get('params', {})
+        # prevent infinite loop when iterating through paginated API calls
+        if params.get('after') is not None:
+            update_resp = MOCK_SAVED_DATA_RAW_RESP.copy()
+            update_resp['data']['after']=None
+            return MockResponse(json_data=update_resp)
+        return MockResponse(json_data=MOCK_SAVED_DATA_RAW_RESP)
+
+    print(f"UNKNOWN URL: {args[0]}")
+    return MockResponse(status_code=400)
 
 class TestRedditAPI(TestTemplate):
     @patch.object(Session, 'post')
@@ -94,8 +151,18 @@ class TestRedditAPI(TestTemplate):
             self.assertIn(post_id, files_to_exclude)
         self.assertEqual(len(post_list + data_2), len(files_to_exclude)/2)
 
+    @mock.patch('requests.Session.get', side_effect=mocked_requests_get)
+    def test_get_saved_data(self, mock_get):
+        """ Test retrieving user's saved post data via API. """
+        raw_data = self.reddit.get_saved_data(raw=True)
+        self.assertEqual(raw_data.get('kind'), MOCK_SAVED_DATA_RAW_RESP.get('kind'))
+        self.assertEqual(len(raw_data['data'].get('children', [])), len(MOCK_SAVED_DATA_RAW_RESP['data'].get('children', [])))
+
+        saved_data = self.reddit.get_saved_data(max_count=len(MOCK_SAVED_DATA_RAW_RESP['data'].get('children', [])))
+        self.assertIsNotNone(saved_data)
+        self.assertEqual(len(saved_data), len(MOCK_SAVED_DATA_RAW_RESP['data'].get('children', [])))
+
     #TODO: write tests for other methods, such as:
-    # - RedditAPI.get_saved_data()
     # - RedditAPI.unsave_post()
     # - RedditAPI.consolidated_saved_files()
     # - RedditAPI.parse_filename()
