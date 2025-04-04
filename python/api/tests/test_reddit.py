@@ -70,9 +70,6 @@ class TestRedditAPI(TestTemplate):
 
     def test_get_files_to_exclude(self):
         api_data_dir = self.test_dir / 'reddit' / f'{self.reddit.username}' / 'api_data'
-        clean_dir(api_data_dir)
-        api_data_dir.mkdir(parents=True, exist_ok=True)
-
         results_file = api_data_dir / '20250101010101--results.json'
         post_list = [f"username{num}_20250101010101_sub{num}_t3_1randm{num}.jpeg" for num in range(0,5)]
         data = {
@@ -81,18 +78,21 @@ class TestRedditAPI(TestTemplate):
             "excluded": post_list[3:]
         }
         write_json_to_file(filename=results_file, data=data)
+        results_file_2 = api_data_dir / '00-EXCLUDE_FILES.json'
+        data_2 = [f"username{num}_20250101010101_sub{num}_t3_1randm{num}.jpeg" for num in range(5,10)]
+        write_json_to_file(filename=results_file_2, data=data_2)
         files_to_exclude = self.reddit.get_files_to_exclude()
 
         self.assertTrue(api_data_dir.exists() and api_data_dir.is_dir())
         self.assertTrue(results_file.exists() and results_file.is_file())
         self.assertNotEqual(len(files_to_exclude), 0)
-        for post in post_list:
+        for post in post_list + data_2:
             search = re.search('.*(t\d_[\w\d]*)\.jpeg', post)
             self.assertIsNotNone(search)
             post_id = search.group(1)
             self.assertIn(post, files_to_exclude)
             self.assertIn(post_id, files_to_exclude)
-        self.assertEqual(len(post_list), len(files_to_exclude)/2)
+        self.assertEqual(len(post_list + data_2), len(files_to_exclude)/2)
 
     #TODO: write tests for other methods, such as:
     # - RedditAPI.get_saved_data()
