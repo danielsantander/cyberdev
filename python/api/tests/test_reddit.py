@@ -3,11 +3,12 @@
 
 import datetime
 import logging
+import re
 import sys
 import unittest
 from unittest.mock import MagicMock, patch
 from requests import Session
-from test_template import TestTemplate, clean_dir, API_DIR
+from test_template import TestTemplate, clean_dir, write_json_to_file, API_DIR
 
 sys.path.insert(0, API_DIR)
 from reddit import RedditAPI
@@ -67,8 +68,33 @@ class TestRedditAPI(TestTemplate):
         data = self.reddit.send_request(url=test_url, method='GET')
         self.assertDictEqual(test_resp, data)
 
+    def test_get_files_to_exclude(self):
+        api_data_dir = self.test_dir / 'reddit' / f'{self.reddit.username}' / 'api_data'
+        clean_dir(api_data_dir)
+        api_data_dir.mkdir(parents=True, exist_ok=True)
+
+        results_file = api_data_dir / '20250101010101--results.json'
+        post_list = [f"username{num}_20250101010101_sub{num}_t3_1randm{num}.jpeg" for num in range(0,5)]
+        data = {
+            "extracted": post_list[:2],
+            "already_exists": [post_list[2]],
+            "excluded": post_list[3:]
+        }
+        write_json_to_file(filename=results_file, data=data)
+        files_to_exclude = self.reddit.get_files_to_exclude()
+
+        self.assertTrue(api_data_dir.exists() and api_data_dir.is_dir())
+        self.assertTrue(results_file.exists() and results_file.is_file())
+        self.assertNotEqual(len(files_to_exclude), 0)
+        for post in post_list:
+            search = re.search('.*(t\d_[\w\d]*)\.jpeg', post)
+            self.assertIsNotNone(search)
+            post_id = search.group(1)
+            self.assertIn(post, files_to_exclude)
+            self.assertIn(post_id, files_to_exclude)
+        self.assertEqual(len(post_list), len(files_to_exclude)/2)
+
     #TODO: write tests for other methods, such as:
-    # - RedditAPI.get_files_to_exclude()
     # - RedditAPI.get_saved_data()
     # - RedditAPI.unsave_post()
     # - RedditAPI.consolidated_saved_files()

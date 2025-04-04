@@ -2,10 +2,12 @@
 #!/usr/bin/python3
 
 import datetime
+import json
 import os
 import sys
 import unittest
 from pathlib import Path
+from typing import Union
 
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))   # current directory
 API_DIR = os.path.dirname(TEST_DIR)                      # parent directory
@@ -19,8 +21,27 @@ def clean_dir(directory:Path):
     directory.rmdir()
     return
 
+def write_json_to_file(filename:Union[str,Path], data:dict):
+    """
+    Write dictionary object to file as JSON.
+
+    Keyword arguments:
+    filename -- name or path of file to write json to (required)
+    dict_obj -- dictionary object to convert into JSON file (required)
+    """
+    p = filename if isinstance(filename,Path) else Path(filename)
+    if not p.exists():
+        if not p.parent.exists(): p.parent.mkdir()
+        p.touch()
+    p = p if str(p.name).endswith('.json') else p.parent/f"{p.stem}.json"
+
+    with open(p.absolute(), "w") as f:
+        # json.dump(data, f, indent=2)  # should work as well
+        f.write(json.dumps(data, indent=2))
+
 class TestTemplate(unittest.TestCase):
     _test_dir = Path(TEST_DIR)
+    _test_dir.mkdir(parents=True, exist_ok=True)
 
     def setUp(self):
         self.now = datetime.datetime.utcnow()

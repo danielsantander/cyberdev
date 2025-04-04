@@ -18,7 +18,7 @@ from typing import Union
 # - can probably improve get_files_to_exclude() method
 
 # REG_EX:
-RE_REDDIT_FILE_FORMAT = r'^(?P<username>.*)_(?P<date>\d{14})_(?P<subreddit>.*)_(?P<post_kind>.*)_(?P<post_id>.*).(?P<extension>\w{3})$'    # <username>_YYYYMMDDSSSSSS_<subreddit>_<post_kind>_<post_id>.<ext>
+RE_REDDIT_FILE_FORMAT = r'^(?P<username>.*)_(?P<date>\d{14})_(?P<subreddit>.*)_(?P<post_kind>.*)_(?P<post_id>[\w\d]+)\.(?P<extension>\w{3,4})$'    # <username>_YYYYMMDDSSSSSS_<subreddit>_<post_kind>_<post_id>.<ext>
 RE_OLD_REDDIT_SAVE_FILE_FORMAT = r'^(?P<username>.*)_saved_data_(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)(\.json)?' # username_saved_data_YYYYMMDDSS.json
 RE_REDDIT_SAVE_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)?\-\-saved_data(\.json)?'                  # YYYYMMDDSSSSSS--saved_data.json
 RE_RESULTS_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)?\-\-results\.json'                            # YYYYMMDDSSSSSS--results.json
