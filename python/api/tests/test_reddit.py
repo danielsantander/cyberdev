@@ -177,9 +177,25 @@ class TestRedditAPI(TestTemplate):
         resp = self.reddit.unsave_post(MOCK_POST)
         self.assertIsNotNone(resp)
 
+    def test_consolidate_saved_files(self):
+        from utils.constants import DEFAULT_DATETIME_FMT_LONG
+        api_data_dir = self.reddit.api_data_dir_path
+        now = datetime.datetime.now(datetime.timezone.utc).strftime(DEFAULT_DATETIME_FMT_LONG)
+        saved_data_files = [api_data_dir / f'{now[:-1]}{x}--saved_data.json' for x in range(0,5)]
+        for f in saved_data_files:
+            write_json_to_file(f, [MOCK_POST])
+        resp = self.reddit.consolidated_saved_files()
+        for f in saved_data_files: f.unlink()
+        self.assertEqual(len(list(self.reddit.api_data_dir_path.iterdir())), 1)
+        consolidated_file = [f for f in self.reddit.api_data_dir_path.iterdir()][0]
+        print (f"consolidated_file: {consolidated_file.name}")
+        search = re.search('^\d{14}--consolidated_saved_data.json$', consolidated_file.name)
+        self.assertIsNotNone(search)
+        self.assertEqual(search.group(), consolidated_file.name)
+
+
 
     #TODO: write tests for other methods, such as:
-    # - RedditAPI.consolidated_saved_files()
     # - RedditAPI.parse_filename()
     # - RedditAPI.process_saved_data()
     # - RedditAPI.retrieve_last_saved()
