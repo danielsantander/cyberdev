@@ -4,6 +4,7 @@
 import datetime
 import logging
 import re
+import requests
 import sys
 import unittest
 from unittest import mock
@@ -17,7 +18,7 @@ from reddit import RedditAPI
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-MOCK_SAVED_DATA = {
+MOCK_POST = {
     "kind": "t3",
     "data": {
         "subreddit": "MortalKombat",
@@ -39,26 +40,35 @@ MOCK_SAVED_DATA_RAW_RESP = {
         "dist": 25,
         "modhash": None,
         "geo_filter": "",
-        "children": [MOCK_SAVED_DATA],
+        "children": [MOCK_POST],
         "before": None
     }
 }
 
+class MockResponse:
+    def __init__(self, json_data={}, status_code=200, url=""):
+        self.json_data = json_data
+        self.status_code = status_code
+        self.ok:bool = int(self.status_code) in [200, 201]
+        self.url = url
+
+    def json(self):
+        return self.json_data
+
+    def raise_for_status(self, status=None):
+        do_raise = True if self.ok is False or status not in [None, False] else False
+        if do_raise: raise requests.exceptions.HTTPError("{0} Client Error".format(self.status_code))
+        return do_raise
+
+def mocked_requests_post(*args, **kwargs):
+    # print(f"\n\nINSIDE mocked_requests_post -- args:{args};kwargs:{kwargs}")
+    if 'api/unsave' in args[0]:
+        return MockResponse(json_data={}, status_code=201)
+    print(f"UNKNOWN URL: {args[0]}")
+    return MockResponse(json_data={"ERROR": "UNKNOWN"}, status_code=429)
+
 def mocked_requests_get(*args, **kwargs):
-    # print(f"\n\nINSIDE mocked_requests -- args:{args};kwargs:{kwargs}")
-    class MockResponse:
-        def __init__(self, json_data={}, status_code=200, url=""):
-            self.json_data = json_data
-            self.status_code = status_code
-            self.ok = int(self.status_code) in [200, 201]
-            self.url = url
-
-        def json(self):
-            return self.json_data
-
-        def raise_for_status(self, status=None):
-            return status
-
+    # print(f"\n\nINSIDE mocked_requests_get -- args:{args};kwargs:{kwargs}")
     if search_results := re.search('^.*user\/(?P<username>[^\/]+)\/saved\/?$',args[0]):
         url = search_results.group()
         username = search_results.group(1)
@@ -162,8 +172,13 @@ class TestRedditAPI(TestTemplate):
         self.assertIsNotNone(saved_data)
         self.assertEqual(len(saved_data), len(MOCK_SAVED_DATA_RAW_RESP['data'].get('children', [])))
 
+    @mock.patch('requests.Session.post', side_effect=mocked_requests_post)
+    def test_unsave_post(self, mock_post):
+        resp = self.reddit.unsave_post(MOCK_POST)
+        self.assertIsNotNone(resp)
+
+
     #TODO: write tests for other methods, such as:
-    # - RedditAPI.unsave_post()
     # - RedditAPI.consolidated_saved_files()
     # - RedditAPI.parse_filename()
     # - RedditAPI.process_saved_data()

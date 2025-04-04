@@ -174,7 +174,7 @@ class RedditAPI(APIBase):
         except requests.exceptions.HTTPError as err:
             # 429 Client Error -- too many requests
             if "429 Client Error" in err.__str__():
-                self.logger.warning(f"429 Client Error -- too many requests: {err.__str__()}")
+                self._logger.warning(f"429 Client Error -- too many requests: {err.__str__()}")
                 return {}
             self._logger.exception(f"send_request error - {err.__str__()}")
             raise
