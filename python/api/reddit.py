@@ -346,8 +346,7 @@ class RedditAPI(APIBase):
             post_date_created_timestamp = int(post_data.get('created_utc', 0))
             post_date_created_str = timestamp_to_date_string(post_date_created_timestamp)
             post_hint:str = post_data.get('post_hint', '')
-            post_link_url:str = post_data.get('link_url', '')
-            post_url_overridden_by_dest = post_data.get('url_overridden_by_dest', post_link_url)
+            post_url_overridden_by_dest = post_data.get('url_overridden_by_dest', '')
             post_url:str = post_data.get('url', post_url_overridden_by_dest)
             post_domain:str = post_data.get('domain', '')
             post_ext = post_url.split(".")[-1]
@@ -357,13 +356,6 @@ class RedditAPI(APIBase):
             post_is_video = post_data.get('is_video', False)
             is_nsfw = post_data.get('over_18', False) or post_subreddit in SUBREDDIT_BLACK_LIST
             is_gallery = post_data.get('is_gallery', False)
-
-            # NOTE: temporarily commenting out,  fallback_url does not include sound
-            # post_reddit_video = post_secure_media.get('reddit_video', {})
-            # fallback_url = post_reddit_video.get('fallback_url')
-            fallback_url = None
-
-            # TODO: figure out new way to retrieve video url
 
             # TODO: handle gallery posts, skip for now
             if is_gallery:
@@ -392,8 +384,7 @@ class RedditAPI(APIBase):
             # IMAGE MEDIA TYPE
             # -------------------
             elif (
-                (post_ext not in VIDEO_EXTENSION_LIST) and
-                (('image' in post_hint) or (post_ext in IMAGE_EXTENSION_LIST))
+                ('image' in post_hint) or (post_ext in IMAGE_EXTENSION_LIST)
             ):
                 self._logger.debug(f"identified post ({post_name}) as image, retrieving media source url...")
                 updated_header.update({"Content-type": "image/jpeg"})
@@ -463,7 +454,6 @@ class RedditAPI(APIBase):
                 if post_ext in ['gif']: media_src_url = post_url
                 elif post_ext=="gifv": media_src_url = post_url.replace(".gifv", ".mp4")
                 elif post_url.endswith(".mp4"): media_src_url = post_url
-                elif fallback_url: media_src_url = fallback_url
                 else: media_src_url = get_video_source_url(post_url, xpath_list=XPATH_LIST, lgr=self._logger)
                 if media_src_url is None:
                     self._logger.warning(f"skipping extraction, no video source found.")

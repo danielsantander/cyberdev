@@ -5,15 +5,24 @@ import datetime
 import logging
 import re
 import requests
+import os
 import sys
 import unittest
 from unittest import mock
 from unittest.mock import MagicMock, patch
+from pathlib import Path
 from requests import Session
 from test_template import TestTemplate, clean_dir, write_json_to_file, API_DIR
 
 sys.path.insert(0, API_DIR)
 from reddit import RedditAPI
+
+PY_DIR = os.path.dirname(API_DIR)
+SCRIPT_DIR = os.path.join(PY_DIR, 'scripts')
+sys.path.insert(0, SCRIPT_DIR)
+from utils import webutils
+from utils.date_helper import timestamp_to_date_string
+from utils.constants import DEFAULT_DATETIME_FMT_LONG
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -21,15 +30,26 @@ logger.setLevel(logging.DEBUG)
 MOCK_POST = {
     "kind": "t3",
     "data": {
-        "subreddit": "MortalKombat",
-        "title": "FATALITY",
-        "subreddit_name_prefixed": "r/MortalKombat",
-        "name": "t3_1jctblb",
-        "created": 1742152810.0,
-        "id": "1jctblb",
-        "created_utc": 1742152810.0,
-        "media": {},
-        "is_video": True
+        "author": "OutrageousMight457",
+        "subreddit": "pics",
+        "name": "t3_1fd79on",
+        "created_utc": 1725934894.0,
+        "post_hint": "image",
+        "url_overridden_by_dest": "https://i.redd.it/9xrd20j56wnd1.png",
+        "url": "https://i.redd.it/9xrd20j56wnd1.png",
+        "domain": "i.redd.it",
+        "media": None,
+        "secure_media": None,
+        "is_video": False,
+        "over_18": False,
+
+        "created": 1725934894.0,
+        "title": "Empire State Building lit up with Darth Vader's colors on March 21, 2024. For James Earl Jones.",
+        "upvote_ratio": 0.97,
+        "ups": 126512,
+        "score": 126512,
+        "subreddit_id": "t5_2qh0u",
+        "id": "1fd79on",
     }
 }
 
@@ -120,7 +140,7 @@ class TestRedditAPI(TestTemplate):
         expected_expire_date = self.now + datetime.timedelta(seconds=self.token_data.get('expires_in'))
         self.assertTrue(self.reddit.token.is_valid)
         self.assertEqual(self.reddit.token.access_token, self.token_data.get('access_token'))
-        self.assertGreaterEqual(self.reddit.token.expire_date.replace(microsecond=0), expected_expire_date.replace(microsecond=0))
+        self.assertGreaterEqual(self.reddit.token.expire_date.replace(second=0,microsecond=0), expected_expire_date.replace(second=0,microsecond=0))
 
     @patch.object(Session, 'get')
     def test_send_request(self, mock_get):
@@ -178,7 +198,6 @@ class TestRedditAPI(TestTemplate):
         self.assertIsNotNone(resp)
 
     def test_consolidate_saved_files(self):
-        from utils.constants import DEFAULT_DATETIME_FMT_LONG
         api_data_dir = self.reddit.api_data_dir_path
         now = datetime.datetime.now(datetime.timezone.utc).strftime(DEFAULT_DATETIME_FMT_LONG)
         saved_data_files = [api_data_dir / f'{now[:-1]}{x}--saved_data.json' for x in range(0,5)]
@@ -194,7 +213,6 @@ class TestRedditAPI(TestTemplate):
         self.assertEqual(search.group(), consolidated_file.name)
 
     def test_parse_filename(self):
-        from utils.constants import DEFAULT_DATETIME_FMT_LONG
         now = datetime.datetime.now(datetime.timezone.utc).strftime(DEFAULT_DATETIME_FMT_LONG)
         subreddit = "DogSubreddit"
         post_kind = "t3"
@@ -215,10 +233,61 @@ class TestRedditAPI(TestTemplate):
         for k,v in expected_results.items():
             self.assertEqual(results[k], expected_results[k])
 
+    @mock.patch('requests.Session.post', side_effect=mocked_requests_post)
+    @patch.object(webutils, 'extract_media_from_url')
+    def test_process_saved_data(self, mock_extract_media_from_url, mock_post):
+        post = MOCK_POST.copy()
+        is_success = True
+        file_stat_info = None
+        mock_extract_media_from_url.return_value = (is_success, file_stat_info)
+
+        # save file so file already exists upon processing
+        post_date_created_timestamp = int(MOCK_POST['data']['created_utc'])
+        post_date_created_str = timestamp_to_date_string(post_date_created_timestamp)
+        extension = "png"
+        filename = f"{MOCK_POST['data']['author']}_{post_date_created_str}_{MOCK_POST['data']['subreddit']}_{MOCK_POST['data']['name']}.{extension}"
+        filepath: Path = self.reddit.save_dir_path / 'subreddits' / MOCK_POST['data']['subreddit'] / filename
+        filepath.parent.mkdir(parents=True, exist_ok=True)
+        filepath.touch()
+
+        # image post -- already exists
+        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/someimage.png"})
+        results = self.reddit.process_saved_data([post])
+        parsed_filename = self.reddit.parse_filename(results['already_exists'][0])
+        self.assertEqual(parsed_filename.get('username'), MOCK_POST['data']['author'])
+        self.assertEqual(parsed_filename.get('subreddit'), MOCK_POST['data']['subreddit'])
+        self.assertEqual(parsed_filename.get('post_kind'), MOCK_POST['kind'])
+        self.assertEqual(parsed_filename.get('post_id'), MOCK_POST['data']['id'])
+        self.assertEqual(len(results['already_exists']), 1)
+        self.assertEqual(len(results['already_exists']), results['already_exists_count'])
+
+        # image post -- file in exclude_files list
+        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/someimage.png"})
+        results = self.reddit.process_saved_data([post], exclude_files=[filename])
+        parsed_filename = self.reddit.parse_filename(results['excluded'][0])
+        self.assertEqual(parsed_filename.get('username'), MOCK_POST['data']['author'])
+        self.assertEqual(parsed_filename.get('subreddit'), MOCK_POST['data']['subreddit'])
+        self.assertEqual(parsed_filename.get('post_kind'), MOCK_POST['kind'])
+        self.assertEqual(parsed_filename.get('post_id'), MOCK_POST['data']['id'])
+        self.assertEqual(len(results['excluded']), 1)
+        self.assertEqual(len(results['excluded']), results['excluded_count'])
+
+        # video post
+        post['data'].update({"post_hint": "video", "url": "https://i.redd.it/someimage.mp4", "is_video": True})
+        results = self.reddit.process_saved_data([post])
+
+        # case: already exists/extracted & do purge
+        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/someimage.png"})
+        results = self.reddit.process_saved_data([post], do_purge=True)     # already_exists
+        parsed_filename = self.reddit.parse_filename(results['already_exists'][0])
+        self.assertEqual(parsed_filename.get('username'), MOCK_POST['data']['author'])
+        self.assertEqual(parsed_filename.get('subreddit'), MOCK_POST['data']['subreddit'])
+        self.assertEqual(parsed_filename.get('post_kind'), MOCK_POST['kind'])
+        self.assertEqual(parsed_filename.get('post_id'), MOCK_POST['data']['id'])
+        self.assertEqual(len(results['already_exists']), 1)
+        self.assertEqual(len(results['already_exists']), results['already_exists_count'])
 
     #TODO: write tests for other methods, such as:
-    # - RedditAPI.parse_filename()
-    # - RedditAPI.process_saved_data()
     # - RedditAPI.retrieve_last_saved()
     # - RedditAPI.sanitize()
 
