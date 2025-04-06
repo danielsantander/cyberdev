@@ -75,7 +75,7 @@ def extract_media_from_url(url:str, save_path:Path=None, request_timeout:int=120
     assert save_path
     parent_dir = save_path.parent
     if not parent_dir.exists(): parent_dir.mkdir(parents=True, exist_ok=True)
-    s = requests.session()
+    s = requests.Session()
     chuck_size = 256
     file_stat_info = None
     is_success = False

@@ -59,7 +59,7 @@ from utils.webutils import extract_media_from_url, get_video_source_url
 class Token(object):
     def __init__(self):
         self.access_token = None
-        self.expire_date = datetime.datetime=datetime.datetime.utcnow()
+        self.expire_date = datetime.datetime.now(datetime.timezone.utc)
         self.is_valid = False
 
     def __str__(self):
@@ -149,7 +149,7 @@ class RedditAPI(APIBase):
         Checks access token's expire date & generates new token if necessary.
         Returns true if token is expired and get_token() is executed, otherwise returns False.
         """
-        if self.token.expire_date < datetime.datetime.utcnow() or self.token.is_valid is False:
+        if self.token.expire_date.timestamp() < datetime.datetime.now(datetime.timezone.utc).timestamp() or self.token.is_valid is False:
             self._logger.debug(f"generating new access token...")
             self.get_token()
             return True
@@ -247,7 +247,7 @@ class RedditAPI(APIBase):
 
             # break if exceeds max_count:
             if max_count is not None and len(all_data) >= max_count:
-                self._logger.warning(f"max_count ({max_count}) exceeded, breaking request loop...")
+                self._logger.warning(f"get_saved_data -- max_count ({max_count}) exceeded, breaking request loop...")
                 break
         self._logger.info(f"total num of items retrieved:\t{len(all_data)}")
         return all_data

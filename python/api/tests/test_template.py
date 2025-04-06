@@ -42,9 +42,9 @@ def write_json_to_file(filename:Union[str,Path], data:dict):
 class TestTemplate(unittest.TestCase):
     _test_dir = Path(TEST_DIR)
     _test_dir.mkdir(parents=True, exist_ok=True)
+    _now = datetime.datetime.now(datetime.timezone.utc)
 
     def setUp(self):
-        self.now = datetime.datetime.utcnow()
         return
 
     def tearDown(self):

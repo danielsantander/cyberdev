@@ -80,33 +80,53 @@ class MockResponse:
         if do_raise: raise requests.exceptions.HTTPError("{0} Client Error".format(self.status_code))
         return do_raise
 
+    def iter_content(self, chunk_size=256):
+        """
+        Used for extracting media from url.
+        """
+        return iter(()) # empty_iterator
+
 def mocked_requests_post(*args, **kwargs):
     # print(f"\n\nINSIDE mocked_requests_post -- args:{args};kwargs:{kwargs}")
-    if 'api/unsave' in args[0]:
+    url = args[0] if len(args) else kwargs.get('url')
+
+    if 'api/unsave' in url:
         return MockResponse(json_data={}, status_code=201)
-    print(f"UNKNOWN URL: {args[0]}")
+    print(f"UNKNOWN URL: {url}")
     return MockResponse(json_data={"ERROR": "UNKNOWN"}, status_code=429)
 
 def mocked_requests_get(*args, **kwargs):
     # print(f"\n\nINSIDE mocked_requests_get -- args:{args};kwargs:{kwargs}")
-    if search_results := re.search('^.*user\/(?P<username>[^\/]+)\/saved\/?$',args[0]):
+    url = args[0] if len(args) else kwargs.get('url')
+    approved_media_content_type_list = ["image/jpeg","video/mp4"]
+    content_type = kwargs.get('Content-type')
+
+    if search_results := re.search('^.*user\/(?P<username>[^\/]+)\/saved\/?$',url):
         url = search_results.group()
-        username = search_results.group(1)
+        username = search_results.groupdict('username')
         params = kwargs.get('params', {})
+
         # prevent infinite loop when iterating through paginated API calls
         if params.get('after') is not None:
             update_resp = MOCK_SAVED_DATA_RAW_RESP.copy()
             update_resp['data']['after']=None
             return MockResponse(json_data=update_resp)
+
         return MockResponse(json_data=MOCK_SAVED_DATA_RAW_RESP)
 
-    print(f"UNKNOWN URL: {args[0]}")
+    # extract_media_from_url call
+    elif search_results := re.search('^.*test_process_saved_data\.(?P<extension>.*)$',url) or content_type in approved_media_content_type_list:
+        extension = search_results.groupdict().get('extension')
+        return MockResponse(json_data={})
+
+    print(f"UNKNOWN URL: {url}")
     return MockResponse(status_code=400)
+
 
 class TestRedditAPI(TestTemplate):
     @patch.object(Session, 'post')
     def setUp(self, mock_post)->None:
-        self.now = datetime.datetime.utcnow()
+        self.now = datetime.datetime.now(datetime.timezone.utc)
         self.test_dir = self._test_dir / 'TestRedditAPI'
         self.token_data = mock_resp_data = { "access_token": "TOKEN", "token_type": "bearer", "expires_in": 86400, "scope": "*" }
         params = {
@@ -117,7 +137,7 @@ class TestRedditAPI(TestTemplate):
             "password": "password123!",
             # APIBase args:
             "logger": logger,
-            "save_dir": self.test_dir,
+            "save_dir": self.test_dir,  # ensure in test_dir so tearDown removes any created data
             "use_verbose": True,
         }
         self.reddit = RedditAPI(**params)
@@ -140,7 +160,7 @@ class TestRedditAPI(TestTemplate):
         expected_expire_date = self.now + datetime.timedelta(seconds=self.token_data.get('expires_in'))
         self.assertTrue(self.reddit.token.is_valid)
         self.assertEqual(self.reddit.token.access_token, self.token_data.get('access_token'))
-        self.assertGreaterEqual(self.reddit.token.expire_date.replace(second=0,microsecond=0), expected_expire_date.replace(second=0,microsecond=0))
+        self.assertGreaterEqual(self.reddit.token.expire_date.replace(second=0,microsecond=0).timestamp(), expected_expire_date.replace(second=0,microsecond=0).timestamp())
 
     @patch.object(Session, 'get')
     def test_send_request(self, mock_get):
@@ -207,7 +227,6 @@ class TestRedditAPI(TestTemplate):
         for f in saved_data_files: f.unlink()
         self.assertEqual(len(list(self.reddit.api_data_dir_path.iterdir())), 1)
         consolidated_file = [f for f in self.reddit.api_data_dir_path.iterdir()][0]
-        print (f"consolidated_file: {consolidated_file.name}")
         search = re.search('^\d{14}--consolidated_saved_data.json$', consolidated_file.name)
         self.assertIsNotNone(search)
         self.assertEqual(search.group(), consolidated_file.name)
@@ -233,13 +252,10 @@ class TestRedditAPI(TestTemplate):
         for k,v in expected_results.items():
             self.assertEqual(results[k], expected_results[k])
 
+    @mock.patch('requests.Session.get', side_effect=mocked_requests_get)
     @mock.patch('requests.Session.post', side_effect=mocked_requests_post)
-    @patch.object(webutils, 'extract_media_from_url')
-    def test_process_saved_data(self, mock_extract_media_from_url, mock_post):
+    def test_process_saved_data(self, mock_get, mock_post):
         post = MOCK_POST.copy()
-        is_success = True
-        file_stat_info = None
-        mock_extract_media_from_url.return_value = (is_success, file_stat_info)
 
         # save file so file already exists upon processing
         post_date_created_timestamp = int(MOCK_POST['data']['created_utc'])
@@ -251,7 +267,7 @@ class TestRedditAPI(TestTemplate):
         filepath.touch()
 
         # image post -- already exists
-        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/someimage.png"})
+        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/test_process_saved_data.png"})
         results = self.reddit.process_saved_data([post])
         parsed_filename = self.reddit.parse_filename(results['already_exists'][0])
         self.assertEqual(parsed_filename.get('username'), MOCK_POST['data']['author'])
@@ -262,7 +278,7 @@ class TestRedditAPI(TestTemplate):
         self.assertEqual(len(results['already_exists']), results['already_exists_count'])
 
         # image post -- file in exclude_files list
-        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/someimage.png"})
+        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/test_process_saved_data.png"})
         results = self.reddit.process_saved_data([post], exclude_files=[filename])
         parsed_filename = self.reddit.parse_filename(results['excluded'][0])
         self.assertEqual(parsed_filename.get('username'), MOCK_POST['data']['author'])
@@ -273,11 +289,11 @@ class TestRedditAPI(TestTemplate):
         self.assertEqual(len(results['excluded']), results['excluded_count'])
 
         # video post
-        post['data'].update({"post_hint": "video", "url": "https://i.redd.it/someimage.mp4", "is_video": True})
+        post['data'].update({"post_hint": "video", "url": "https://i.redd.it/test_process_saved_data.mp4", "is_video": True})
         results = self.reddit.process_saved_data([post])
 
         # case: already exists/extracted & do purge
-        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/someimage.png"})
+        post['data'].update({"post_hint": "image", "url": "https://i.redd.it/test_process_saved_data.png"})
         results = self.reddit.process_saved_data([post], do_purge=True)     # already_exists
         parsed_filename = self.reddit.parse_filename(results['already_exists'][0])
         self.assertEqual(parsed_filename.get('username'), MOCK_POST['data']['author'])
@@ -287,8 +303,30 @@ class TestRedditAPI(TestTemplate):
         self.assertEqual(len(results['already_exists']), 1)
         self.assertEqual(len(results['already_exists']), results['already_exists_count'])
 
+    def test_retrieve_last_saved(self):
+        now = datetime.datetime.now(datetime.timezone.utc)
+
+        # last saved file is None
+        results = self.reddit.retrieve_last_saved()
+        self.assertEqual(len(results), 0)
+
+        # creation date differs
+        for idx in range(0,5):
+            file_path = self.reddit.api_data_dir_path / f"{now.replace(hour=idx, minute=0, second=0, microsecond=0).strftime(DEFAULT_DATETIME_FMT_LONG)}--saved_data.json"
+            write_json_to_file(filename=file_path, data={})
+        results = self.reddit.retrieve_last_saved()
+        self.assertIsNotNone(results)
+
+        # base case
+        now_str = now.strftime(DEFAULT_DATETIME_FMT_LONG)
+        file_path = self.reddit.api_data_dir_path / f"{now_str}--saved_data.json" # YYYYMMDDSSSSSS--saved_data.json
+        data = [MOCK_POST]
+        write_json_to_file(filename=file_path, data=data)
+        results = self.reddit.retrieve_last_saved()
+        self.assertEqual(len(data), len(results))
+        self.assertEqual(data[0]['data']['id'], results[0]['data']['id'])
+
     #TODO: write tests for other methods, such as:
-    # - RedditAPI.retrieve_last_saved()
     # - RedditAPI.sanitize()
 
 if __name__ == '__main__':
