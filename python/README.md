@@ -133,18 +133,20 @@ Setup:
 Importing as module.
 
 ```python
-import RedditAPI
+import json
+import os
+from reddit import RedditAPI
 from pathlib import Path
 
-save_directory_path = Path("/some/save/directory/path/")
-
-reddit = RedditAPI(
-  client_id="enter_client_id_here",
-  client_secret="enter_cilent_secret_here",
-  username="enter_username_here",
-  password="enter_password_here"
-  save_dir=save_directory_path,
-  use_verbose=True,)
+params = {
+    "client_id": os.environ.get('REDDIT_CLIENT_ID'),
+    "client_secret": os.environ.get('REDDIT_CLIENT_SECRET'),
+    "username": os.environ.get('REDDIT_USERNAME'),
+    "password": os.environ.get('REDDIT_PASSWORD'),
+    "save_dir": Path() / 'api_data',
+    "use_verbose": True,
+}
+reddit = RedditAPI(**params)
 
 # retrieve user's saved posts data, returns dictionary of data
 saved_data = reddit.get_saved_data()
