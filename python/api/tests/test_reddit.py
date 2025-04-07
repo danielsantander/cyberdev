@@ -30,7 +30,7 @@ logger.setLevel(logging.DEBUG)
 MOCK_POST = {
     "kind": "t3",
     "data": {
-        "author": "OutrageousMight457",
+        "author": "Username123",
         "subreddit": "pics",
         "name": "t3_1fd79on",
         "created_utc": 1725934894.0,
@@ -326,8 +326,57 @@ class TestRedditAPI(TestTemplate):
         self.assertEqual(len(data), len(results))
         self.assertEqual(data[0]['data']['id'], results[0]['data']['id'])
 
-    #TODO: write tests for other methods, such as:
-    # - RedditAPI.sanitize()
+    def test_sanitize(self):
+        """
+        Tests sanitizing directories based on blacklisted.
+        Moves:
+            - reddit/Batman/subreddits/blacklist/Username123_20240909212134_blacklist_t3_1fd79on.png
+        To:
+            - reddit/Batman/nsfw/Username123/Username123_20240909212134_blacklist_t3_1fd79on.png
+        """
+
+        # no directory -- empty results
+        results = self.reddit.sanitize(subreddit_blacklist=[])
+        self.assertIsInstance(results, dict)
+        for k,v in results.items():
+            self.assertIsInstance(v, list)
+            self.assertEqual(len(v), 0)
+
+        # pass in blacklist
+        post = MOCK_POST.copy()
+        post['data']['subreddit'] = 'blacklist'
+        post_date_created_str = timestamp_to_date_string(int(post['data']['created_utc']))
+        fname = f"{post['data']['author']}_{post_date_created_str}_{post['data']['subreddit']}_{post['data']['name']}.png"
+        file_path: Path = self.reddit.save_dir_path / 'subreddits' / post['data']['subreddit'] / fname
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch()
+
+        results = self.reddit.sanitize(subreddit_blacklist=['blacklist'])
+        self.assertIsInstance(results, dict)
+        for k,v in results.items():
+            expected_count = 1 if k == 'posts_moved' else 0
+            self.assertIsInstance(v, list)
+            self.assertEqual(len(v), expected_count)
+        moved_file_path = self.reddit.save_dir_path / 'nsfw' / post['data']['author'] / fname
+        self.assertFalse(file_path.exists() and file_path.is_file())    # ensure file moved no longer exists in old path
+        self.assertFalse(file_path.parent.exists())                     # ensure empty directory is removed
+        self.assertTrue(moved_file_path.parent.exists())                # ensure parent directory of new file path exists
+        self.assertTrue(moved_file_path.parent.is_dir())
+        self.assertTrue(moved_file_path.exists())
+        self.assertTrue(moved_file_path.is_file())
+
+        # case -- already exists
+        file_path.parent.mkdir(parents=True, exist_ok=True)
+        file_path.touch()
+        self.assertTrue(file_path.exists() and file_path.is_file())
+        self.assertTrue(moved_file_path.exists())
+        results = self.reddit.sanitize(subreddit_blacklist=['blacklist'])
+        self.assertIsInstance(results, dict)
+        for k,v in results.items():
+            expected_count = 1 if k == 'already_exists' else 0
+            self.assertIsInstance(v, list)
+            self.assertEqual(len(v), expected_count)
+
 
 if __name__ == '__main__':
     unittest.main()

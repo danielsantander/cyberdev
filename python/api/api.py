@@ -7,6 +7,7 @@ import logging
 import os
 import sys
 from pathlib import Path
+from typing import Optional
 
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 scripts_dir = os.path.abspath(f"{os.path.dirname(CUR_DIR)}/scripts")
@@ -23,7 +24,6 @@ class APIBase(object):
         self._save_dir = self._verify_or_create_directory(save_dir)
 
         # dates
-        # self._now = datetime.datetime.utcnow()
         self._now = datetime.datetime.now(datetime.timezone.utc)
         self._now_str_long = self._now.strftime(DEFAULT_DATETIME_FMT_LONG)
         self._now_str_short = self._now.strftime(DEFAULT_DATETIME_FMT_SHORT)
@@ -46,7 +46,7 @@ class APIBase(object):
         # self._logger.debug('session setup complete')
         return session
 
-    def _verify_or_create_directory(self, dir_path:Path):
+    def _verify_or_create_directory(self, dir_path:Path)->Optional[Path]:
         """
         Verifies the given dir_path is a valid directory.
         Returns Path if exists or created, returns None otherwise.

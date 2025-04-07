@@ -553,6 +553,10 @@ class RedditAPI(APIBase):
             "already_exists": [],
         }
 
+        if not sanitize_dir_path.exists():
+            self._logger.info(f"dir path ({sanitize_dir_path.absolute()}) does not exist, nothing to sanitize.")
+            return results
+
         self._logger.info(f"sanitizing, iterating through directory '{sanitize_dir_path.name}'")
         for sub_dir in sanitize_dir_path.iterdir():
 
