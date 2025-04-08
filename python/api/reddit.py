@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #!/usr/bin/python3
 
-import argparse
 import datetime
 import logging
 import json
@@ -603,65 +602,45 @@ class RedditAPI(APIBase):
         return results
 
 
-def get_args()->dict:
-    parser = argparse.ArgumentParser(description="Reddit API")
-    parser.add_argument('-a', '--action',
-                        dest='action',
-                        action='store',
-                        choices=ACTION_CHOICES,
-                        help='Desired action.',
-                        required=True)
-    parser.add_argument('-d','-v', '--verbose','--debug',
-                        dest='debug',
-                        action='store_true',
-                        default=DEBUG_MODE,
-                        help=f'Debug/verbose mode. [{DEBUG_MODE}]')
-    parser.add_argument('-u', '--update',
-                        dest='update',
-                        action='store_true',
-                        default=False,
-                        help='Default is False, and will not update save data.')
-    parser.add_argument('-i','-o','--input','--output',
-                        dest='input',
-                        metavar='PATH',
-                        action='store',
-                        type=str,
-                        default=DEFAULT_REDDIT_SAVE_DIR.absolute(),
-                        help=f'Source path of input file/directory. [{DEFAULT_REDDIT_SAVE_DIR.absolute()}]')
-    parser.add_argument('-f', '--file',
-                        dest='file',
-                        metavar='FILE_PATH',
-                        action='store',
-                        type=str,
-                        help='Source of file to input.')
-    return vars(parser.parse_args())
-
-def main():
+if __name__ == '__main__':
+    import argparse
     from time import time
-    results = {}
 
-    # ARGS
-    args = get_args()
+    # GET ARGS
+    # --------
+    parser = argparse.ArgumentParser(description="Reddit API")
+    parser.add_argument('-a', '--action', dest='action', action='store', choices=ACTION_CHOICES, help='Desired action.', required=True)
+    parser.add_argument('-d','-v', '--verbose','--debug', dest='debug', action='store_true', default=DEBUG_MODE, help=f'Debug/verbose mode. [{DEBUG_MODE}]')
+    parser.add_argument('-u', '--update', dest='update', action='store_true', default=False, help='Default is False, and will not update save data.')
+    parser.add_argument('-i','-o','--input','--output', dest='input', metavar='PATH', action='store', type=str, default=DEFAULT_REDDIT_SAVE_DIR.absolute(), help=f'Source path of input file/directory. [{DEFAULT_REDDIT_SAVE_DIR.absolute()}]')
+    parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, help='Source of file to input.')
+    args = vars(parser.parse_args())
+
+
+    # SETUP ARGS
+    # ----------
+    results = {}
     save_dir = Path(args.get('input')) if args.get('input') else DEFAULT_REDDIT_SAVE_DIR
     input_file = Path(args.get('file')) if args.get('file') else None
-    desired_action = str(args.get('action', ""))
     do_update = args.get('update', False)
     debug_mode = args.get('debug')
+    desired_action = str(args.get('action', ""))
+    if desired_action not in ACTION_CHOICES:
+        print("\nInvalid action specified: {0}.\nOne of the following actions are required: {1}\n".format(desired_action, ACTION_CHOICES))
+        sys.exit()
 
     # LOGGER
+    # -------
     logger = logging.getLogger("reddit")
     console_handler = logging.StreamHandler()
     console_handler.setFormatter(DEFAULT_LOG_FORMAT)
     logger.addHandler(console_handler)
     log_level = logging.DEBUG if debug_mode else logging.INFO
     logger.setLevel(log_level)
+    logger.info("Performing action -- '{0}'".format(desired_action))
 
-    # validate action
-    if desired_action not in ACTION_CHOICES:
-        print("\nInvalid action specified: {0}.\nOne of the following actions are required: {1}\n".format(desired_action, ACTION_CHOICES))
-        sys.exit()
-    else: logger.info("Performing action -- '{0}'".format(desired_action))
-
+    # RedditAPI params
+    # ----------------
     params = {
         "client_id": os.environ.get('REDDIT_CLIENT_ID'),
         "client_secret": os.environ.get('REDDIT_CLIENT_SECRET'),
@@ -676,6 +655,7 @@ def main():
     results: dict = {}
 
     # ACTION: get_saved -- retrieve and processes saved posts
+    # -------------------------------------------------------
     if desired_action == 'get_saved':
         t0 = time()
         saved_data:list[dict] = []
@@ -704,20 +684,24 @@ def main():
         logger.info("finished get_saved in {0} seconds".format(t1-t0))
 
     # ACTION: consolidate -- combine saved data into one JSON file
+    # ------------------------------------------------------------
     if desired_action == 'consolidate':
         t0 = time()
         results = reddit.consolidated_saved_files()
         t1 = time()
         logger.info("finished consolidation in {0} seconds".format(t1-t0))
-        return
+        sys.exit()
 
     # ACTION: sanitize -- clean subreddit directories to remove and separate blacklisted subreddits
+    # ---------------------------------------------------------------------------------------------
     if desired_action == 'sanitize':
         t0 = time()
         results = reddit.sanitize(subreddit_blacklist=SUBREDDIT_BLACK_LIST)
         t1 = time()
         logger.info("finished sanitizing in {0} seconds".format(t1-t0))
 
+    # WRITE RESULTS TO FILE
+    # ---------------------
     if results and isinstance(results, dict):
         for k,v in results.items():
             if isinstance(v, list):
@@ -727,6 +711,3 @@ def main():
         logger.info(f"results for action '{desired_action}':\n{json.dumps(results, indent=2)}")
     else: logger.warning("no results returned")
     sys.exit()
-
-if __name__ == '__main__':
-    main()
