@@ -31,7 +31,8 @@ def jpg_to_gif(img_dir:Union[str, Path, list[Path]], gif_dir:Union[str, Path]=No
         img_dir=Path(img_dir)
 
     if isinstance(img_dir, Path):
-        assert img_dir.exists() and img_dir.is_dir() and None in img_dir.iterdir() #and any(img_dir.iterdir())
+        #assert img_dir.exists() and img_dir.is_dir() and None in img_dir.iterdir() #and any(img_dir.iterdir())
+        assert img_dir.exists() and img_dir.is_dir() and any(img_dir.iterdir())
         img_path_list = [x for x in img_dir.iterdir() if x.is_file()]
 
     if gif_dir is None: gif_dir = img_dir
