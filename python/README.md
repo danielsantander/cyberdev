@@ -105,18 +105,19 @@ Ensure to set any credentials within a `.env` file (copy `.env.dev.` as template
 
 Before using the `nasa.py` script, enter your `NASA_API_KEY` within the `.env` file and run `. .env`.
 
-Saved files will be located in the same directory at:  `./api_data/nasa/`
+Saved files will be located in the same directory at the default path:  `./api_data/nasa/`
 
 ```shell
-usage: ./nasa.py [data]
+# NASA_API_KEY optional if already in ENVIRONMENT
+usage: ./nasa.py -a [action] -k [NASA_API_KEY]
 
 # example: retrieve data from EPIC satellite
-python3 nasa.py epic
+python3 nasa.py -a epic
 Use enhanced images (Y/N)?: Y
 
 # example to retrieve data from Mars Curiosity rover.
 # (earth date in format: YYYY-MM-DD)
-python3 nasa.py curiosity
+python3 nasa.py -a curiosity
 Query by 'martian_sol' or 'earth_date': sol
 Enter Sol date [1000]: 1001
 ```
@@ -148,19 +149,17 @@ params = {
 }
 reddit = RedditAPI(**params)
 
-# retrieve user's saved posts data, returns dictionary of data
+# retrieve user's saved post data, returns dictionary of posts
 saved_data = reddit.get_saved_data()
 
 # unsave a given post, returns the response
 resp = reddit.unsave_post(post_dict)
 ```
 
-When using interactively through the shell, ensure the environment variables are set within `.env` (copied from `.dev.env`) and run `. .env` for the script to pick up the credentials. Then proceed.
-
 Some Examples:
 
 ```shell
-# get_saved: get user's saved data and save to a given directory
+# get_saved: get user's saved data, retrieve media from source urls, and save to a given directory
 ./reddit.py -a get_saved -u -d -o /some/path/to/save_data_directory/
 # where:
 # - a: action

@@ -15,13 +15,10 @@ sys.path.insert(0, scripts_dir)
 from utils.constants import DEFAULT_DATETIME_FMT_LONG, DEFAULT_DATETIME_FMT_SHORT
 from utils.custom_logging import create_console_logger
 
+
 class APIBase(object):
     def __init__(self, logger:logging.Logger=None, save_dir:Path=None, use_verbose:bool=False, **kwargs):
         self._use_verbose: bool = use_verbose
-
-        # save directory
-        if save_dir is None: save_dir = Path(CUR_DIR)
-        self._save_dir = self._verify_or_create_directory(save_dir)
 
         # dates
         self._now = datetime.datetime.now(datetime.timezone.utc)
@@ -29,9 +26,18 @@ class APIBase(object):
         self._now_str_short = self._now.strftime(DEFAULT_DATETIME_FMT_SHORT)
 
         # logger
-        log_level = logging.DEBUG if use_verbose else logging.INFO
-        self._logger = logger if logger is not None else create_console_logger(name="API", level=log_level)
-        self._logger.debug(f"APIBase init complete -- save dir: {self._save_dir.absolute()}")
+        log_level = logging.DEBUG if self._use_verbose else logging.INFO
+        logger_name = "API"
+        if logger and isinstance(logger, str):
+            logger_name = logger
+        self._logger = logger if logger and isinstance(logger, logging.Logger) else create_console_logger(name=logger_name, level=log_level)
+
+        # save directory
+        if save_dir is None:
+            self._logger.debug('No save directory provided, using current directory path.')
+            save_dir = Path(CUR_DIR)
+        self._save_dir = self._verify_or_create_directory(save_dir)
+        self._logger.debug(f"APIBase init complete -- _save_dir: {self._save_dir.absolute()}")
 
         # init
         self._session = self.__setup_session()
@@ -45,6 +51,25 @@ class APIBase(object):
         session.mount('https://', adapter)
         # self._logger.debug('session setup complete')
         return session
+
+    def send_request(self, url:str, method:str='GET', **kwargs)->Optional[requests.Response]:
+        default_timeout = kwargs.pop('timeout', 300)
+        try:
+            if method.upper() == 'POST':
+                # TODO: continue here
+                pass
+            else:
+                resp = self._session.get(url, timeout=default_timeout, **kwargs)
+                self._logger.debug('send_request -- {0} {1} {2}'.format(method.upper(), resp.status_code, resp.url))
+                resp.raise_for_status()
+                return resp
+        except requests.exceptions.HTTPError as err:
+            if '403 Client Error' in err.__str__(): self._logger.error("403 Client Error for {0}".format(resp.url))
+            raise
+        except Exception as err:
+            self._logger.error(f"send_request error - {err.__str__()}")
+            raise
+        return requests.Response()
 
     def _verify_or_create_directory(self, dir_path:Path)->Optional[Path]:
         """

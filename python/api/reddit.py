@@ -94,9 +94,10 @@ class RedditAPI(APIBase):
             import logging.handlers
             log_dir = make_directory(directory_path=self.save_dir_path / 'logs')
             log_filename =  os.path.join(log_dir, "RedditAPI.log")
+            log_level = logging.DEBUG if self._use_verbose else logging.INFO
             max_byte_size_50 = 50*1024*1024 # ~52mb
             file_handler = logging.handlers.RotatingFileHandler(log_filename, maxBytes=max_byte_size_50, backupCount=5)
-            self._logger = add_handler_to_logger(self._logger, file_handler)
+            self._logger = add_handler_to_logger(self._logger, new_handler=file_handler, log_level=log_level)
 
         # session
         self._session.headers.update({"User-Agent": f"{self.username}_App/0.1 by {self.username}"})
@@ -119,7 +120,7 @@ class RedditAPI(APIBase):
         cred_data = {"grant_type": "password", "username": self.username, "password": self.password}
         try:
             resp = self._session.post(url=url, auth=client_auth, data=cred_data, timeout=300)
-            self._logger.info(f"POST ({resp.status_code}) - {resp.url}")
+            self._logger.debug(f"POST ({resp.status_code}) - {resp.url}")
             if resp.status_code == 401:
                 raise UnauthorizedError("Invalid credentials.")
             resp.raise_for_status()
@@ -259,7 +260,7 @@ class RedditAPI(APIBase):
         - post (dict): saved post to unsave
         """
         fullname = post.get('data', {}).get("name")
-        self._logger.info(f"unsaving post: {fullname}")
+        self._logger.debug(f"unsaving post: {fullname}")
         url = f"{self.oauth_url}/api/unsave"
         return self.send_request(url=url, method="POST", params={"id":fullname})
 

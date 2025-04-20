@@ -4,6 +4,7 @@
 import datetime
 import json
 import os
+import requests
 import sys
 import unittest
 from pathlib import Path
@@ -12,6 +13,28 @@ from typing import Union
 TEST_DIR = os.path.dirname(os.path.realpath(__file__))   # current directory
 API_DIR = os.path.dirname(TEST_DIR)                      # parent directory
 sys.path.insert(0, API_DIR)
+
+class MockResponse:
+    def __init__(self, json_data={}, status_code=200, url=""):
+        self.json_data = json_data
+        self.status_code = status_code
+        self.ok:bool = int(self.status_code) in [200, 201]
+        self.url = url
+
+    def json(self):
+        return self.json_data
+
+    def raise_for_status(self):
+        if self.ok is False:
+            err_msg = self.json_data.get("error", "Client Error")
+            raise requests.exceptions.HTTPError("{0} {1}".format(self.status_code, err_msg))
+
+    def iter_content(self, chunk_size=256):
+        """
+        Used for extracting media from url.
+        """
+        return iter(()) # empty_iterator
+
 
 def clean_dir(directory:Path):
     assert directory.exists() and directory.is_dir()

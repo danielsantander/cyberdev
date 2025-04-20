@@ -14,23 +14,17 @@ import re
 import requests
 import sys
 from pathlib import Path
-from typing import Union, Optional
-
-# TODO:
-# - Allow NASA class to inherit from APIBase (inherit session and request methods)
-# - Remove inheritance from EPIC & CuriosityAPI classes in order to begin using APIBase, instead
-# - use argparse to get more use input
-    # - gif duration for EPIC images
-    # - save directory location
-    # - use file log rotation
+from api import APIBase
+from typing import Optional
 
 
 DEBUG_MODE = False
-DEFAULT_DURATION = 2.5
+DEFAULT_DURATION_FAST = 2.5
+DEFAULT_DURATION = 5.0
 NO_INPUT = False
-CUR_DIR = os.path.dirname(os.path.abspath(__file__))     # ./python/api
+CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 DEFAULT_NASA_SAVE_DIR = Path(CUR_DIR) / 'api_data' / 'nasa'
-SCRIPTS_DIR = os.path.abspath(f"{os.path.dirname(CUR_DIR)}/scripts")   # ./python/scripts
+SCRIPTS_DIR = os.path.abspath(f"{os.path.dirname(CUR_DIR)}/scripts")
 
 sys.path.insert(0, SCRIPTS_DIR)
 from utils.constants import DEFAULT_DATETIME_FMT_SHORT, DEFAULT_DATETIME_FMT_LONG, RE_NASA_IMG_DATES
@@ -42,67 +36,33 @@ from utils.validation import str2bool
 from utils.webutils import extract_media_from_url
 
 
-class NASA:
-    def __init__(self, api_key:str, save_dir:Path=DEFAULT_NASA_SAVE_DIR, verbose_mode:bool=False, logger:logging.Logger=None):
-        self._save_dir = self._verify_or_get_save_directory(dir_path=save_dir)
-        self.session = requests.session()
-        self._now = datetime.datetime.utcnow()
-        self._now_str_long = self._now.strftime(DEFAULT_DATETIME_FMT_LONG)   # %Y%m%d%H%M%S
-        self._now_str_short = self._now.strftime(DEFAULT_DATETIME_FMT_SHORT) # '%Y%m%d'
-        self._logger = logger if logger else create_logger(name="NASA", level=logging.DEBUG, log_dir=self._save_dir/'logs')
-        self.api_key = self._verify_api_key(api_key) if api_key is not None else None
-        self._logger.info(f"NASA init complete, using _save_dir: {self._save_dir.absolute()}")
+class NASA(APIBase):
+    def __init__(self, api_key:str=None, save_dir:Path=DEFAULT_NASA_SAVE_DIR, use_verbose:bool=False, logger:logging.Logger=None):
+        super().__init__(logger=logger, save_dir=save_dir, use_verbose=use_verbose)
+        self.api_key = self._verify_api_key(api_key)
+        self._logger.debug(f"NASA init complete -- _save_dir: {self._save_dir.absolute()}")
 
-    def _verify_or_get_save_directory(self, dir_path:Path):
+    def _verify_api_key(self, api_key:str, local_storage:bool=True)->Optional[str]:
         """
-        Verifies the given dir_path is a valid directory.
-        Returns path if valid, else returns current directory.
-        """
-        default_dir = Path(os.path.abspath(os.path.dirname(__file__)))
-        if dir_path is None: return default_dir
-        if dir_path.exists() and dir_path.is_dir(): return dir_path
-        dir_path.mkdir(parents=True, exist_ok=True)
-        return dir_path
-
-    def _verify_api_key(self, api_key:str, local_storage:bool=True):
-        """
-        Retrieves NASA api token based on provided api key. Returns api_key if valid, else None.
+        Retrieves NASA api key. Returns key if valid, else None.
 
         Keyword arguments:
         - api_key (str): api key to use for verification
-        - local_storage (bool): save to JSOn file in save directory (defaults to True)
+        - local_storage (bool): save to JSON file in save directory (defaults to True)
         """
-        url = f"https://api.nasa.gov/planetary/apod?api_key={api_key}"
-        resp = self.send_request(url=url)
-        if resp.ok:
-            data = resp.json()
-            filename = self._save_dir / f'{self._now_str_short}--verify_api_key_response.json'
-            write_json_to_file(filename, data)
-            return api_key
-        return None
+        if api_key is None: return None
+        resp = self.send_request(url=f"https://api.nasa.gov/planetary/apod?api_key={api_key}", method="GET")
+        if resp.ok is False: return None
+        data = resp.json()
+        filename = self._save_dir / f'{self._now_str_short}--verify_api_key_response.json'
+        if not filename.exists(): write_json_to_file(filename, data)
+        return api_key
 
-    def send_request(self, url:str, params:dict={}, headers:Optional[dict]=None, method:str="GET", **kwargs):
-        try:
-            self._logger.debug(f"sending {method} request to \'{url}\' with params: {params}")
-            if method == "GET":
-                resp = self.session.get(url, params=params)
-            else:
-                # TODO: implement other methods if needed
-                self._logger.error(f"need to implement {method} method for sending requests")
-                return None
-            self._logger.debug(f"send_request resp ({resp.status_code}): {resp.url}")
-            resp.raise_for_status()
-        except Exception as err:
-            self._logger.error(f"send_request error ({resp.status_code}) to \'{resp.url}\': {err.__str__()}")
-            return resp
-        return resp
 
 class EPIC(NASA):
-    def __init__(self, logger:logging.Logger=None, **kwargs)->None:
-        api_key = kwargs.get('api_key')
+    def __init__(self, logger:logging.Logger=None, **kwargs):
         save_dir = kwargs.get('save_dir', DEFAULT_NASA_SAVE_DIR)
-        verbose_mode = kwargs.get('verbose_mode', False)
-        super().__init__(api_key=api_key, save_dir=save_dir, verbose_mode=verbose_mode, logger=logger)
+        super().__init__(logger=logger, save_dir=save_dir, use_verbose=kwargs.get('use_verbose', False))
         self._logger.name = 'EPIC'
 
         self.base_url = "https://epic.gsfc.nasa.gov"
@@ -114,16 +74,16 @@ class EPIC(NASA):
         self.images_dir :Path = make_directory(self.save_dir / 'images')
         self.api_data_dir :Path = make_directory(self.save_dir / 'api_data')
 
-        self._logger.info(f"EPIC init complete -- save_dir: {self.save_dir.absolute()}")
+        self._logger.debug(f"EPIC init complete -- save_dir: {self.save_dir.absolute()}")
 
-    def get_epic_images(self, use_enhanced: bool=False, use_png: bool=False):
+    def get_epic_images(self, use_enhanced: bool=False, use_png: bool=False)->bool:
         sub_save_dir:Path = None # directory to save this iteration of images
         chunk_size = 256
-        isSuccess = True
+        isSuccess = False
 
         # Get image data
         url = f"{self.api_url}enhanced/" if use_enhanced else f"{self.api_url}natural/"
-        resp = requests.get(url)
+        resp = self.send_request(url=url, method="GET")
         assert resp.ok and resp.status_code == 200
         self._logger.debug(f"media extraction request ({resp.status_code}) -- {resp.url}")
         data_list = resp.json()
@@ -135,14 +95,16 @@ class EPIC(NASA):
         identifier_date = datetime.datetime.strptime(data_list[0].get('identifier'), DEFAULT_DATETIME_FMT_LONG).strftime(DEFAULT_DATETIME_FMT_SHORT)
         file_path:Path = self.api_data_dir / f'{identifier_date}.json'
         proceed = True
-        if file_path.exists():
+        overwrite: bool=False
+        if file_path.exists() and overwrite is False:
             input_msg = f"Image data file {file_path.name} already exists, overwrite (Y/N)? [N]: "
             raw_input = "N" if NO_INPUT else input(input_msg) or "N"
-            proceed = str2bool(raw_input)
-        if file_path.exists() is False or proceed:
+            overwrite = str2bool(raw_input)
+        if file_path.exists() is False or overwrite:
             write_json_to_file(file_path, data_list)
 
         # iterate data to get images
+        success_count = 0
         for idx, data in enumerate(data_list):
             # retrieve image date YYYYMMDD
             m = re.search(RE_NASA_IMG_DATES, data.get('date', ''))
@@ -161,12 +123,13 @@ class EPIC(NASA):
             image_filename = f"{str(idx).zfill(2)}_{image_name}--{collection}"
             image_filename += f".{image_type}"
             save_dest:Path = sub_save_dir / image_filename
-            if save_dest.exists() and save_dest.is_file() and save_dest.name.endswith(image_type):
+            overwrite = False
+            if save_dest.exists() and save_dest.is_file() and save_dest.name.endswith(image_type) and overwrite is False:
                 self._logger.warning(f'image file ({save_dest.name}) already exists.')
                 input_msg = f"Image file ({save_dest.name}) already exists, overwrite (Y/N)? [N]: "
                 raw_input = "N" if NO_INPUT else input(input_msg) or "N"
-                proceed = str2bool(raw_input)
-                if proceed is False: continue
+                overwrite = str2bool(raw_input)
+                if overwrite is False: continue
 
             # retrieve image from API
             try:
@@ -178,10 +141,9 @@ class EPIC(NASA):
                     for chunk in resp.iter_content(chunk_size=chunk_size):
                         save_file.write(chunk)
                 if save_dest.exists() and resp.ok:
-                    # isSuccess = True
+                    success_count += 1
                     continue
                 else:
-                    isSuccess = False
                     self.__logger.warning(f'unable to save media {save_dest.name} from {url}, skipping')
                     continue
             except requests.exceptions.HTTPError as err:
@@ -189,14 +151,11 @@ class EPIC(NASA):
                 self._logger.exception(f"error retrieving image ({resp.url}): {err_msg}")
                 continue
 
+        isSuccess = bool(len(data_list) == success_count)
         if isSuccess:
             gif_filename = f"{sub_save_dir.stem}--enhanced.gif" if use_enhanced else f"{sub_save_dir.stem}--natural.gif"
             gif_path = self.gif_dir / gif_filename
-            duration = None  # TODO: retrieve input from user for duration?
-            if duration is None:
-                duration = DEFAULT_DURATION
-            if gif_path.exists() is False: jpg_to_gif(sub_save_dir, self.gif_dir, gif_name=f"{gif_path.stem}.gif", duration=duration)
-
+            if gif_path.exists() is False and None in sub_save_dir.iterdir(): jpg_to_gif(sub_save_dir, self.gif_dir, gif_name=f"{gif_path.stem}.gif", duration=DEFAULT_DURATION)
         return isSuccess
 
 class CuriosityAPI(NASA):
@@ -219,12 +178,11 @@ class CuriosityAPI(NASA):
     | api_key | str  | DEMO_KEY | api.nasa.gov.key for expanded usage          |
     """
 
-    def __init__(self, api_key:str, logger:logging.Logger, **kwargs):
+    def __init__(self, api_key:str, logger:logging.Logger=None, **kwargs):
         if api_key is None: raise Exception("API Key is required for Curiosity.")
-        api_key = api_key
-        save_dir = kwargs.get('save_dir')
-        verbose_mode = kwargs.get('verbose_mode', False)
-        super().__init__(api_key=api_key, save_dir=save_dir, verbose_mode=verbose_mode, logger=logger)
+        save_dir = kwargs.get('save_dir', DEFAULT_NASA_SAVE_DIR)
+        use_verbose = kwargs.get('use_verbose', False)
+        super().__init__(api_key=api_key, save_dir=save_dir, use_verbose=use_verbose, logger=logger)
         self._logger.name = 'CuriosityAPI'
 
         self.base_url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos"
@@ -232,16 +190,16 @@ class CuriosityAPI(NASA):
         # dirs
         self.save_dir :Path = make_directory(self._save_dir / 'curiosity')
         self.api_dir :Path = make_directory(self.save_dir / 'api_data')
-        self.images_dir :Path = make_directory(self.save_dir / 'images')\
-
-        self._logger.info(f"Curiosity init complete -- save_dir: {self.save_dir.absolute()}")
+        self.images_dir :Path = make_directory(self.save_dir / 'images')
+        self._logger.debug(f"Curiosity init complete -- save_dir: {self.save_dir.absolute()}")
 
     def get_images(self, query_by:str='sol', params:dict=None):
-        """Query and save images from NASA Curiosity rover."""
-        default_params = {'sol': 1000, 'camera': 'all', 'page': 1} if query_by == 'sol' else {'earth_date': self._now.strftime("%Y-%m-%d"), 'camera': 'all', 'page': 1}
-
-        params = default_params if params is None else params
-        params['api_key']  = self.api_key
+        """
+        Query and save images from NASA Curiosity rover.
+        """
+        default_params:dict = {'sol': 1000, 'camera': 'all', 'page': 1} if query_by == 'sol' else {'earth_date': self._now.strftime("%Y-%m-%d"), 'camera': 'all', 'page': 1}
+        params = params if params else default_params
+        params['api_key'] = self.api_key
         resp = self.send_request(url=self.base_url, params=params)
 
         filename = f"{self._now_str_long}--curiosity"
@@ -303,28 +261,36 @@ class CuriosityAPI(NASA):
 if __name__ == '__main__':
 
     # args
-    valid_actions = ['curiosity', 'epic']
-    num_args = len(sys.argv)
-    if num_args < 2:
-        print (f"\tUsage: ./{__file__.split('/')[-1]} [data]\n\tExample: ./{__file__.split('/')[-1]} epic\n")
-        sys.exit()
-    action = sys.argv[1]
-    api_key:str = sys.argv[2] if len(sys.argv) >= 3 else os.environ.get('NASA_API_KEY')
+    import argparse
+    parser = argparse.ArgumentParser(description="NASA API")
+    valid_action_choices = ['epic', 'curiosity']
+    parser.add_argument('-a', '--action', dest='action', action='store', choices=valid_action_choices, help="Desired action. Defaults to {0}".format(valid_action_choices[0]), default=valid_action_choices[0])
+    parser.add_argument('-d','-v', '--verbose','--debug', dest='debug', action='store_true', default=DEBUG_MODE, help="Debug mode [{0}]".format(DEBUG_MODE))
+    parser.add_argument('-k', '--key', dest='api_key', action='store', type=str, help="NASA API Key", required=False)
+    parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, default=DEFAULT_NASA_SAVE_DIR, help="Directory to save api and media data. Defaults to: {0}".format(DEFAULT_NASA_SAVE_DIR.name), required=False)
+    args = vars(parser.parse_args())
+    action = args.get("action")
+    api_key = args.get('api_key') or os.environ.get('NASA_API_KEY')
+    output_dir = args.get("file")
+    debug_mode = args.get("debug")
 
-    now = datetime.datetime.utcnow()
+    # dates & logger
+    now = datetime.datetime.now(datetime.timezone.utc)
     now_str = now.strftime(DEFAULT_DATETIME_FMT_LONG)
-
     logger = create_console_logger(name="NASA", level=logging.DEBUG)
+    logger.info("args: {}".format(args))
+
 
     # actions
     logger.info(f"performing action: {action}")
-    if action.lower() in ['mars', 'mars_rover', 'marsrover', 'mars_rover', 'curiosity']:
 
+    # CURIOSITY
+    if action.lower() == 'curiosity':
         # assert api_key exists
         if api_key is None:
             api_key = input("Enter api key: ") or None
         if api_key is None:
-            print("Need api key, exiting...")
+            print("API key needed, exiting...")
             sys.exit()
 
         curiosity = CuriosityAPI(api_key, logger, save_dir=DEFAULT_NASA_SAVE_DIR)
@@ -345,12 +311,11 @@ if __name__ == '__main__':
             curiosity.get_images(query_by='sol', params=params)
         sys.exit()
 
-    # epic & default:
+    # EPIC
     elif action.lower() in ['epic']:
         epic = EPIC(logger=logger)
         user_resp = input('Use enhanced images (Y/N)?: ') or 'N'
         use_enhanced: bool = True if user_resp.lower() in ['y', 'yes'] else False
         epic.get_epic_images(use_enhanced=use_enhanced) # only use_enhanced=False and use_png=False are working
-    else:
-        print (f"unknown action, valid choices are: {valid_actions}")
+
     sys.exit()

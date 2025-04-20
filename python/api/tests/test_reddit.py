@@ -12,7 +12,7 @@ from unittest import mock
 from unittest.mock import MagicMock, patch
 from pathlib import Path
 from requests import Session
-from test_template import TestTemplate, clean_dir, write_json_to_file, API_DIR
+from test_template import TestTemplate, MockResponse, clean_dir, write_json_to_file, API_DIR
 
 sys.path.insert(0, API_DIR)
 from reddit import RedditAPI
@@ -65,27 +65,6 @@ MOCK_SAVED_DATA_RAW_RESP = {
     }
 }
 
-class MockResponse:
-    def __init__(self, json_data={}, status_code=200, url=""):
-        self.json_data = json_data
-        self.status_code = status_code
-        self.ok:bool = int(self.status_code) in [200, 201]
-        self.url = url
-
-    def json(self):
-        return self.json_data
-
-    def raise_for_status(self, status=None):
-        do_raise = True if self.ok is False or status not in [None, False] else False
-        if do_raise: raise requests.exceptions.HTTPError("{0} Client Error".format(self.status_code))
-        return do_raise
-
-    def iter_content(self, chunk_size=256):
-        """
-        Used for extracting media from url.
-        """
-        return iter(()) # empty_iterator
-
 def mocked_requests_post(*args, **kwargs):
     # print(f"\n\nINSIDE mocked_requests_post -- args:{args};kwargs:{kwargs}")
     url = args[0] if len(args) else kwargs.get('url')
@@ -110,20 +89,21 @@ def mocked_requests_get(*args, **kwargs):
         if params.get('after') is not None:
             update_resp = MOCK_SAVED_DATA_RAW_RESP.copy()
             update_resp['data']['after']=None
-            return MockResponse(json_data=update_resp)
+            return MockResponse(json_data=update_resp, status_code=200, url=url)
 
-        return MockResponse(json_data=MOCK_SAVED_DATA_RAW_RESP)
+        return MockResponse(json_data=MOCK_SAVED_DATA_RAW_RESP, status_code=200, url=url)
 
     # extract_media_from_url call
     elif search_results := re.search('^.*test_process_saved_data\.(?P<extension>.*)$',url) or content_type in approved_media_content_type_list:
         extension = search_results.groupdict().get('extension')
-        return MockResponse(json_data={})
+        return MockResponse(json_data={}, status_code=200, url=url)
 
     print(f"UNKNOWN URL: {url}")
-    return MockResponse(status_code=400)
+    return MockResponse(status_code=400, url=url)
 
 
 class TestRedditAPI(TestTemplate):
+
     @patch.object(Session, 'post')
     def setUp(self, mock_post)->None:
         self.now = datetime.datetime.now(datetime.timezone.utc)
@@ -138,7 +118,8 @@ class TestRedditAPI(TestTemplate):
             # APIBase args:
             # "logger": logger,
             "save_dir": self.test_dir,  # ensure in test_dir so tearDown removes any created data
-            "use_verbose": True,
+            # "use_verbose": True,
+            "use_verbose": False,
         }
         self.reddit = RedditAPI(**params)
 
