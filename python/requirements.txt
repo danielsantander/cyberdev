@@ -1,5 +1,5 @@
 Django==3.2.10      # web development
-lxml==4.6.2
+# lxml==4.6.2
 matplotlib==3.9.4   # plotting
 paramiko==3.4.0     # netowrk scanning
 pdf2image==1.17.0   # to convert pdf to jpg
