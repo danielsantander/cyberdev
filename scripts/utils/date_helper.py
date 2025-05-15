@@ -6,17 +6,20 @@ import datetime
 from os import times
 import pytz
 from pytz.tzinfo import DstTzInfo
-from typing import Union
+from typing import Union, Optional
 from utils.constants import DEFAULT_DATETIME_FMT_LONG
 
-def timestamp_to_date_string(timestamp: int=datetime.datetime.utcnow().timestamp(), str_format: str=DEFAULT_DATETIME_FMT_LONG)->str:
+def timestamp_to_date_string(timestamp:Optional[int]=None, str_format:str=DEFAULT_DATETIME_FMT_LONG, timezone=datetime.timezone.utc)->str:
     """ Returns datetime string representation of given timestamp with format 'YYYYMMDDHHMMSS'.
 
     Keyword arguments:
     timestamp -- integer value representing the timestamp to convert (default: datetime.datetime.utcnow().timestamp())
+    str_format -- string of date format
+    timezone -- defaults to datetime.timezone.utc
     """
+    timestamp = timestamp if timestamp is not None else datetime.datetime.now(timezone).timestamp()
     ts = int(str(timestamp).split(".")[0])
-    date = datetime.datetime.fromtimestamp(ts)
+    date = datetime.datetime.fromtimestamp(ts, tz=timezone)
     return date.strftime(str_format)
 
 def current_iso_time(tz:Union[str,DstTzInfo]=pytz.timezone('UTC')) -> str:

@@ -1,31 +1,21 @@
+#!/usr/bin/env python
 #!/usr/bin/python3
-'''
-Unit testing for file helper.
 
-RUN:
-$ python3 -m coverage run --source="." -m unittest python/scripts/tests/test_file_helper.py --verbose
-$ coverage report
-$ coverage annotate -d coverage_files/
-'''
 import datetime
 import unittest
-import os
-import sys
 from pathlib import Path
+import sys
+from test_template import SCRIPTS_DIR, TestTemplate
 
-CURRENT_DIR_NAME = os.path.dirname(os.path.realpath(__file__))
-CURRENT_DIR_PATH = Path(CURRENT_DIR_NAME)
-PARENT_DIR_NAME = os.path.dirname(CURRENT_DIR_NAME)
-# UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
-
-sys.path.insert(0, PARENT_DIR_NAME)
+sys.path.insert(0, SCRIPTS_DIR)
 from utils.custom_exceptions import InvalidDirectory
 from utils.file_helper import write_json_to_file, open_json_from_file, combine_pdfs, create_pdf, encrypt_pdf, rename_path
 
-class TestFileHelper(unittest.TestCase):
+class TestFileHelper(TestTemplate):
     def setUp(self)->None:
-        self.test_dir = CURRENT_DIR_PATH / 'TestFileHelperDirectory'
-        if not self.test_dir.exists(): self.test_dir.mkdir()
+        super().setUp()
+        self.test_dir:Path = self._test_dir / 'TestFileHelperDirectory'
+        if self.test_dir.exists() is False: self.test_dir.mkdir()
         self.test_json_file = self.test_dir / 'test.json'
         self.pdf_file_dne = self.test_dir / 'DoesNotExist.pdf'
         self.invalid_pdf_file = self.test_dir / 'Invalid.pdf'
@@ -183,13 +173,6 @@ class TestFileHelper(unittest.TestCase):
         test_file.unlink()
 
     def tearDown(self) -> None:
-        # delete (unlink) any test files or directories
-        pdfDir = self.test_dir / 'pdfs'
-        if pdfDir.exists() & pdfDir.is_dir():
-            [x.unlink() for x in pdfDir.iterdir() if x.is_file()]
-            pdfDir.rmdir()
-        if self.test_dir.exists() and self.test_dir.is_dir():
-            [x.unlink() for x in self.test_dir.iterdir() if x.is_file()]
-            self.test_dir.rmdir()
+        return super().tearDown()
 
 if __name__ == '__main__': unittest.main()

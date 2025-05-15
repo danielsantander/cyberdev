@@ -44,7 +44,8 @@ def mocked_requests_get(*args, **kwargs):
         image_type = search_results.groupdict().get('image_type')
         return MockResponse(json_data=MOCK_IMG_DATA, status_code=200, url=url)
 
-    elif search_results := re.search('^https://epic.gsfc.nasa.gov/archive/natural/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<img_ext>\w{3})/(?P<img_name>[^\.]+)\.jpg', url):
+    elif search_results := re.search('^https://epic.gsfc.nasa.gov/archive/(?P<image_type>[^\/]+)\/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<img_ext>\w{3})/(?P<img_name>[^\.]+)\.jpg', url):
+        image_type = search_results.groupdict().get('image_type')
         year = search_results.groupdict().get('year')
         month = search_results.groupdict().get('month')
         day = search_results.groupdict().get('day')
@@ -76,18 +77,14 @@ def mocked_requests_get(*args, **kwargs):
 
 class TestNASA(TestTemplate):
     def setUp(self)->None:
+        super.setUp()
         self.test_dir = self._test_dir / 'TestNASA'
         if not self.test_dir.exists(): self.test_dir.mkdir(parents=True, exist_ok=True)
         self.nasa = NASA(save_dir=self.test_dir)
 
     def tearDown(self) -> None:
-        if self.test_dir.exists() and self.test_dir.is_dir(): clean_dir(self.test_dir)
+        super().tearDown()
 
-    def test_init(self):
-        pass
-
-    def test_epic(self):
-        pass
 
 class TestEpic(TestTemplate):
     def setUp(self):
@@ -111,7 +108,7 @@ class TestEpic(TestTemplate):
         self.assertTrue(results)
 
     def tearDown(self):
-        if self.test_dir.exists() and self.test_dir.is_dir(): clean_dir(self.test_dir)
+        super().tearDown()
 
 class TestCuriosity(TestTemplate):
     def setUp(self, ):
@@ -148,8 +145,8 @@ class TestCuriosity(TestTemplate):
         results = curiosity.process_data(data=image_data, filename=filename)
         # TODO: handle `extract_media_from_url()` when called from `process_data()` -- when adding data in image_data
 
-    def tearDown(self):
-        if self.test_dir.exists() and self.test_dir.is_dir(): clean_dir(self.test_dir)
+    def tearDown(self) -> None:
+        return super().tearDown()
 
 if __name__ == '__main__':
     unittest.main()

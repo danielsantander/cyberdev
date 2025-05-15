@@ -26,7 +26,6 @@ RE_RESULTS_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<
 ACTION_CHOICES: list[str] = ['get_saved', 'consolidate', 'sanitize']
 DEBUG_MODE: bool = False
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-DEFAULT_REDDIT_SAVE_DIR = Path(CUR_DIR) / 'api_data' / 'reddit'
 
 # OS ENV
 SUBREDDIT_BLACK_LIST = json.loads(os.environ.get('SUBREDDIT_BLACK_LIST', '[]')) or []
@@ -46,7 +45,7 @@ TYPE_PREFACE_MAPPER = {
 # import utils library
 script_dir = os.path.abspath(f"{os.path.dirname(CUR_DIR)}/scripts")
 sys.path.insert(0, script_dir)
-from utils.constants import DEFAULT_LOG_FORMAT, IMAGE_EXTENSION, IMAGE_EXTENSION_LIST, VIDEO_EXTENSION, VIDEO_EXTENSION_LIST
+from utils.constants import DEFAULT_API_SAVE_DIRECTORY, DEFAULT_LOG_FORMAT, IMAGE_EXTENSION, IMAGE_EXTENSION_LIST, VIDEO_EXTENSION, VIDEO_EXTENSION_LIST
 from utils.custom_exceptions import UnauthorizedError
 from utils.custom_logging import add_handler_to_logger
 from utils.date_helper import timestamp_to_date_string
@@ -54,6 +53,8 @@ from utils.file_helper import get_file_creation_date, open_json_from_file, write
 from utils.image_helper import yt_download  # TODO: remove, this may not be working properly
 from utils.navigation import make_directory
 from utils.webutils import extract_media_from_url, get_video_source_url
+
+DEFAULT_REDDIT_SAVE_DIR = Path(DEFAULT_API_SAVE_DIRECTORY) / 'reddit'
 
 class Token(object):
     def __init__(self):
@@ -71,12 +72,8 @@ class RedditAPI(APIBase):
     oauth_url = "https://oauth.reddit.com"
     base_api_url = f"{reddit_url}/api/v1"
 
-    def __init__(self, client_id:str, client_secret:str, username:str, password:str, logger:logging.Logger=None, save_dir:Path=None, use_verbose:bool=False, **kwargs):
-        super().__init__(logger=logger, save_dir=save_dir, use_verbose=use_verbose)
-        self._logger.name = 'RedditAPI'
-
-        if None in [client_id, client_secret, username, password]:
-            raise ValueError("Need credentials.")
+    def __init__(self, client_id:str, client_secret:str, username:str, password:str, logger:Union[logging.Logger, str]='RedditAPI', save_dir:Path=None, use_verbose:bool=False, **kwargs):
+        super().__init__(save_dir=save_dir, use_verbose=use_verbose)
 
         # creds
         self.client_id = client_id
@@ -88,16 +85,16 @@ class RedditAPI(APIBase):
         if 'reddit' not in self._save_dir.name: self._save_dir = self._save_dir / 'reddit'
         self.save_dir_path: Path = make_directory(self._save_dir / f'{self.username}')
         self.api_data_dir_path: Path = make_directory(self.save_dir_path / 'api_data')
+        self.log_dir_path: Path = make_directory(self.save_dir_path / 'logs')
 
-        # if no logger provided, create file handler and add to logger
-        if logger is None:
-            import logging.handlers
-            log_dir = make_directory(directory_path=self.save_dir_path / 'logs')
-            log_filename =  os.path.join(log_dir, "RedditAPI.log")
-            log_level = logging.DEBUG if self._use_verbose else logging.INFO
-            max_byte_size_50 = 50*1024*1024 # ~52mb
-            file_handler = logging.handlers.RotatingFileHandler(log_filename, maxBytes=max_byte_size_50, backupCount=5)
-            self._logger = add_handler_to_logger(self._logger, new_handler=file_handler, log_level=log_level)
+        # logger
+        log_level = logging.DEBUG if use_verbose else logging.INFO
+        self._logger = self._create_logger(log_name='RedditAPI', log_level=log_level, log_dir=self.log_dir_path)
+
+        if None in [self.client_id, self.client_secret, self.username, self.password]:
+            err_msg = "Need credentials."
+            self._logger.error(err_msg)
+            raise ValueError(err_msg)
 
         # session
         self._session.headers.update({"User-Agent": f"{self.username}_App/0.1 by {self.username}"})
@@ -617,7 +614,6 @@ if __name__ == '__main__':
     parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, help='Source of file to input.')
     args = vars(parser.parse_args())
 
-
     # SETUP ARGS
     # ----------
     results = {}
@@ -638,7 +634,6 @@ if __name__ == '__main__':
     logger.addHandler(console_handler)
     log_level = logging.DEBUG if debug_mode else logging.INFO
     logger.setLevel(log_level)
-    logger.info("Performing action -- '{0}'".format(desired_action))
 
     # RedditAPI params
     # ----------------
@@ -653,6 +648,7 @@ if __name__ == '__main__':
     }
     reddit = RedditAPI(**params)
     logger = reddit._logger
+    logger.info("Performing action -- '{0}'".format(desired_action))
     results: dict = {}
 
     # ACTION: get_saved -- retrieve and processes saved posts

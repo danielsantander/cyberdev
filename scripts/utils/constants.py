@@ -1,5 +1,9 @@
 import logging
+import os
 from typing import List
+
+DEFAULT_SAVE_DIRECTORY = os.path.join(os.path.dirname(os.path.dirname((os.path.abspath(__file__)))), 'data')
+DEFAULT_API_SAVE_DIRECTORY = os.path.join(DEFAULT_SAVE_DIRECTORY, 'api')
 
 DEFAULT_DATETIME_FMT_SHORT = '%Y%m%d'
 DEFAULT_DATETIME_FMT_LONG = '%Y%m%d%H%M%S'

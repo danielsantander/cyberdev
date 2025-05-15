@@ -1,29 +1,20 @@
+#!/usr/bin/env python
 #!/usr/bin/python3
-'''
-Unit testing for navigation library.
 
-RUN:
-$ python3 -m coverage run --source="." -m unittest python/scripts/tests/test_navigation.py --verbose
-$ coverage report
-$ coverage annotate -d coverage_files/
-'''
 import unittest
 import os
 import sys
 from pathlib import Path
+from test_template import SCRIPTS_DIR, TestTemplate
 
-CURRENT_DIR_NAME = os.path.dirname(os.path.realpath(__file__))
-CURRENT_DIR_PATH = Path(CURRENT_DIR_NAME)
-PARENT_DIR_NAME = os.path.dirname(CURRENT_DIR_NAME)
-# UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
-
-sys.path.insert(0, PARENT_DIR_NAME)
+sys.path.insert(0, SCRIPTS_DIR)
 from utils.custom_exceptions import InvalidDirectory
 from utils.navigation import make_directory, clean_directory, get_filenames
 
-class TestNavigation(unittest.TestCase):
+class TestNavigation(TestTemplate):
     def setUp(self)->None:
-        self.test_dir =  CURRENT_DIR_PATH / "TestNavigationDirectory"
+        super().setUp()
+        self.test_dir =  self._test_dir / "TestNavigationDirectory"
 
     def test_make_directory(self):
         self.assertEqual(self.test_dir.exists(), False)
@@ -88,10 +79,10 @@ class TestNavigation(unittest.TestCase):
         self.assertEqual(len(file_list), 2)
 
     def test_invalid_directory_raises_exception(self):
-        fake_directory_name:Path = CURRENT_DIR_PATH / 'FAKE_DIRECTORY'
+        fake_directory_name:Path = self.test_dir / 'InvalidDirectory'
         self.assertRaises(InvalidDirectory, get_filenames, fake_directory_name)
 
-    def tearDown(self)->None:
-        if self.test_dir.exists() and self.test_dir.is_dir(): clean_directory(self.test_dir, remove_directory=True)
+    def tearDown(self):
+        return super().tearDown()
 
 if __name__ == '__main__': unittest.main()

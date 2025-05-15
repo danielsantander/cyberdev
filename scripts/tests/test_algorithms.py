@@ -1,16 +1,14 @@
+#!/usr/bin/env python
 #!/usr/bin/python3
 
-import os
 import sys
 import unittest
-from pathlib import Path
-from test_base import TestBase
+from test_template import TestTemplate, UTILS_DIR, clean_dir
 
-CUR_DIR_NAME = os.path.dirname(os.path.realpath(__file__))
-sys.path.insert(0, os.path.dirname(CUR_DIR_NAME))
-from utils.algorithms import calc_x_trajectory, calc_y_trajectory, plot_trajectory
+sys.path.insert(0, UTILS_DIR)
+from algorithms import calc_x_trajectory, calc_y_trajectory, plot_trajectory
 
-class TestAlgorithms(TestBase):
+class TestAlgorithms(TestTemplate):
     def setUp(self) -> None:
         self.horizontal_velocity = 10 # meters
         self.vertical_velocity = 10   # meters
@@ -31,7 +29,7 @@ class TestAlgorithms(TestBase):
         print(f"results: {results}")
         return
 
-    def tearDown(self):
-        return
+    def tearDown(self) -> None:
+        return super().tearDown()
 
 if __name__ == '__main__': unittest.main()

@@ -3,16 +3,17 @@
 
 import datetime
 import json
+import logging
 import os
 import requests
-import sys
 import unittest
 from pathlib import Path
 from typing import Union
 
-TEST_DIR = os.path.dirname(os.path.realpath(__file__))   # current directory
-API_DIR = os.path.dirname(TEST_DIR)                      # parent directory
-sys.path.insert(0, API_DIR)
+TEST_DIR = os.path.dirname(os.path.realpath(__file__))
+SCRIPTS_DIR = os.path.dirname(TEST_DIR)
+API_DIR = os.path.join(SCRIPTS_DIR, 'api')
+UTILS_DIR = os.path.join(SCRIPTS_DIR, 'utils')
 
 class MockResponse:
     def __init__(self, json_data={}, status_code=200, url=""):
@@ -62,14 +63,19 @@ def write_json_to_file(filename:Union[str,Path], data:dict):
         f.write(json.dumps(data, indent=2))
 
 class TestTemplate(unittest.TestCase):
-    _test_dir = Path(TEST_DIR)
-    _test_dir.mkdir(parents=True, exist_ok=True)
+
+    _test_dir = Path(TEST_DIR) / 'TestTemplateDir'
     _now = datetime.datetime.now(datetime.timezone.utc)
 
     def setUp(self):
+        self._test_dir.mkdir(parents=True, exist_ok=True)
+        # disable all logging calls with levels less severe than or equal to CRITICAL
+        logging.disable(logging.CRITICAL)
         return
 
     def tearDown(self):
         if self._test_dir.exists() and self._test_dir.is_dir():
             clean_dir(self._test_dir)
-        return
+        # re-enable logging
+        logging.disable(logging.NOTSET)
+        return super().tearDown()

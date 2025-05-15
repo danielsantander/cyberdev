@@ -1,8 +1,7 @@
 #! /bin/bash
 
-python3 -m coverage run --source="../" -m unittest discover .
+python3 -m coverage run --source="../api,../utils" -m unittest discover .
 pid=$!
-
 
 # kill -0 -> doesn't send a signal, but returns exit status 0 if process exists else non-zero
 while kill -0 $pid >/dev/null 2>&1; do

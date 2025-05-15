@@ -11,7 +11,7 @@ from utils.custom_logging import create_logger
 
 LOGGER = create_logger(name='ImageHelper', level=logging.DEBUG)
 
-def jpg_to_gif(img_dir:Union[str, Path, list[Path]], gif_dir:Union[str, Path]=None, gif_name:str=None, duration:float=None, do_sort:bool=True) -> None:
+def jpg_to_gif(img_dir:Union[str, Path, list[Path]], gif_dir:Union[str, Path]=None, gif_name:str=None, duration:float=None, do_sort:bool=True, lgr:logging.Logger=LOGGER) -> None:
     """Combines a set of images from directory into a single gif image.
 
     Keyword arguments:
@@ -49,9 +49,13 @@ def jpg_to_gif(img_dir:Union[str, Path, list[Path]], gif_dir:Union[str, Path]=No
     else: raise InvalidDirectory
 
     # gif conversion
-    img_path_list = sorted(img_path_list, key=lambda i: i.name) if do_sort else img_path_list
-    images = [imageio.imread(x.resolve()) for x in img_path_list if x.is_file()]
-    imageio.mimsave(gif_path, images, 'GIF', duration=duration)
+    try:
+        img_path_list = sorted(img_path_list, key=lambda i: i.name) if do_sort else img_path_list
+        images = [imageio.imread(x.resolve()) for x in img_path_list if x.is_file()]
+        imageio.mimsave(gif_path, images, 'GIF', duration=duration)
+    except Exception as err:
+        lgr.error('unable to convert images to gif: {0}'.format(err.__str__()))
+        return None
     return gif_path
 
 def pdf_to_jpg(path:Union[str,Path], outPath:Union[str,Path]=None, lgr:logging.Logger=LOGGER) -> None:

@@ -20,6 +20,7 @@ def mocked_requests_get(*args, **kwargs):
 class TestAPIBasic(TestTemplate):
 
     def setUp(self):
+        super().setUp()
         self.test_dir = self._test_dir / 'TestAPIBasic'
         args = {
             "logger": None,
@@ -28,10 +29,6 @@ class TestAPIBasic(TestTemplate):
             "use_verbose": False
         }
         self.api_base = APIBase(**args)
-
-    def tearDown(self):
-        if self.test_dir.exists() and self.test_dir.is_dir():
-            clean_dir(self.test_dir)
 
     def test_save_dir(self):
         self.assertTrue(self.api_base._save_dir.exists())
@@ -60,6 +57,9 @@ class TestAPIBasic(TestTemplate):
         self.assertEqual(resp.status_code, expected_status_code)
         self.assertEqual(resp.url, test_url)
         return
+
+    def tearDown(self) -> None:
+        return super().tearDown()
 
 if __name__ == '__main__':
     unittest.main()

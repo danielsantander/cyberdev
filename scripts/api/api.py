@@ -7,13 +7,13 @@ import logging
 import os
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
-CUR_DIR = os.path.dirname(os.path.abspath(__file__))
-scripts_dir = os.path.abspath(f"{os.path.dirname(CUR_DIR)}/scripts")
-sys.path.insert(0, scripts_dir)
-from utils.constants import DEFAULT_DATETIME_FMT_LONG, DEFAULT_DATETIME_FMT_SHORT
-from utils.custom_logging import create_console_logger
+API_DIR = os.path.dirname(os.path.abspath(__file__))
+SCRIPTS_DIR = os.path.dirname(API_DIR)
+sys.path.insert(0, SCRIPTS_DIR)
+from utils.constants import DEFAULT_API_SAVE_DIRECTORY, DEFAULT_DATETIME_FMT_LONG, DEFAULT_DATETIME_FMT_SHORT
+from utils.custom_logging import create_logger
 
 
 class APIBase(object):
@@ -22,25 +22,32 @@ class APIBase(object):
 
         # dates
         self._now = datetime.datetime.now(datetime.timezone.utc)
-        self._now_str_long = self._now.strftime(DEFAULT_DATETIME_FMT_LONG)
-        self._now_str_short = self._now.strftime(DEFAULT_DATETIME_FMT_SHORT)
-
-        # logger
-        log_level = logging.DEBUG if self._use_verbose else logging.INFO
-        logger_name = "API"
-        if logger and isinstance(logger, str):
-            logger_name = logger
-        self._logger = logger if logger and isinstance(logger, logging.Logger) else create_console_logger(name=logger_name, level=log_level)
+        self._now_str_long = self._now.strftime(DEFAULT_DATETIME_FMT_LONG)      # YYYYMMDDHHMMSS
+        self._now_str_short = self._now.strftime(DEFAULT_DATETIME_FMT_SHORT)    # YYYYMMDD
 
         # save directory
         if save_dir is None:
             self._logger.debug('No save directory provided, using current directory path.')
-            save_dir = Path(CUR_DIR)
+            save_dir = Path(DEFAULT_API_SAVE_DIRECTORY) / 'APIBaseDirectory'
         self._save_dir = self._verify_or_create_directory(save_dir)
+
+        # logger
+        log_level = logging.DEBUG if self._use_verbose else logging.INFO
+        if logger and isinstance(logger, logging.Logger):
+            self._logger = logger
+        # elif logger and isinstance(logger, str):
+        #     self._logger = logging.getLogger(logger)
+        else: self._logger = logging.getLogger("APIBase")
+        self._logger.setLevel(log_level)
         self._logger.debug(f"APIBase init complete -- _save_dir: {self._save_dir.absolute()}")
 
         # init
         self._session = self.__setup_session()
+
+    def _create_logger(self, log_name:str, log_level=None, log_dir:Union[Path, str, None]=None)->logging.Logger:
+        if log_level is None: log_level = logging.DEBUG if self._use_verbose else logging.INFO
+        self._logger = create_logger(name=log_name, level=log_level, log_dir=log_dir)
+        return self._logger
 
     def __setup_session(self)->requests.Session:
         from urllib3.util.retry import Retry

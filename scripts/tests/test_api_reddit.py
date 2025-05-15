@@ -12,17 +12,15 @@ from unittest import mock
 from unittest.mock import MagicMock, patch
 from pathlib import Path
 from requests import Session
-from test_template import TestTemplate, MockResponse, clean_dir, write_json_to_file, API_DIR
+from test_template import TestTemplate, MockResponse, clean_dir, write_json_to_file, API_DIR, UTILS_DIR
 
 sys.path.insert(0, API_DIR)
 from reddit import RedditAPI
 
-PY_DIR = os.path.dirname(API_DIR)
-SCRIPT_DIR = os.path.join(PY_DIR, 'scripts')
-sys.path.insert(0, SCRIPT_DIR)
-from utils import webutils
-from utils.date_helper import timestamp_to_date_string
-from utils.constants import DEFAULT_DATETIME_FMT_LONG
+sys.path.insert(0, UTILS_DIR)
+import webutils
+from date_helper import timestamp_to_date_string
+from constants import DEFAULT_DATETIME_FMT_LONG
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -106,6 +104,7 @@ class TestRedditAPI(TestTemplate):
 
     @patch.object(Session, 'post')
     def setUp(self, mock_post)->None:
+        super().setUp()
         self.now = datetime.datetime.now(datetime.timezone.utc)
         self.test_dir = self._test_dir / 'TestRedditAPI'
         self.token_data = mock_resp_data = { "access_token": "TOKEN", "token_type": "bearer", "expires_in": 86400, "scope": "*" }
@@ -131,10 +130,6 @@ class TestRedditAPI(TestTemplate):
         mock_resp.raise_for_status.return_value = None
         mock_post.return_value = mock_resp
         self.reddit.update_token()
-
-    def tearDown(self) -> None:
-        if self.test_dir.exists() and self.test_dir.is_dir():
-            clean_dir(self.test_dir)
 
     def test_token(self):
         self.assertTrue(self.reddit.token.is_valid)
@@ -358,6 +353,8 @@ class TestRedditAPI(TestTemplate):
             self.assertIsInstance(v, list)
             self.assertEqual(len(v), expected_count)
 
+    def tearDown(self) -> None:
+        return super().tearDown()
 
 if __name__ == '__main__':
     unittest.main()

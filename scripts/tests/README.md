@@ -1,6 +1,16 @@
-# Python Unit Testing
+# Testing
 
-[source](https://docs.python.org/3/library/unittest.html)
+## run_tests.sh
+
+Script to run unittests and evaluate code coverage for test residing in this directory.
+
+Usage: `./run_test.sh`
+
+Will output test results and save code coverage results within `coverage_files/`
+
+## Python Unit Testing
+
+source: [unittest — Unit testing framework](https://docs.python.org/3/library/unittest.html)
 
 Use unittest from the command line to run tests from modules, classes and individual test methods.
 
@@ -37,4 +47,3 @@ Generated Text Annotation Prefix Values:
 | >         | executed               |
 | !         | missing (not executed) |
 | -         | excluded               |
-

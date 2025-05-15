@@ -44,15 +44,16 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=None, m
     backup_count -- number of backup files to keep in rotation (default 5)
     format -- logger format
     """
-    logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    log_name = name[:-4] if name.lower().endswith('.log') else name
+    logger = logging.getLogger(log_name)
+    logger.setLevel(level)
     log_format = logging.Formatter(format) if isinstance(format, str) else format
     if log_dir is not None:
         log_dir = log_dir if isinstance(log_dir, Path) else Path(log_dir)
         log_dir = make_directory(log_dir)
 
         # Master logger (holds all logs)
-        master_location = os.path.join(log_dir, f"{name}.log")
+        master_location = os.path.join(log_dir, f"{log_name}.log")
         #max_byte_size_50 = 50*1024*1024 # ~52mb
         master_file_handler = logging.handlers.RotatingFileHandler(master_location, maxBytes=max_byte_size, backupCount=backup_count)
         master_file_handler.setLevel(logging.DEBUG)

@@ -1,40 +1,27 @@
 #!/usr/bin/env python
 #!/usr/bin/python3
-'''
-Unit testing for custom exceptions.
-
-RUN TESTS:
-$ python -m unittest python/scripts/tests/test_custom_exceptions.py --verbose
-
-RUN TESTS WITH COVERAGE:
-$ python -m coverage run --source="." -m unittest python/scripts/tests/test_custom_exceptions.py --verbose
-$ coverage report
-$ coverage annotate -d coverage_files/
-'''
 
 import unittest
-import os
 import sys
 import unittest
 from pathlib import Path
+from test_template import SCRIPTS_DIR, TestTemplate
 
-CURRENT_DIR_NAME = os.path.dirname(os.path.realpath(__file__))
-CURRENT_DIR_PATH = Path(CURRENT_DIR_NAME)
-PARENT_DIR_NAME = os.path.dirname(CURRENT_DIR_NAME)
-# UTILS_DIR = Path(PARENT_DIR_NAME) / 'utils'
-
-sys.path.insert(0, PARENT_DIR_NAME)
+sys.path.insert(0, SCRIPTS_DIR)
 from utils import custom_exceptions
 
-class TestInvalidDirectory(unittest.TestCase):
+class TestInvalidDirectory(TestTemplate):
     def setUp(self)->None:
-        self.test_dir : Path = CURRENT_DIR_PATH / 'sample_test_data'
+        super().setUp()
+        self.test_dir : Path = self._test_dir / 'TestInvalidDirectory'
+        self.test_dir.mkdir(parents=True, exist_ok=True)
 
     def test_valid_directory(self):
         self.assertTrue(self.test_dir.exists() and self.test_dir.is_dir())
 
+
     def test_invalid_directory(self):
-        invalid_directory = CURRENT_DIR_PATH / 'into_the_void'
+        invalid_directory = self.test_dir / 'into_the_void'
         self.assertFalse(invalid_directory.exists())
         self.assertFalse(invalid_directory.is_dir())
 
@@ -45,7 +32,10 @@ class TestInvalidDirectory(unittest.TestCase):
             raise_exception()
         self.assertTrue(str(context.exception).find('Invalid path given. Directory does not exist') != -1)
 
-class TestInvalidBoolValue(unittest.TestCase):
+    def tearDown(self):
+        return super().tearDown()
+
+class TestInvalidBoolValue(TestTemplate):
     def setUp(self) -> None:
         return super().setUp()
 
@@ -57,12 +47,16 @@ class TestInvalidBoolValue(unittest.TestCase):
             raise_exception()
         self.assertTrue(str(context.exception).find('Unknown boolean value') != -1)
 
-class TestInvalidFile(unittest.TestCase):
+    def tearDown(self):
+        return super().tearDown()
+
+class TestInvalidFile(TestTemplate):
     def setUp(self) -> None:
-        return super().setUp()
+        super().setUp()
+        self.test_dir : Path = self._test_dir / 'TestInvalidFile'
 
     def test_invalid_file(self):
-        invalid_file = CURRENT_DIR_PATH / 'invalid_file.txt'
+        invalid_file = self.test_dir / 'invalid_file.txt'
         self.assertFalse(invalid_file.exists())
         self.assertFalse(invalid_file.is_dir())
         def raise_exception():
@@ -70,6 +64,9 @@ class TestInvalidFile(unittest.TestCase):
         with self.assertRaises(custom_exceptions.InvalidFile) as context:
             raise_exception()
         self.assertEqual(str(context.exception), f'Invalid file {invalid_file.absolute().__str__()}')
+
+    def tearDown(self):
+        return super().tearDown()
 
 
 if __name__ == '__main__': unittest.main()
