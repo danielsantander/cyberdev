@@ -6,7 +6,6 @@ import json
 import re
 import os
 import platform
-import requests
 import sys
 from pathlib import Path
 from typing import Union, List
@@ -167,7 +166,9 @@ def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone
         stat = os.stat(path_to_file)
         try:
             #return stat.st_birthtime
-            file_timestamp = stat.st_birthtime
+            file_birthtime = stat.st_birthtime
+            file_modtime = stat.st_mtime
+            file_timestamp = min(file_birthtime, file_modtime)
         except AttributeError:
             # We're probably on Linux. No easy way to get creation dates here,
             # so we'll settle for when its content was last modified.
@@ -177,7 +178,7 @@ def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone
     return datetime.datetime.fromtimestamp(file_timestamp, tz=timezone)
 
 
-def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list[Path]:
+def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list:
     """
     Iterates through given directory and returns a list of files recently  created.
 
@@ -246,9 +247,9 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
     """
     # usage: results = rename_path(path, f"APPEND_TO_FILENAME____{path.name}")
     path = path if isinstance(path, Path) else Path(path)
+    new_name = new_name if isinstance(new_name, Path) else Path(path.parent / str(new_name))
     try:
-        if (overwrite is False and (path.parent / new_name).exists()): raise FileExistsError(f'File {new_name} already exists.')
-
+        if (overwrite is False and (path.parent / new_name.name).exists()): raise FileExistsError(f'File {new_name.name} already exists.')
         path = path.rename(new_name)
 
     # path file does not exist, file path not found.
