@@ -1,6 +1,15 @@
 #!/usr/bin/env python
 #!/usr/bin/python3
 
+"""
+examples:
+# default output directory
+./reddit.py -a get_saved -u -d
+
+# specify output directory:
+./reddit.py -a get_saved -u -d -o {output_directory}
+"""
+
 import datetime
 import logging
 import json
