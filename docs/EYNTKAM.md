@@ -274,7 +274,7 @@ Script files will begin with the shebang: `#!/bin/bash`
 ## Update & Upgrade
 
 ```shell
-sudo apt-get update && sudo apt-get upgrade
+sudo apt-get update && sudo apt-get upgrade -y
 ```
 
 ## Update User Password
@@ -886,6 +886,7 @@ apt-get install {package-name}
 Update list of packages available for download from repository
 
 ```shell
+# update list of available packages and their versions
 apt-get update
 ```
 
@@ -894,10 +895,10 @@ apt-get update
 Actually upgrade the packages to the latest version
 
 ```shell
+# installs newer versions of packages
 apt-get upgrade
 ```
 
-> `apt-get update` updates the list of available packages and their versions, but does not install or upgrade any packages. Whereas `apt-get upgrade` actually installs newer versions of the packages.
 
 ### Removing Software
 

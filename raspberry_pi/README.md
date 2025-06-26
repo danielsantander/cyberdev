@@ -129,8 +129,7 @@ sudo apt-get update
 sudo apt-get install python-picamera python3-picamera
 
 # update
-sudo apt-get update
-sudo apt-get upgrade
+sudo apt-get update && sudo apt-get upgrade -y
 
 # remove installation
 sudo apt-get remove python-picamera python3-picamera

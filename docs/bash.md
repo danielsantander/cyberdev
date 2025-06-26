@@ -8,7 +8,7 @@
 
 ```shell
 # Upgrade Python distribution
-sudo apt-get upgrade python3
+sudo apt-get update && apt-get upgrade python3
 ```
 
 # Make script executable
