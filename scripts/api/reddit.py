@@ -52,7 +52,7 @@ TYPE_PREFACE_MAPPER = {
 }
 
 # import utils library
-script_dir = os.path.abspath(f"{os.path.dirname(CUR_DIR)}/scripts")
+script_dir = os.path.abspath(os.path.dirname(CUR_DIR))
 sys.path.insert(0, script_dir)
 from utils.constants import DEFAULT_API_SAVE_DIRECTORY, DEFAULT_LOG_FORMAT, IMAGE_EXTENSION, IMAGE_EXTENSION_LIST, VIDEO_EXTENSION, VIDEO_EXTENSION_LIST
 from utils.custom_exceptions import UnauthorizedError
