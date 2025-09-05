@@ -217,6 +217,9 @@ git diff --name-status branch_name
 
 # use the same command but pipe with grep go search for changed files named "testFiles"
 git diff --name-status branch_name | grep "testFile[s]"
+
+# diff between two different commits (use '^' to include first_commit changes)
+git diff first_commit^..last_commit
 ```
 
 # Log
@@ -246,6 +249,9 @@ git log --oneline --follow git/docs/README.md
 
 # display commits that develop branch has but main branch does not.
 git log main..develop --oneline
+
+# To search the commit log (across all branches) for the given text (ignoring case sensitivity):
+git log --all -i --grep="search text here"
 ```
 
 # Revert
