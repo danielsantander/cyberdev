@@ -2,6 +2,7 @@
   - [account](#account)
   - [dynamodb](#dynamodb)
   - [ec2](#ec2)
+  - [s3api](#s3api)
 - [Sources](#sources)
 
 # AWS CLI
@@ -55,6 +56,12 @@ aws ec2 describe-instances --filters "Name=private-ip-address,Values=0.0.0.0" | 
                         "Code": 16,
                         "Name": "running"
                     },
+```
+
+## s3api
+
+```shell
+aws s3api list-buckets
 ```
 
 # Sources
