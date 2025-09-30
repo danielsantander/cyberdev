@@ -9,6 +9,8 @@ reportlab==4.3.1    # Canvas to create PDFs
 requests==2.32.3
 scapy==2.5.0        # network scanning
 
+boto3==1.40.41      # aws
+
 # nasa api
 imageio==2.37.0
 
