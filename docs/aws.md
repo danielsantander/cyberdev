@@ -1,6 +1,7 @@
 - [AWS CLI](#aws-cli)
-  - [Account](#account)
-  - [EC2](#ec2)
+  - [account](#account)
+  - [dynamodb](#dynamodb)
+  - [ec2](#ec2)
 - [Sources](#sources)
 
 # AWS CLI
@@ -10,16 +11,38 @@
 aws --version
 ```
 
-## Account
+## account
 
 ```shell
 # list regions
 aws account list-regions --account-id {account_id}
+
+aws account get-account-information
+{
+    "AccountCreatedDate": "2020-01-31T08:10:30+00:00",
+    "AccountId": "############",
+    "AccountName": "Account Name"
+}
 ```
 
-## EC2
+## dynamodb
 
 ```shell
+aws dynamodb list-tables 
+{
+    "TableNames": [
+        "table0",
+        "table1",
+    ]
+}
+```
+
+## ec2
+
+```shell
+# get instance by name
+aws ec2 describe-instances --filters 'Name=tag:Name,Values=MyInstanceName'
+
 # describe instances
 aws ec2 describe-instances --instance-ids {instance_id_here}
 
