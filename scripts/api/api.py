@@ -46,8 +46,8 @@ class APIBase(object):
 
     def _create_logger(self, log_name:str, log_level=None, log_dir:Union[Path, str, None]=None)->logging.Logger:
         if log_level is None: log_level = logging.DEBUG if self._use_verbose else logging.INFO
-        self._logger = create_logger(name=log_name, level=log_level, log_dir=log_dir)
-        return self._logger
+        logger = create_logger(name=log_name, level=log_level, log_dir=log_dir)
+        return logger
 
     def __setup_session(self)->requests.Session:
         from urllib3.util.retry import Retry
