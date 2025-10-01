@@ -40,3 +40,15 @@ scan_subnet() {
         echo "$network";
     fi
 }
+
+get-ip--macos() {
+    ifconfig | grep -E "inet \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" | awk '{print $2}';
+}
+
+get-ip() {
+    if [ ! -e /etc/os-release ]; then
+        get-ip--macos
+    else
+        hostname -I
+    fi;
+}
