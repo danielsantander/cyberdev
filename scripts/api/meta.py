@@ -5,6 +5,7 @@
 Retrieve media from Meta's social media Thread posts given URLs.
 """
 
+import argparse
 import logging
 import json
 import re
@@ -13,12 +14,20 @@ import sys
 from api import APIBase
 from pathlib import Path
 
+DEBUG_MODE = False
 API_DIR = os.path.dirname(os.path.abspath(__file__))     # scripts/api
 SCRIPTS_DIR = os.path.dirname(API_DIR)
 sys.path.insert(0, SCRIPTS_DIR)
 from utils.constants import DEFAULT_API_SAVE_DIRECTORY
 from utils.custom_logging import create_logger
 from utils.webutils import extract_media_from_url
+
+def get_args():
+    parser = argparse.ArgumentParser(description="Reddit API")
+    parser.add_argument('-u', '--url', dest='url', action='store', help='URL', required=False)
+    parser.add_argument('-d','-v', '--verbose','--debug', dest='debug', action='store_true', default=DEBUG_MODE, help=f'Debug/verbose mode. [{DEBUG_MODE}]')
+    parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, help='Source of file to input.')
+    return vars(parser.parse_args())
 
 class Threads(APIBase):
     def __init__(self, use_verbose:bool=True):
@@ -86,10 +95,9 @@ class Threads(APIBase):
                 if save_file_path.exists():
                     print (f"file ({save_file_path}) already exists, skipping...")
                     continue
-                print(f"Video Source: {video_src}")
-                print (f"filename: {filename}")
-                print (f"save_file: {save_file_path.absolute()}")
-                print ("...extracting video from url...")
+                # print(f"Video Source: {video_src}")
+                # print (f"filename: {filename}")
+                # print (f"save_file: {save_file_path.absolute()}")
                 extract_media_from_url(url=video_src, save_path=save_file_path)
         finally:
             # Close the browser
@@ -98,9 +106,32 @@ class Threads(APIBase):
         return results
 
 if __name__ == '__main__':
+    args = get_args()
+    debug_mode = args.get('debug', DEBUG_MODE)
+    url = args.get('url')
+    file_path = args.get('file')
+
+    # print(f"Debug mode: {debug_mode}")
+    # print(f"URL: {url}")
+    # print(f"File path: {file_path}")
 
     # TODO: get user input for lists -- file and/or single url input
-    url_list = []
+    url_list = [] if url is None else [url]
+    if len(url_list) < 1 and file_path is not None:
+        print (f"Reading URLs from file: {file_path} ...")
+        try:
+            with open(file_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    if line:
+                        url_list.append(line)
+        except Exception as e:
+            print (f"Error reading file ({file_path}): {e}")
+            sys.exit(1)
+    if len(url_list) < 1:
+        print("No URLs provided, exiting...")
+        sys.exit(1)
+
     thread = Threads()
     results = thread.get_thread_posts(url_list)
 
