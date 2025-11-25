@@ -22,6 +22,8 @@ from utils.constants import DEFAULT_API_SAVE_DIRECTORY
 from utils.custom_logging import create_logger
 from utils.webutils import extract_media_from_url
 
+URL_LIST = []
+
 def get_args():
     parser = argparse.ArgumentParser(description="Reddit API")
     parser.add_argument('-u', '--url', dest='url', action='store', help='URL', required=False)
@@ -111,12 +113,8 @@ if __name__ == '__main__':
     url = args.get('url')
     file_path = args.get('file')
 
-    # print(f"Debug mode: {debug_mode}")
-    # print(f"URL: {url}")
-    # print(f"File path: {file_path}")
-
     # TODO: get user input for lists -- file and/or single url input
-    url_list = [] if url is None else [url]
+    url_list = URL_LIST if url is None else [url]
     if len(url_list) < 1 and file_path is not None:
         print (f"Reading URLs from file: {file_path} ...")
         try:
@@ -131,9 +129,7 @@ if __name__ == '__main__':
     if len(url_list) < 1:
         print("No URLs provided, exiting...")
         sys.exit(1)
-
     thread = Threads()
     results = thread.get_thread_posts(url_list)
-
 
 # TODO: add unit testing

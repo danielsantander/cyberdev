@@ -42,6 +42,11 @@ DESKTOP_USER_AGENT_LIST = [
 
 # xpath list for web app scraping
 XPATH_LIST = [
+    "//meta[@property='og:video:url']/@content",  # Open Graph video URL
+    "//meta[@name='twitter:player']/@content",   # Twitter player URL
+    "//script[contains(text(), 'DASHPlaylist')]", # JSON or JS-embedded URLs
+    "/html/body/shreddit-app/div[3]/div/div/main/shreddit-post/div[3]/shreddit-aspect-ratio/shreddit-async-loader/activate-feature/shreddit-player-2//video",   # reddit vids
+    "/html/body/video",
     "video"
     "video/source[@src and @type='video/mp4']",
     "//video/source[@src and @type='video/mp4']",

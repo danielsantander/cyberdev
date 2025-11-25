@@ -144,7 +144,7 @@ def file_modification_date(filename: Union[str, Path], timezone=datetime.timezon
     return datetime.datetime.fromtimestamp(t, tz=timezone)
 
 
-def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->datetime.datetime:
+def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone.utc, use_timestamp:bool=False)->Union[datetime.datetime, float]:
     """
     Returns datetime (from timestamp) of file creation date.
 
@@ -161,6 +161,7 @@ def get_file_creation_date(filename:Union[str, Path], timezone=datetime.timezone
     # source: https://stackoverflow.com/a/39501288/14745606
     # if platform.system() == 'Windows':
     if platform.system().lower() in ['windows']:
+        # print(f"get_file_creation_date -- detected OS as Windows.")
         return os.path.getctime(path_to_file)
     else:
         stat = os.stat(path_to_file)
