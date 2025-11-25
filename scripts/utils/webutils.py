@@ -1,12 +1,14 @@
 import logging
 import lxml
+import random
 import requests
 import os
 from pathlib import Path
 from typing import Any, Optional
 from lxml import html
-from utils.constants import XPATH_LIST
+from utils.constants import XPATH_LIST, DESKTOP_USER_AGENT_LIST
 from utils.custom_logging import create_console_logger
+from html import unescape
 
 DEBUG_MODE: bool = False
 logger = create_console_logger(name='webutils', level=logging.DEBUG)
@@ -31,8 +33,17 @@ def get_video_source_url(url: str, request_timeout: int=120, xpath_list:list[str
 
     # get response
     try:
-        resp = requests.get(url, timeout=request_timeout)
+        rand_int = random.randint(0, len(DESKTOP_USER_AGENT_LIST) - 1)
+        rand_user_agent = DESKTOP_USER_AGENT_LIST[rand_int]
+
+        resp = requests.get(url, timeout=request_timeout, headers = {'User-agent': rand_user_agent})
         resp.raise_for_status()
+
+        # Check Content-Type before parsing
+        content_type = resp.headers.get('Content-Type', '').lower()
+        if 'text/html' not in content_type:
+            lgr.warning(f"get_video_source_url -- Skipping HTML parsing for non-HTML content (Content-Type: {content_type}) from {url}")
+            return None
     except requests.exceptions.HTTPError as err:
         if "403 client error" in str(err).lower():
             lgr.error(f"get_video_source_url -- HTTP 403 forbidden error ({url}): {err.__str__()}")
@@ -52,19 +63,34 @@ def get_video_source_url(url: str, request_timeout: int=120, xpath_list:list[str
 
     # search html content
     try:
-        html_code = resp.content.strip()
+        html_code = resp.content.strip().decode('utf-8', errors='ignore')
+        # lgr.debug(f"get_video_source_url -- HTML content ({content_type}): {html_code}")
         tree = html.fromstring(html_code)
         xpath_list = XPATH_LIST + xpath_list if xpath_list else XPATH_LIST
+        xpath_list += []
         for xpath in xpath_list:
             results = tree.xpath(xpath)
             for source in results:
-                src_url = str(source.get('src', source.get('content', ""))).strip()
+                if isinstance(source, str):  # Handle string results
+                    src_url = source.strip()
+                elif hasattr(source, 'tag') and source.tag in ['source', 'video']:
+                    src_url = str(source.get('src', "")).strip()
+                else:
+                    lgr.warning("get_video_source_url -- Unhandled source type in results, no video source found.")
+                    continue
                 if "-mobile" in src_url: continue
                 if src_url:
-                    lgr.debug(f"get_video_source_url -- video source found {src_url} from xpath {xpath}")
-                    return src_url
+                    # Decode HTML-encoded text
+                    decoded_url = unescape(src_url)
+                    lgr.debug(f"get_video_source_url -- video source found {decoded_url} from xpath {xpath}")
+                    return decoded_url
     except lxml.etree.ParserError as err:
-        lgr.error(f'get_video_source_url -- ParserError: {err.__str__}')
+        lgr.error(f'get_video_source_url -- ParserError while parsing HTML content from {url}: {err}')
+        # lgr.debug(f'get_video_source_url -- Response headers: {resp.headers}')
+        # lgr.debug(f'get_video_source_url -- Response content (truncated): {html_code[:500]}')  # Log first 500 characters
+        video_src_url = None
+    except Exception as err:
+        lgr.error(f'get_video_source_url -- Unexpected error while processing {url}: {err}')
         video_src_url = None
     return video_src_url
 
