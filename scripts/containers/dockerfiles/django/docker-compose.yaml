@@ -1,0 +1,11 @@
+version: "3.8"
+
+services:
+  django:
+    image: djs-django:${VERSION:-latest}
+    container_name: djs-django
+    build: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./app:/app

@@ -1,0 +1,20 @@
+# Use the official Ubuntu 24.04 image as the base image
+FROM ubuntu:24.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Update package lists and install Nginx
+RUN apt-get update && \
+    apt-get install -y vim && \
+    apt-get install -y nginx && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy a custom index.html file into the Nginx web root
+COPY ./index.html /var/www/html/index.html
+
+# Expose port 80 for Nginx
+EXPOSE 80
+
+# Start Nginx in the foreground when the container launches
+CMD ["nginx", "-g", "daemon off;"]
