@@ -1,11 +1,29 @@
-- [Build Container](#build-container)
-- [Enter Container Interactively](#enter-container-interactively)
+
+- [Install](#install)
+- [Quick Tips](#quick-tips)
+  - [Build Container](#build-container)
+  - [Build with Docker Compose](#build-with-docker-compose)
+  - [Enter Container](#enter-container)
 - [Example Build](#example-build)
 - [Prune and Delete](#prune-and-delete)
 
-# Build Container
+# Install
 
-`docker image build -t python:0.0.1 <location_to_directory_holding_dockerfile>`
+```shell
+# Install via homebrew via MacOS
+brew update
+brew install docker
+
+# Install on Linux
+sudo apt install docker.io docker-compose
+sudo systemctl start docker
+```
+
+# Quick Tips
+
+## Build Container
+
+`docker image build -t python:0.0.1 {Dockerfile_location}`
 
 ```shell
 docker build --tag python-docker .
@@ -15,7 +33,7 @@ docker build --tag python-docker .
 docker ps -a
 
 # start container
-docker start -i <container_id>
+docker start -i {container_id}
 
 # run container
 # - `d` Run container in background and print container ID
@@ -27,27 +45,39 @@ curl localhost:8000
 Hello, World!
 ```
 
-# Enter Container Interactively
-
-Usage: `docker exec -it <container name> command`
-
-- `i` Interactive mode (Keep STDIN open even if not attached)
-- `t` Allocate a pseudo-TTY
+## Build with Docker Compose
 
 ```shell
-docker exec -it <container> /bin/ash
-docker exec -it <container> /bin/sh
+# build within same directory of Dockerfile
+docker-compose build --no-cache
 
+# run
+docker-compose up
+
+# stop and remove
+docker-compose down
+```
+
+## Enter Container
+
+```shell
+# depending on which shell to use, with the following options
+# - `i` Interactive mode (Keep STDIN open even if not attached)
+# - `t` Allocate a pseudo-TTY
+docker exec -it {CONTAINER_ID} /bin/ash
+docker exec -it {CONTAINER_ID} /bin/sh
+
+# EXAMPLES:
+# ----------
 # execute crond help page
 docker exec <container> crond --help
-
 # list cronjobs
 docker exec <container> cat /etc/crontabs/root
 ```
 
 # Example Build
 
-Use mycron to run Python scripts with a Docker container.
+Use `mycron` to run Python scripts with a Docker container.
 
 ```shell
 # build 'mycron' image
@@ -59,13 +89,13 @@ $ docker run -ti mycron
 # start image as interactive in an Alpine base container
 # - `i` Interactive mode (Keep STDIN open even if not attached)
 # - `t` Allocate a pseudo-TTY
-docker exec -it <container name> /bin/ash
+docker exec -it {CONTAINER_ID} /bin/ash
 
 # execute crond help page
-docker exec <container_id> crond --help
+docker exec {CONTAINER_ID} crond --help
 
 # list of crontabs
-docker exec <container_id> cat /etc/crontabs/root
+docker exec {CONTAINER_ID} cat /etc/crontabs/root
 ```
 
 # Prune and Delete
@@ -85,7 +115,7 @@ docker rmi -f $(docker images -aq)
 
 # delete everything
 # - all stopped containers
-# - all networks  not used by at least one container
+# - all networks not used by at least one container
 # - all volumes not used by at least one container
 # - all images without at least one container associated with it
 # - all build cache

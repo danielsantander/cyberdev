@@ -14,7 +14,11 @@
 - [Settings](#settings)
   - [Django Sessions](#django-sessions)
     - [Session settings](#session-settings)
-- [Install Apps](#install-apps)
+  - [Install Apps](#install-apps)
+- [Redis](#redis)
+  - [Store Item Views in Redis](#store-item-views-in-redis)
+  - [Storing a ranking in Redis](#storing-a-ranking-in-redis)
+- [Sources](#sources)
 
 Notes on Django Web Framework and Django Rest Framework.
 
@@ -254,7 +258,7 @@ Customize sessions with specific settings such as:
 
 > Use `request.session.set_expiry()` method to overwrite the duration of the current session.
 
-# Install Apps
+## Install Apps
 
 Add apps within `INSTALLED_APP` list in settings:
 
@@ -265,3 +269,67 @@ INSTALLED_APPS = [
     'rest_framework',
 ]
 ```
+
+# Redis
+
+Assuming version `redis==3.4.1`
+
+## Store Item Views in Redis
+
+Store total times an image has been viewed.
+
+> Storing this value in Django ORM will involve a SQL `UPDATE` query every time an image is displayed
+
+Use Redis instead, to simply increase a counter stored in memory resulting in a much better performance and less overhead.
+
+```python
+import redis
+from django.conf import settings
+# establish Redis connection
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB)
+
+def detail_view(request, id, slug):
+  obj = get_object_or_404(Image, id=id, slug=slug)
+  total_views = r.incr(f'object_name:{obj.id}:views')
+  return render(request, 'detail.html', { 'object': obj, 'total_views': total_views })
+```
+
+## Storing a ranking in Redis
+
+```python
+# views.py
+import redis
+from django.conf import settings
+r = redis.Redis(host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB)
+
+def detail_view(request, id, slug):
+  obj = get_object_or_404(Image, id=id, slug=slug)
+  total_views = r.incr(f'image:{obj.id}:views')
+  # increment image ranking by 1
+  r.zincrby('image_ranking', 1, image.id)
+  return render(request, 'detail.html', { 'object': obj, 'total_views': total_views })
+
+# create view to display the ranking of the most viewed images.
+@login_required
+def image_ranking(request):
+    # get image ranking dictionary
+    image_ranking = r.zrange('image_ranking', 0, -1,
+                             desc=True)[:10]
+    image_ranking_ids = [int(id) for id in image_ranking]
+    # get most viewed images
+    most_viewed = list(Image.objects.filter(
+                           id__in=image_ranking_ids))
+    most_viewed.sort(key=lambda x: image_ranking_ids.index(x.id))
+    return render(request,
+                  'images/image/ranking.html',
+                  {'section': 'images',
+                   'most_viewed': most_viewed})
+```
+
+# Sources
+
+- [redis-py docs](https://redis-py.readthedocs.io/en/stable/)
