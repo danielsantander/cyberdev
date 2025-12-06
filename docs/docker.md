@@ -101,6 +101,9 @@ docker exec {CONTAINER_ID} cat /etc/crontabs/root
 # Prune and Delete
 
 ```shell
+# remove unused Docker objects (stopped containers, dangling images e.i. not associated with any image and not tagged, unused networks)
+sudo docker system prune --all
+
 # remove all stopped containers, -f will not ask for confirmation (y/N)
 docker container prune -f
 
