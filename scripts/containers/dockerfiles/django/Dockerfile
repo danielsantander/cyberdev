@@ -33,4 +33,4 @@ COPY ./app/ /app/
 # Expose the port your Django application will run on (e.g., Gunicorn)
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app.wsgi:application"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app.wsgi:application", "--reload"]
