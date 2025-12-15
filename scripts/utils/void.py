@@ -14,7 +14,7 @@ from datetime import datetime
 from typing import Union
 
 
-def afk():
+def afk(t_sleep=10):
     import pyautogui as pag
     # note: may need to upgrade numpy -> python3 -m pip install --upgrade numpy
     pag.FAILSAFE = False
@@ -24,7 +24,8 @@ def afk():
             y = random.randint(200,600)
             print (f"moving to {x},{y} ...")
             pag.moveTo(x,y,0.5)
-            time.sleep(2)
+            # time.sleep(2)
+            time.sleep(t_sleep)
     except KeyboardInterrupt:
         print("Exiting...")
         sys.exit()
