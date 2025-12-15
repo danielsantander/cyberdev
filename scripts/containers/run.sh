@@ -63,6 +63,7 @@ function django-docker-compose () {
         cd $WORKING_DIRECTORY || exit 1
         return 0
     else
+        echo -n "---BUILDING AND RUNNING THE DJANGO DOCKER CONTAINER---"
         sudo docker-compose up --build -d
         if [ $? -ne 0 ]; then
             echo "  - ERROR: DOCKER BUILD FAILED."
