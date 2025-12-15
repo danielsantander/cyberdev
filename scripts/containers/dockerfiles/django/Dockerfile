@@ -15,17 +15,26 @@ WORKDIR /app
 
 RUN apt-get update \
     && apt-get -y install \
-         build-essential \
-         libpq-dev \
-         gcc \
-         vim \
+        bash \
+        build-essential \
+        libpq-dev \
+        gcc \
+        vim \
     && apt-get clean
 
+SHELL ["/bin/bash", "-c"]
+
 # Install dependencies
-COPY ./requirements.txt /app
+COPY ./requirements.txt /app/
 RUN pip install --upgrade pip \
     && pip install -r requirements.txt
 
+# Copy the env file and set environment variables
+COPY container.env /.env
+
+# Copy the entrypoint script, and make the script executable
+COPY entrypoint.sh /
+RUN chmod +x /entrypoint.sh
 
 # Copy application code
 COPY ./app/ /app/
@@ -33,4 +42,8 @@ COPY ./app/ /app/
 # Expose the port your Django application will run on (e.g., Gunicorn)
 EXPOSE 8000
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "app.wsgi:application"]
+# Set the entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Define a default command (CMD becomes arguments to ENTRYPOINT)
+CMD ["echo", "Container started successfully"]
