@@ -51,17 +51,29 @@ function get-logs-by-container-id () {
 }
 
 function django-docker-compose () {
-    app_name="djs-django"
-    version=${1:-$VERSION}
-    tag_name="${app_name}:${version}"
+    container_name="djs-django"
     tmp_working_directory="$(dirname "$0")/dockerfiles/django/"
     cd "$tmp_working_directory" || exit 1
-    sudo docker-compose up --build -d
-    if [ $? -ne 0 ]; then
-        echo "  - ERROR: DOCKER BUILD FAILED."
-        return 1
+    container_id=$(docker ps -aqf "name=$container_name")
+    if [ -n "$container_id" ]; then
+        echo "  - WARNING: container $container_name already exists ($container_id)"
+        echo ""
+        echo "---STARTING THE EXISTING DJANGO DOCKER CONTAINER ($container_id)---"
+        sudo docker-compose start
+        cd $WORKING_DIRECTORY || exit 1
+        return 0
+    else
+        sudo docker-compose up --build -d
+        if [ $? -ne 0 ]; then
+            echo "  - ERROR: DOCKER BUILD FAILED."
+        else
+            cd $WORKING_DIRECTORY || exit 1
+            return 0
+        fi
+
     fi
-    return $?
+    cd $WORKING_DIRECTORY || exit 1
+    return 1
 }
 
 function django () {
