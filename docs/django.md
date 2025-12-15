@@ -8,6 +8,7 @@
   - [test](#test)
   - [custom management commands](#custom-management-commands)
 - [Django Shell](#django-shell)
+  - [Get User Model](#get-user-model)
   - [Reset User Password](#reset-user-password)
   - [Serialize Out Data](#serialize-out-data)
     - [Print Model in JSON format](#print-model-in-json-format)
@@ -177,6 +178,13 @@ class Command(BaseCommand):
 > run with: `python manage.py ensure_user --username=admin --email=admin@example.com --password=pass`
 
 # Django Shell
+
+## Get User Model
+
+```python
+from django.contrib.auth import get_user_model
+User = get_user_model()
+```
 
 ## Reset User Password
 
