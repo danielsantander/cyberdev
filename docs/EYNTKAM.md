@@ -5,7 +5,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Check Linux Versions and Bit Size](#check-linux-versions-and-bit-size)
   - [Dot Files](#dot-files)
     - [bashrc vs bash\_profile](#bashrc-vs-bash_profile)
-  - [Generate SSH Keys](#generate-ssh-keys)
+  - [SSH Service](#ssh-service)
   - [Install](#install)
     - [Kali for Raspberry Pi 4](#kali-for-raspberry-pi-4)
     - [Install VS Code](#install-vs-code)
@@ -13,6 +13,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Script Shebang](#script-shebang)
   - [Update \& Upgrade](#update--upgrade)
   - [Update User Password](#update-user-password)
+  - [Install RealTek ALFA AWUS036ACS Wifi Drivers](#install-realtek-alfa-awus036acs-wifi-drivers)
 - [Permissions](#permissions)
   - [Change File Ownership](#change-file-ownership)
   - [Permission Levels](#permission-levels)
@@ -37,6 +38,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [Install resolvconf service](#install-resolvconf-service)
   - [DNS Zone Transfer](#dns-zone-transfer)
   - [Ports](#ports)
+  - [Enable Promiscuous Mode](#enable-promiscuous-mode)
 - [Proxy Servers](#proxy-servers)
   - [proxychains](#proxychains)
     - [proxychains configurations](#proxychains-configurations)
@@ -58,9 +60,8 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [Configure Web Server](#configure-web-server)
     - [Enable/Disable Sites](#enabledisable-sites)
   - [Docker](#docker)
-    - [Check Storage](#check-storage)
-    - [System Prune](#system-prune)
-    - [Delete](#delete)
+    - [Docker Prune](#docker-prune)
+    - [Docker Delete](#docker-delete)
     - [Reboot Docker Services](#reboot-docker-services)
   - [Homebrew for MacOS](#homebrew-for-macos)
   - [Metasploit](#metasploit)
@@ -68,6 +69,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [Start Metasploit](#start-metasploit)
     - [Setup PostgreSQL](#setup-postgresql)
     - [Connect to SQL Database](#connect-to-sql-database)
+    - [wmap scan](#wmap-scan)
     - [Metasploit sources](#metasploit-sources)
   - [MySql](#mysql)
     - [Commands](#commands)
@@ -97,6 +99,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [Drop Tables](#drop-tables)
     - [Truncate Table](#truncate-table)
   - [vim](#vim)
+  - [Wireshark -- tshark](#wireshark----tshark)
 - [Process Management](#process-management)
   - [ps](#ps)
   - [top](#top)
@@ -111,6 +114,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [kill](#kill)
 - [Commands](#commands-1)
   - [awk](#awk)
+  - [arp-scan](#arp-scan)
   - [bzip2 (compress)](#bzip2-compress)
   - [bunzip](#bunzip)
   - [compress](#compress)
@@ -146,7 +150,6 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [Change variables](#change-variables)
   - [Update PATH](#update-path)
 - [Scripting](#scripting)
-  - [Terms](#terms)
   - [Shebang](#shebang)
   - [Exit Status Codes](#exit-status-codes)
   - [Make Script Executable](#make-script-executable)
@@ -220,7 +223,15 @@ uname -a
 
 `bashrc` is commonly used to set aliases, define functions, and customize prompt while `bash_profile` is commonly used to set PATH variable and to run commands that are needed only once at start of your session.
 
-## Generate SSH Keys
+## SSH Service
+
+```shell
+# update SSH configs
+sudo vi /etc/ssh/sshd_config
+
+# restart ssh service
+sudo service ssh restart
+```
 
 Generate a SSH key pair consisting of a public key and a private key.
 
@@ -233,15 +244,6 @@ ssh-keygen -b 2048 -t rsa
 
 # verify ssh key and  passphrase, if successful it will show you the associated public key else display "load failed".
 ssh-keygen -y -f .ssh/id_rsa
-```
-
-Update necessary SSH configs
-
-```shell
-sudo vi /etc/ssh/sshd_config
-
-# restart ssh service
-sudo service ssh restart
 ```
 
 ## Install
@@ -288,7 +290,7 @@ sudo su -
 # update password for 'ubuntu' user
 passwd ubuntu
 
-# update sshd_config file to allow password authenticatio
+# update sshd_config file to allow password authentication
 sudo vi /etc/ssh/sshd_config
 # Find the line with the PasswordAuthentication parameter and change its value from no to yes
 # If you want to set up root login, find the PermitRootLogin parameter and change its value from prohibit-password to yes
@@ -301,6 +303,87 @@ sudo su ubuntu
 
 # or if logged out log back in with user
 ssh ubuntu@ip_address
+```
+
+## Install RealTek ALFA AWUS036ACS Wifi Drivers
+
+- source:
+  - [google search](https://www.google.com/search?q=Raspberian+Pi+OS+enable+RealTek+ALFA+AWUS036ACS&oq=Raspberian+Pi+OS+enable+RealTek+ALFA+AWUS036ACS&gs_lcrp=EgZjaHJvbWUyBggAEEUYOTIJCAEQIRgKGKABMgkIAhAhGAoYoAEyCQgDECEYChigATIJCAQQIRgKGKABMgcIBRAhGI8CMgcIBhAhGI8C0gEIMzcyNGowajmoAgCwAgHxBcu_djFq-d8J&sourceid=chrome&ie=UTF-8)
+
+Raspbian Pi OS:
+
+```shell
+sudo apt update && sudo apt upgrade -y
+sudo apt-get install realtek-rtl88xxau-dkms
+sudo apt-get install realtek-rtl8812au-dkms
+
+# Install from a Third-Party Repository/Script (Recommended for Raspberry Pi OS)
+# If the package is not in the default repositories (which is often the case for standard Raspberry Pi OS), a common and simple solution is to use a pre-compiled driver installer script, such as the one from fars-robotics.net.
+mkdir tmp; cd tmp;
+sudo wget http://fars-robotics.net/install-wifi
+sudo chmod +x install-wifi
+
+# Run the script to automatically install the correct driver for your current kernel:
+sudo install-wifi
+
+# Reboot your Raspberry Pi after installation:
+sudo reboot
+
+# ----
+
+# Clone the driver source from a reliable GitHub repository (e.g., aircrack-ng's version):
+git clone https://github.com/aircrack-ng/rtl8812au.git
+cd rtl*
+
+# Install the driver using the DKMS installation script:
+# If you encounter an error related to arm7l vs arm architecture, you may need to apply a fix mentioned in some guides, such as this one.
+sudo ./dkms-install.sh
+
+sudo reboot
+```
+
+This is the process in which to install the ALFA AWUS036ACS drivers on Kali Linux 2020.
+
+```shell
+# install drivers
+sudo apt-get install realtek-rtl88xxau-dkms
+
+# install Dynamic Kernel Module Support (dkms)
+sudo apt-get install dkms
+
+# clone drivers from aircrack-ng github page
+git clone https://github.com/aircrack-ng/rtl8812au
+cd rtl8812au/
+
+# install software
+make
+sudo make install
+
+#------------------
+# troubleshooting
+#------------------
+# if 'no such file or directory' error performing make, try installing the linux headers:
+sudo apt-get install linux-headers-$(uname -r)
+
+# or maybe:
+sudo apt-get install build-essential linux-headers-$(uname -r)
+
+# show usb and wifi config
+lsusb
+iwconfig
+```
+
+You may need to uninstall and purge wifi drivers and then reinstall it using the following commands below.
+
+```shell
+# install driver
+sudo apt install realtek-rtl88xxau-dkms
+
+# uninstall & purge
+apt remove realtek-rtl88xxau-dkms
+apt purge realtek-rtl88xxau-dkms
+
+# reinstall
 ```
 
 # Permissions
@@ -567,6 +650,9 @@ Type & code fields notify the receiving host what type of ICMP message is arrivi
 ### PCAPs
 
 ```shell
+# use tcpdump tool to manage pcap files
+sudo apt install tcpdump
+
 # capture packets
 tcpdump -i {interface, en0 is ethernet, en1 is wireless}
 tcpdump -i en0
@@ -581,7 +667,8 @@ tcpdump -i en0 -c100 -nn -w output_file.pcap
 tcpdump -i en0 -c100 -nn > output_file.txt     # use conventional means to read output file
 
 # read pcap file
-tcpdump -r output_file.pcap
+tcpdump -r output_file.pcap               # -r option to read from a specified capture file
+tcpdump -nnr output_file.pcap             # -n/-nn avoid name resolution, prevent tcpdump from converting IP addresses to hostnames and port numbers to service names, which speeds up the process
 tcpdump -qns 0 -X -r server_request.pcap
 tcpdump -qns 0 -A -r server_request.pcap
 ```
@@ -736,15 +823,16 @@ systemctl status resolvconf.service
 
 A type of DNS transaction and a mechanism available for admins to replicate DNS databases across a set of DNS servers.
 
-DNS zone transfer uses the Transmission Control Protocl (TCP) for transport, and takes the form of a client-server transaction. The client requesting a zone transfer may be a secondary server requesting data from a primary server. The portion replicated is *zone*.
+DNS zone transfer uses the Transmission Control Protocol (TCP) for transport, and takes the form of a client-server transaction. The client requesting a zone transfer may be a secondary server requesting data from a primary server. The portion replicated is *zone*.
 
-DNS zone Transfer is the process of replicating or copying a DNS database or the zone file from a primary DNS server to a secondary DNS server. The correspnding DNS query or record is the axfr record. The zone file contains all the DNS names that are defined for that particular DNS server. The zone file also contains all the ip address of servers and hosts, as a results this can be useful for an attacker as they can find import information such as the internal network.
+DNS zone Transfer is the process of replicating or copying a DNS database or the zone file from a primary DNS server to a secondary DNS server. The corresponding DNS query or record is the axfr record. The zone file contains all the DNS names that are defined for that particular DNS server. The zone file also contains all the ip address of servers and hosts, as a results this can be useful for an attacker as they can find import information such as the internal network.
 
-> This does not give anything important in regards of explotation.
+> This does not give anything important in regards of exploitation.
 
 ## Ports
 
 Common Ports:
+
 | port | desc            |
 |------|-----------------|
 | 22   | SSH             |
@@ -754,6 +842,19 @@ Common Ports:
 | 443  | HTTPS           |
 | 3306 | MySQL [default] |
 | 6379 | Redis           |
+
+## Enable Promiscuous Mode
+
+```shell
+# determine which interface is being used
+ip route get {DESTINATION_IP}       # Example: ip route get 8.8.8.8
+
+# Check network device's promiscuous mode -- output might include: promiscuity 1
+ip -d link show {INTERFACE_NAME}     # Example: ip -d link show eth0
+
+# Enable promiscuous mode -- You can then use the ip link show command above to verify the PROMISC flag or the promiscuity counter
+sudo ip link set {INTERFACE_NAME} promisc on
+```
 
 # Proxy Servers
 
@@ -871,7 +972,7 @@ Advanced Packaging Tool (apt) is the default software manager for debian-based L
 Before downloading a software package, check whether the package is available from the repository.
 
 ```shell
-# search for software packages before downloading
+# search for package modules installed
 apt-cache search {keyword}
 ```
 
@@ -982,23 +1083,15 @@ Check status
 
 ```shell
 systemctl status docker.service
-```
 
-Start Container
-
-```shell
+# start container
 docker start -i {container_id}
-```
 
-### Check Storage
-
-Check Available Storage
-
-```shell
+# check storage
 docker system df
 ```
 
-### System Prune
+### Docker Prune
 
 Use prune to do some clean up and remove unused data. (view more info: `docker system prune --help`)
 
@@ -1007,19 +1100,15 @@ docker system prune --all --force
 
 # volumes are not pruned by default, must include `--volume`
 docker system prune -a --volumes
-```
 
-Remove all unused local volumes.
-
-```shell
+# remove all unused local volumes.
 docker volume prune
 ```
 
-### Delete
-
-Delete Untagged Images
+### Docker Delete
 
 ```shell
+# Delete Untagged Images
 docker rmi -f $(docker image ls -a | grep "<none>" | awk "{print \$3}")
 ```
 
@@ -1044,6 +1133,10 @@ sudo systemctl start docker
 Change python install version links.
 
 ```shell
+# update homebrew and upgrade outdated packages
+brew update && brew upgrade
+
+# change python symlinks
 brew unlink python@3.9
 brew unlink python@3.8
 brew link --force python@3.9
@@ -1082,11 +1175,19 @@ service postgresql --status
 With postgres running, launch Metasploit and enter the msfconsole.
 
 ```shell
-# start metasploit, and enter console
+# enter metasploit console
 msfconsole
+
+# open Metasploit w/o header
+msfconsole -q
+
+# ensure postgresql is started
+sudo service --status-all | grep "postgresql"
+sudo service postgresql start
 ```
 
 ### Setup PostgreSQL
+
 Initialize DB
 
 ```shell
@@ -1143,6 +1244,20 @@ msf6> db_status
 
 #disconnect database
 msf6> db_disconnect
+```
+
+### wmap scan
+
+wmap utility will scan a list of URLs to test whether the web server exhibits security flaws.
+
+> Ensure you run the utility on a website you own.
+
+```shell
+# load wmap framework plugin
+msf6> load wmap
+
+# run against a target
+msf6> wmap_targets -t https://0.0.0.0
 ```
 
 ### Metasploit sources
@@ -1529,6 +1644,23 @@ Install
 sudo apt install vim
 ```
 
+## Wireshark -- tshark
+
+```shell
+# Update Packages
+sudo apt update && sudo apt upgrade
+
+# install tshark
+# To allow non-root users, during the installation, you'll be asked if non-root users should be able to capture packets. Select <Yes>.
+sudo apt install tshark
+
+# reboot
+sudo reboot
+
+# Add current user to the wireshark group so you can capture packets without sudo every time:
+sudo usermod -a -G wireshark $USER
+```
+
 # Process Management
 
 ## ps
@@ -1720,6 +1852,32 @@ Search for pattern with `//`:
 awk '/pattern/{print $0}' file
 ```
 
+## arp-scan
+
+[Github](https://github.com/royhills/arp-scan)
+
+arp-scan is a network scanning tool that uses the ARP protocol to discover and fingerprint IPv4 hosts on the local network. It is available for Linux, BSD, macOS and Solaris under the GPLv3 licence.
+
+```shell
+# MacOS install via homebrew
+brew install arp-scan
+
+# Linux (Debian/Ubuntu) install
+sudo apt update
+sudo apt install arp-scan
+
+# scan local network
+sudo arp-scan --localnet
+sudo arp-scan -l
+
+# scan specific range, showing only IP & MAC address (no headers/footers)
+sudo arp-scan -xq 192.168.1.0/24
+
+# some options:
+-I {interface}: Specify the network interface (e.g., -I eth0).
+-w {file}:      Write results to a pcap file for analysis in Wireshark/tcpdump.
+```
+
 ## bzip2 (compress)
 
 Use `bzip2` to compress files (usually with better compression ratios than gzip). Uses extension `.tar.bz2`
@@ -1800,6 +1958,7 @@ dd if=/dev/sdb of=/root/flashdrivecopy bs=4096 conv:noerror
 ```
 
 Where:
+
 | arg        | description                                                                                 |
 |------------|---------------------------------------------------------------------------------------------|
 | `bs`       | block size: Num of bytes read/written per block of data being copied [default = 512 bytes]  |
@@ -2261,8 +2420,6 @@ PATH=$PATH:/root/tools/MyNewTool
 ```
 
 # Scripting
-
-## Terms
 
 *Bash (Bourne-again shell)* - A type of shell available for Linux that can run any system commands, utilities, processes, programs, or applications.
 
