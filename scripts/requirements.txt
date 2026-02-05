@@ -1,0 +1,12 @@
+requests==2.32.5    # pip install requests      -- HTTP requests
+coverage==7.13.1    # pip install coverage      -- code coverage measurement for testing
+lxml==6.0.2         # pip install lxml          -- webscraping
+scapy==2.7.0        # pip install scapy         -- network packet manipulation / host detection
+yt-dlp==2025.12.8   # pip install yt-dlp        -- video downloading
+python-nmap==0.7.1  # pip install python-nmap   -- network scanning
+pytube==15.0.0      # pip install pytube        -- video downloading
+pdf2image==1.17.0   # pip install pdf2image     -- PDF to image conversion
+imageio             # pip install imageio       -- image processing
+PyPDF2==3.0.1       # pip install PyPDF2        -- PDF manipulation
+reportlab==4.4.9    # pip install reportlab     -- PDF generation
+selenium==4.40.0    # pip install selenium      -- web automation (meta.py)
