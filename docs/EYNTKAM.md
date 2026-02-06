@@ -73,7 +73,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [Metasploit sources](#metasploit-sources)
   - [MySql](#mysql)
     - [Commands](#commands)
-    - [Show Current Databse](#show-current-databse)
+    - [Show Current Database](#show-current-database)
     - [Connect to Database](#connect-to-database)
     - [List Users](#list-users)
     - [Set MySQL Password For User](#set-mysql-password-for-user)
@@ -175,14 +175,6 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
 - [Notes](#notes)
   - [The Onion Router (Tor)](#the-onion-router-tor)
   - [Virtual Private Networks (VPN)](#virtual-private-networks-vpn)
-
-More Docs:
-
-- [scripting](docs/scripting.md)
-- [Documentation](docs/README.md)
-  - [services](docs/15_services.md)
-    - [Apache2](docs/15_services.md#apache-web-server)
-    - [OpenSSH](docs/15_services.md#openssh)
 
 ---
 
@@ -1307,7 +1299,7 @@ The two default admin databases (information_schema, performance_schema) and one
 +--------------------+
 ```
 
-### Show Current Databse
+### Show Current Database
 
 ```sql
 SELECT DATABASE();
