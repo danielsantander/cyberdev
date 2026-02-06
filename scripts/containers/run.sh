@@ -138,8 +138,8 @@ function ubuntu_24 () {
         else
             echo "  - no running container found with image id $image_id"
             echo ""
-            echo "---Running the Ubuntu 24 Docker container---"
-            docker run -d -p 8080:80 $tag_name
+            echo "---Running the Ubuntu 24 Docker container with volume mounting---"
+            docker run -d -p 8080:80 -v "./index.html:/var/www/html/index.html" $tag_name
         fi
     else
         echo "---Building Ubuntu 24 Docker image---"
@@ -148,8 +148,8 @@ function ubuntu_24 () {
             echo "  - Docker build failed."
             exit 1
         fi
-        echo "---Running the Ubuntu 24 Docker container---"
-        docker run -d -p 8080:80 $tag_name
+        echo "---Running the Ubuntu 24 Docker container with volume mounting---"
+        docker run -d -p 8080:80 -v "./index.html:/var/www/html/index.html" $tag_name
     fi
 
     cd $WORKING_DIRECTORY || exit 1
