@@ -63,6 +63,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
     - [Docker Prune](#docker-prune)
     - [Docker Delete](#docker-delete)
     - [Reboot Docker Services](#reboot-docker-services)
+  - [ffmpeg](#ffmpeg)
   - [Homebrew for MacOS](#homebrew-for-macos)
   - [Metasploit](#metasploit)
     - [PostgreSQL (postgres)](#postgresql-postgres)
@@ -1068,7 +1069,6 @@ sudo a2ensite test.conf
 sudo systemctl reload apache2
 ```
 
-
 ## Docker
 
 Check status
@@ -1119,6 +1119,31 @@ sudo reboot
 # sudo systemctl enable docker
 sudo systemctl start docker
 ```
+
+## ffmpeg
+
+A complete, cross-platform solution to record, convert and stream audio and video. [src](https://www.ffmpeg.org/)
+
+```shell
+# convert mp4 to gif
+ffmpeg -i input.mp4 output.gif
+
+# Optimize Quality & Size (Recommended):
+# - sets frame rate (10-15 is good for GIFs),
+# - scales width to 320px,
+# - uses the Lanczos filter for better resizing
+ffmpeg -i input.mp4 -vf "fps=15,scale=320:-1:flags=lanczos" output.gif
+
+# Trim Video:
+# - Use -ss for start time and -t for duration (in seconds):
+ffmpeg -ss 00:00:05 -t 3 -i input.mp4 -vf "fps=15,scale=320:-1:flags=lanczos" output.gif
+
+# High-Quality Palette Generation (Two-Pass):
+ffmpeg -y -i input.mp4 -vf fps=10,scale=320:-1:flags=lanczos,palettegen palette.png
+ffmpeg -y -i input.mp4 -i palette.png -filter_complex "fps=10,scale=320:-1:flags=lanczos[x];[x][1:v]paletteuse" output.gif
+
+```
+
 
 ## Homebrew for MacOS
 
