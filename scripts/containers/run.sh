@@ -118,6 +118,41 @@ function django () {
     exit 0
 }
 
+function flask () {
+    tag_name="djs:flask-app"
+    tmp_working_dir="$(dirname "$0")/dockerfiles/flask/"
+    tmp_dockerfile="FLASK_DOCKFILE"
+    cd "$tmp_working_dir" || exit 1
+    image_id=$(docker images -q $tag_name 2> /dev/null)
+    if [ -n "$image_id" ]; then
+        container_id=$(docker ps -a --filter "ancestor=$image_id" --format "{{.ID}}")
+        if [ -n "$container_id" ]; then
+            echo "  - WARNING: container ($container_id) already running with image ($image_id) $tag_name"
+            echo ""
+            echo "---STARTING THE EXISTING FLASK DOCKER CONTAINER ($container_id)---"
+            docker start $container_id
+            cd $WORKING_DIRECTORY || exit 1
+            exit 0
+        fi
+        echo "  - Docker image ($image_id) $tag_name already exists."
+        echo ""
+        echo "---RUNNING THE FLASK DOCKER CONTAINER---"
+        # detached mode (-d) to get terminal back after starting container
+        docker run -d -p 8000:8000 -v "./app/:/app/" $tag_name
+    else
+        echo "---Building Flask Docker image---"
+        docker build -f $tmp_dockerfile -t $tag_name . --no-cache
+        if [ $? -ne 0 ]; then
+            echo "  - Docker build failed."
+            cd $WORKING_DIRECTORY
+            exit 1
+        fi
+        echo "---RUNNING THE FLASK DOCKER CONTAINER---"
+        # detached mode (-d) to get terminal back after starting container
+        docker run -d -p 8000:8000 -v "./app/:/app/" $tag_name
+    fi
+}
+
 function ubuntu_24 () {
     tag_name="djs:ubuntu24"
     tmp_working_dir="$(dirname "$0")/dockerfiles/ubuntu24/"
@@ -167,7 +202,7 @@ function enter_container () {
 
 
 if [ $# -eq 0 ]; then
-    echo "No action specified. Usage: ./run.sh [django|ubuntu|enter|clean-up|logs] [args...]"
+    echo "No action specified. Usage: ./run.sh [django|ubuntu|flask|enter|clean-up|logs] [args...]"
     exit 1
 fi
 case $1 in
@@ -177,6 +212,8 @@ case $1 in
         django-docker-compose ${2:-$VERSION};;
     "ubuntu")
         ubuntu_24 ;;
+    "flask")
+        flask ;;
     "enter")
         if [ $# -lt 2 ]; then
             echo "No container ID provided. Usage: ./run.sh enter [container_id]"

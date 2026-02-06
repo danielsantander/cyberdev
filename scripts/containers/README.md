@@ -2,6 +2,7 @@ Dockerized Applications
 
 - [Django Application](#django-application)
 - [nginx with Ubuntu24](#nginx-with-ubuntu24)
+- [Flask App](#flask-app)
 
 ---
 
@@ -26,3 +27,13 @@ Once running, navigate to `http://0.0.0.0:8000/admin/` and log in using credenti
 ```shell
 ./run.sh ubuntu
 ```
+
+Then navigate to http://0.0.0.0:8080
+
+# Flask App
+
+```shell
+./run.sh flask
+```
+
+Then navigate to http://0.0.0.0:8000
