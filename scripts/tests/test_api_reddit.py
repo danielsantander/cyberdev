@@ -116,7 +116,7 @@ class TestRedditAPI(TestTemplate):
             "password": "password123!",
             # APIBase args:
             # "logger": logger,
-            "save_dir": self.test_dir,  # ensure in test_dir so tearDown removes any created data
+            "save_dir_path": self.test_dir,  # ensure in test_dir so tearDown removes any created data
             # "use_verbose": True,
             "use_verbose": False,
         }

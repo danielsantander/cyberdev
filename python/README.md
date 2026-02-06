@@ -144,7 +144,7 @@ params = {
     "client_secret": os.environ.get('REDDIT_CLIENT_SECRET'),
     "username": os.environ.get('REDDIT_USERNAME'),
     "password": os.environ.get('REDDIT_PASSWORD'),
-    "save_dir": Path() / 'api_data',
+    "save_dir_path": Path() / 'api_data',
     "use_verbose": True,
 }
 reddit = RedditAPI(**params)

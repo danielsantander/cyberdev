@@ -80,7 +80,7 @@ class TestNASA(TestTemplate):
         super.setUp()
         self.test_dir = self._test_dir / 'TestNASA'
         if not self.test_dir.exists(): self.test_dir.mkdir(parents=True, exist_ok=True)
-        self.nasa = NASA(save_dir=self.test_dir)
+        self.nasa = NASA(save_dir_path=self.test_dir)
 
     def tearDown(self) -> None:
         super().tearDown()
@@ -89,7 +89,7 @@ class TestNASA(TestTemplate):
 class TestEpic(TestTemplate):
     def setUp(self):
         self.test_dir = self._test_dir / 'TestEpic'
-        self.epic = EPIC(save_dir=self.test_dir)
+        self.epic = EPIC(save_dir_path=self.test_dir)
 
     def test_init(self):
         epic_dir: Path = self.test_dir / 'epic'
@@ -117,7 +117,7 @@ class TestCuriosity(TestTemplate):
 
     @mock.patch('requests.Session.get', side_effect=mocked_requests_get)
     def test_init(self, mock_session_get):
-        curiosity = CuriosityAPI(api_key=self.api_key, save_dir=self.test_dir, use_verbose=False)
+        curiosity = CuriosityAPI(api_key=self.api_key, save_dir_path=self.test_dir, use_verbose=False)
         curiosity_dir: Path = self.test_dir / 'curiosity'
         data_dir:  Path = curiosity_dir / 'api_data'
         images_dir: Path = curiosity_dir / 'images'
@@ -127,19 +127,19 @@ class TestCuriosity(TestTemplate):
 
     @mock.patch('requests.Session.get', side_effect=mocked_requests_get)
     def test_get_images_earth(self, mock_get):
-        curiosity = CuriosityAPI(api_key=self.api_key, save_dir=self.test_dir, use_verbose=False)
+        curiosity = CuriosityAPI(api_key=self.api_key, save_dir_path=self.test_dir, use_verbose=False)
         params = {"earth_date": self._now.strftime('%Y-%m-%d')}
         results = curiosity.get_images(query_by='earth', params=params)
 
     @mock.patch('requests.Session.get', side_effect=mocked_requests_get)
     def test_get_images_sol(self, mock_get):
-        curiosity = CuriosityAPI(api_key=self.api_key, save_dir=self.test_dir, use_verbose=False)
+        curiosity = CuriosityAPI(api_key=self.api_key, save_dir_path=self.test_dir, use_verbose=False)
         params = {"sol": 1000 }
         curiosity.get_images(query_by='sol', params=params)
 
     @mock.patch('requests.Session.get', side_effect=mocked_requests_get)
     def test_process_data(self, mock_get):
-        curiosity = CuriosityAPI(api_key=self.api_key, save_dir=self.test_dir, use_verbose=False)
+        curiosity = CuriosityAPI(api_key=self.api_key, save_dir_path=self.test_dir, use_verbose=False)
         image_data = {"photos": []}
         filename = f"{self._now.strftime('%Y%m%d%H%M%S') }--curiosity.json"
         results = curiosity.process_data(data=image_data, filename=filename)

@@ -27,12 +27,18 @@ from typing import Union
 
 # REG_EX:
 RE_REDDIT_FILE_FORMAT = r'^(?P<username>.*)_(?P<date>\d{14})_(?P<subreddit>.*)_(?P<post_kind>.*)_(?P<post_id>[\w\d]+)\.(?P<extension>\w{3,4})$'    # <username>_YYYYMMDDSSSSSS_<subreddit>_<post_kind>_<post_id>.<ext>
-RE_OLD_REDDIT_SAVE_FILE_FORMAT = r'^(?P<username>.*)_saved_data_(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)(\.json)?' # username_saved_data_YYYYMMDDSS.json
-RE_REDDIT_SAVE_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)?\-\-saved_data(\.json)?'                  # YYYYMMDDSSSSSS--saved_data.json
-RE_RESULTS_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)?\-\-results\.json'                            # YYYYMMDDSSSSSS--results.json
+RE_OLD_REDDIT_SAVE_FILE_FORMAT = r'^(?P<username>.*)_saved_data_(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)(\.json)?'         # username_saved_data_YYYYMMDDSS.json
+RE_REDDIT_SAVE_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)?\-\-saved_data(\.json)?'                          # YYYYMMDDSSSSSS--saved_data.json
+RE_RESULTS_FILE_FORMAT = r'^(?P<year>\d{4})(?P<month>\d{2})(?P<date>\d{1,2})(?P<seconds>\d*)?\-\-(results|get_saved)\.json'                        # YYYYMMDDSSSSSS--results.json | YYYYMMDDSSSSSS--get_saved.json
 
 # GLOBALS:
-ACTION_CHOICES: list[str] = ['get_saved', 'consolidate', 'sanitize']
+ACTION_CHOICES = {
+    'get_saved': 'Retrieve saved posts via Reddit API.',
+    'consolidate': 'Consolidate saved post JSON files into one file.',
+    'get_latest': 'Retrieve list of latest files saved locally within the last X days (default: 7).',
+    'sanitize': 'Sanitize subreddit media directory to remove blacklisted subreddits.',
+}
+ACTION_CHOICES_LIST: list[str] = list(ACTION_CHOICES.keys())
 DEBUG_MODE: bool = False
 CUR_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -58,12 +64,12 @@ from utils.constants import DEFAULT_API_SAVE_DIRECTORY, DEFAULT_LOG_FORMAT, IMAG
 from utils.custom_exceptions import UnauthorizedError
 from utils.custom_logging import add_handler_to_logger
 from utils.date_helper import timestamp_to_date_string
-from utils.file_helper import get_file_creation_date, open_json_from_file, write_json_to_file
+from utils.file_helper import get_file_creation_date, open_json_from_file, write_json_to_file, get_recently_created_files
 from utils.image_helper import yt_download  # TODO: remove, this may not be working properly
 from utils.navigation import make_directory
 from utils.webutils import extract_media_from_url, get_video_source_url
 
-DEFAULT_REDDIT_SAVE_DIR = Path(DEFAULT_API_SAVE_DIRECTORY) / 'reddit'
+DEFAULT_REDDIT_SAVE_DIR_PATH = Path(DEFAULT_API_SAVE_DIRECTORY) / 'reddit'
 
 class Token(object):
     def __init__(self):
@@ -81,8 +87,8 @@ class RedditAPI(APIBase):
     oauth_url = "https://oauth.reddit.com"
     base_api_url = f"{reddit_url}/api/v1"
 
-    def __init__(self, client_id:str, client_secret:str, username:str, password:str, logger:Union[logging.Logger, str]='RedditAPI', save_dir:Path=None, use_verbose:bool=False, **kwargs):
-        super().__init__(save_dir=save_dir, use_verbose=use_verbose)
+    def __init__(self, client_id:str, client_secret:str, username:str, password:str, logger:Union[logging.Logger, str]='RedditAPI', save_dir_path:Path=None, use_verbose:bool=False, **kwargs):
+        super().__init__(save_dir_path=save_dir_path, use_verbose=use_verbose)
 
         # creds
         self.client_id = client_id
@@ -91,8 +97,8 @@ class RedditAPI(APIBase):
         self.password = password
 
         # dirs
-        if 'reddit' not in self._save_dir.name: self._save_dir = self._save_dir / 'reddit'
-        self.save_dir_path: Path = make_directory(self._save_dir / f'{self.username}')
+        if 'reddit' not in self._save_dir_path.name: self._save_dir_path = self._save_dir_path / 'reddit'
+        self.save_dir_path: Path = make_directory(self._save_dir_path / f'{self.username}')
         self.api_data_dir_path: Path = make_directory(self.save_dir_path / 'api_data')
         self.log_dir_path: Path = make_directory(self.save_dir_path / 'logs')
 
@@ -107,6 +113,8 @@ class RedditAPI(APIBase):
 
         # session
         self._session.headers.update({"User-Agent": f"{self.username}_App/0.1 by {self.username}"})
+
+        self._logger.debug(f"RedditAPI initialized for user: {self.username}")
 
     def __str__(self) -> str:
         return self.username
@@ -196,8 +204,7 @@ class RedditAPI(APIBase):
         for file in self.api_data_dir_path.iterdir():
 
             # get excluded files from previously saved files
-            saved_file_match = save_file_re.search(file.name)
-            if saved_file_match:
+            if save_file_re.search(file.name):
                 data = open_json_from_file(file)
                 exclude_files_list.extend(data.get("extracted", []))
                 exclude_files_list.extend(data.get("already_exists", []))
@@ -224,6 +231,26 @@ class RedditAPI(APIBase):
 
         self._logger.debug(f"UPDATED excluded files count: {len(exclude_files_list)}")
         return exclude_files_list
+
+    def get_recently_saved_files(self, days:int=7)->list[str]:
+        """
+        Return list of saved files within the last X days.
+        Excludes 'api_data' and 'logs' directories.
+
+        Keyword arguments:
+            - days (int): number of days to look back for saved files (default: 7)
+        """
+        recent_files_list: list[str] = []
+        days_to_hrs = days * 24
+        self._logger.debug(f"get_recently_saved_files -- looking for files saved within last {days} days ({days_to_hrs} hrs)...")
+        for dir_path in self.save_dir_path.iterdir():
+            if dir_path.name in ['api_data', 'logs']: continue
+            self._logger.debug(f"get_recently_saved_files -- iterating through dir: {dir_path.name}")
+            for media_dir in dir_path.iterdir():
+                media_dir_results_list:list[Path] = get_recently_created_files(media_dir, within_hrs=days_to_hrs)
+                recent_files_list.extend([f.name for f in media_dir_results_list])
+        return recent_files_list
+
 
     def get_saved_data(self, limit:int=25, max_count:int=None, raw:bool=False)->list:
         """
@@ -615,24 +642,30 @@ if __name__ == '__main__':
 
     # GET ARGS
     # --------
-    parser = argparse.ArgumentParser(description="Reddit API")
-    parser.add_argument('-a', '--action', dest='action', action='store', choices=ACTION_CHOICES, help='Desired action.', required=True)
+    parser = argparse.ArgumentParser(description="Reddit API", formatter_class=argparse.RawTextHelpFormatter)
+    action_choices_desc_list = [f"{k}: {v}" for k,v in ACTION_CHOICES.items()]
+    parser.add_argument('action', action='store', choices=ACTION_CHOICES_LIST, help=f'Desired action.\n\t{"\n\t".join(action_choices_desc_list)}')
     parser.add_argument('-d','-v', '--verbose','--debug', dest='debug', action='store_true', default=DEBUG_MODE, help=f'Debug/verbose mode. [{DEBUG_MODE}]')
     parser.add_argument('-u', '--update', dest='update', action='store_true', default=False, help='Default is False, and will not update save data.')
-    parser.add_argument('-i','-o','--input','--output', dest='input', metavar='PATH', action='store', type=str, default=DEFAULT_REDDIT_SAVE_DIR.absolute(), help=f'Source path of input file/directory. [{DEFAULT_REDDIT_SAVE_DIR.absolute()}]')
-    parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, help='Source of file to input.')
+    parser.add_argument('-i','-o','--input','--output', dest='input', metavar='PATH', action='store', type=str, default=DEFAULT_REDDIT_SAVE_DIR_PATH.absolute(), help=f'Source path of input file/directory. [{DEFAULT_REDDIT_SAVE_DIR_PATH.absolute()}]')
     args = vars(parser.parse_args())
+
+    # DEBUGGING:
+    # -------------
+    # print(f"args: {json.dumps(args, indent=2, default=str)}")
+    # sys.exit()
 
     # SETUP ARGS
     # ----------
     results = {}
-    save_dir = Path(args.get('input')) if args.get('input') else DEFAULT_REDDIT_SAVE_DIR
-    input_file = Path(args.get('file')) if args.get('file') else None
-    do_update = args.get('update', False)
-    debug_mode = args.get('debug')
     desired_action = str(args.get('action', ""))
-    if desired_action not in ACTION_CHOICES:
-        print("\nInvalid action specified: {0}.\nOne of the following actions are required: {1}\n".format(desired_action, ACTION_CHOICES))
+    debug_mode = args.get('debug')
+    save_dir_path = Path(args.get('input')) if args.get('input') else DEFAULT_REDDIT_SAVE_DIR_PATH
+    do_update = args.get('update', False)
+
+
+    if desired_action not in ACTION_CHOICES_LIST:
+        print("\nInvalid action specified: {0}.\nOne of the following actions are required: {1}\n".format(desired_action, ACTION_CHOICES_LIST))
         sys.exit()
 
     # LOGGER
@@ -652,7 +685,7 @@ if __name__ == '__main__':
         "username": os.environ.get('REDDIT_USERNAME'),
         "password": os.environ.get('REDDIT_PASSWORD'),
         # "logger": logger,     # exclude logger for now, to use FileHandler log rotation
-        "save_dir": save_dir,
+        "save_dir_path": save_dir_path,
         "use_verbose": debug_mode,
     }
     reddit = RedditAPI(**params)
@@ -667,12 +700,8 @@ if __name__ == '__main__':
         saved_data:list[dict] = []
         exclude_files: list[str] = []
 
-        # retrieve saved data from given input file
-        if not do_update and input_file and input_file.exists() and input_file.is_file():
-            saved_data = open_json_from_file(input_file)
-
         # retrieve saved data from last saved file
-        elif not do_update:
+        if not do_update:
             saved_data = reddit.retrieve_last_saved()
 
         # retrieve saved data via API
@@ -706,14 +735,25 @@ if __name__ == '__main__':
         t1 = time()
         logger.info("finished sanitizing in {0} seconds".format(t1-t0))
 
+    if desired_action == 'get_latest':
+        t0 = time()
+        in_days = int(input("Enter number of days to look back for recently saved files (default 7): ") or 7)
+        results = reddit.get_recently_saved_files(days=in_days)
+        t1 = time()
+        logger.info("finished get_latest in {0} seconds".format(t1-t0))
+
     # WRITE RESULTS TO FILE
     # ---------------------
-    if results and isinstance(results, dict):
-        for k,v in results.items():
-            if isinstance(v, list):
-                results[k] = sorted(v, key=lambda x: x.lower())
-        filename = reddit.api_data_dir_path / f"{reddit._now_str_long}--results.json"
-        write_json_to_file(filename, results)
+    if results and (isinstance(results, dict) or isinstance(results, list)):
+        filename = reddit.api_data_dir_path / f"{reddit._now_str_long}--{desired_action}.json"
+        if isinstance(results, list):
+            results = sorted(results, key=lambda x: x.lower())
+            write_json_to_file(filename, results)
+        else:
+            for k,v in results.items():
+                if isinstance(v, list):
+                    results[k] = sorted(v, key=lambda x: x.lower())
+            write_json_to_file(filename, results)
         logger.info(f"results for action '{desired_action}':\n{json.dumps(results, indent=2)}")
     else: logger.warning("no results returned")
     sys.exit()

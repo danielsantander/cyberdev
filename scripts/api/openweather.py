@@ -14,13 +14,13 @@ DEFAULT_LOG_DIR = DEFAULT_OW_SAVE_DIR / 'logs'
 _LOGGER = create_logger('WeatherAPI',level=logging.DEBUG, log_dir=DEFAULT_LOG_DIR)
 
 class WeatherAPI(APIBase):
-    def __init__(self, api_key:str=None, save_dir:Path=DEFAULT_OW_SAVE_DIR, use_verbose:bool=False, **kwargs) -> None:
-        super().__init__(save_dir=save_dir, logger=_LOGGER, use_verbose=use_verbose)
+    def __init__(self, api_key:str=None, save_dir_path:Path=DEFAULT_OW_SAVE_DIR, use_verbose:bool=False, **kwargs) -> None:
+        super().__init__(save_dir_path=save_dir_path, logger=_LOGGER, use_verbose=use_verbose)
         self.api_key = api_key
         self.base_url = "https://api.openweathermap.org/data/2.5"
         self.default_mode = None    # xml, html -> default is json (None)
         self.default_unit = 'metric'  # standard, metric, imperial
-        self._logger.debug(f"WeatherAPI init complete -- _save_dir: {self._save_dir.absolute()}")
+        self._logger.debug(f"WeatherAPI init complete -- _save_dir_path: {self._save_dir_path.absolute()}")
         """
         OpenWeather API Free Plan:
             - Hourly forecast: unavailable

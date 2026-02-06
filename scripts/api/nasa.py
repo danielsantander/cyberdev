@@ -35,13 +35,13 @@ from utils.navigation import make_directory
 from utils.validation import str2bool
 from utils.webutils import extract_media_from_url
 
-DEFAULT_NASA_SAVE_DIR = Path(DEFAULT_API_SAVE_DIRECTORY) / 'nasa'
+DEFAULT_NASA_SAVE_DIR_PATH = Path(DEFAULT_API_SAVE_DIRECTORY) / 'nasa'
 
 class NASA(APIBase):
-    def __init__(self, api_key:str=None, save_dir:Path=DEFAULT_NASA_SAVE_DIR, use_verbose:bool=False):
-        super().__init__(save_dir=save_dir, use_verbose=use_verbose)
+    def __init__(self, api_key:str=None, save_dir_path:Path=DEFAULT_NASA_SAVE_DIR_PATH, use_verbose:bool=False):
+        super().__init__(save_dir_path=save_dir_path, use_verbose=use_verbose)
         self.api_key = self._verify_api_key(api_key)
-        self._logger.debug(f"NASA init complete -- _save_dir: {self._save_dir.absolute()}")
+        self._logger.debug(f"NASA init complete -- _save_dir_path: {self._save_dir_path.absolute()}")
 
     def _verify_api_key(self, api_key:str, local_storage:bool=True)->Optional[str]:
         """
@@ -55,32 +55,32 @@ class NASA(APIBase):
         resp = self.send_request(url=f"https://api.nasa.gov/planetary/apod?api_key={api_key}", method="GET")
         if resp.ok is False: return None
         data = resp.json()
-        filename = self._save_dir / f'{self._now_str_short}--verify_api_key_response.json'
+        filename = self._save_dir_path / f'{self._now_str_short}--verify_api_key_response.json'
         if not filename.exists() and local_storage: write_json_to_file(filename, data)
         return api_key
 
 
 class EPIC(NASA):
     def __init__(self, **kwargs):
-        save_dir = kwargs.get('save_dir', DEFAULT_NASA_SAVE_DIR)
+        save_dir_path = kwargs.get('save_dir_path', DEFAULT_NASA_SAVE_DIR_PATH)
         use_verbose = kwargs.get('user_verbose', VERBOSE_MODE)
-        super().__init__(save_dir=save_dir, use_verbose=use_verbose)
+        super().__init__(save_dir_path=save_dir_path, use_verbose=use_verbose)
 
         self.base_url = "https://epic.gsfc.nasa.gov"
         self.api_url = f"{self.base_url}/api/"
 
         # dirs
-        self.log_dir: Path = make_directory(self._save_dir / 'logs') # nasa/logs/
-        self.save_dir: Path = make_directory(self._save_dir / 'epic')
-        self.gif_dir: Path = make_directory(self.save_dir / 'gifs')
-        self.images_dir: Path = make_directory(self.save_dir / 'images')
-        self.api_data_dir: Path = make_directory(self.save_dir / 'api_data')
+        self.log_dir: Path = make_directory(self._save_dir_path / 'logs') # nasa/logs/
+        self.save_dir_path: Path = make_directory(self._save_dir_path / 'epic')
+        self.gif_dir: Path = make_directory(self.save_dir_path / 'gifs')
+        self.images_dir: Path = make_directory(self.save_dir_path / 'images')
+        self.api_data_dir: Path = make_directory(self.save_dir_path / 'api_data')
 
         # logger
         log_level = logging.DEBUG if use_verbose else logging.INFO
         self._logger = self._create_logger(log_name='EPIC', log_level=log_level, log_dir=self.log_dir)
 
-        self._logger.debug(f"EPIC init complete -- save_dir: {self.save_dir.absolute()}")
+        self._logger.debug(f"EPIC init complete -- save_dir_path: {self.save_dir_path.absolute()}")
 
     def get_epic_images(self, use_enhanced: bool=False, use_png: bool=False)->bool:
         sub_save_dir:Path = None # directory to save this iteration of images
@@ -186,23 +186,23 @@ class CuriosityAPI(NASA):
 
     def __init__(self, api_key:str, **kwargs):
         if api_key is None: raise Exception("API Key is required for Curiosity.")
-        save_dir = kwargs.get('save_dir', DEFAULT_NASA_SAVE_DIR)
+        save_dir_path = kwargs.get('save_dir_path', DEFAULT_NASA_SAVE_DIR_PATH)
         use_verbose = kwargs.get('use_verbose', VERBOSE_MODE)
-        super().__init__(api_key=api_key, save_dir=save_dir, use_verbose=use_verbose)
+        super().__init__(api_key=api_key, save_dir_path=save_dir_path, use_verbose=use_verbose)
 
 
         self.base_url = "https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos"
 
         # dirs
-        self.log_dir: Path = make_directory(self._save_dir / 'logs') # nasa/logs/
-        self.save_dir :Path = make_directory(self._save_dir / 'curiosity')
-        self.api_dir :Path = make_directory(self.save_dir / 'api_data')
-        self.images_dir :Path = make_directory(self.save_dir / 'images')
+        self.log_dir: Path = make_directory(self._save_dir_path / 'logs') # nasa/logs/
+        self.save_dir_path :Path = make_directory(self._save_dir_path / 'curiosity')
+        self.api_dir :Path = make_directory(self.save_dir_path / 'api_data')
+        self.images_dir :Path = make_directory(self.save_dir_path / 'images')
 
         # logger
         log_level = logging.DEBUG if use_verbose else logging.INFO
         self._logger = self._create_logger(log_name='CuriosityAPI', log_level=log_level, log_dir=self.log_dir)
-        self._logger.debug(f"Curiosity init complete -- save_dir: {self.save_dir.absolute()}")
+        self._logger.debug(f"Curiosity init complete -- save_dir_path: {self.save_dir_path.absolute()}")
 
     def get_images(self, query_by:str='sol', params:dict=None):
         """
@@ -278,7 +278,7 @@ if __name__ == '__main__':
     parser.add_argument('-a', '--action', dest='action', action='store', choices=valid_action_choices, help="Desired action. Defaults to {0}".format(valid_action_choices[0]), default=valid_action_choices[0])
     parser.add_argument('-d','-v', '--verbose','--debug', dest='debug', action='store_true', default=DEBUG_MODE, help="Debug mode [{0}]".format(DEBUG_MODE))
     parser.add_argument('-k', '--key', dest='api_key', action='store', type=str, help="NASA API Key", required=False)
-    parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, default=DEFAULT_NASA_SAVE_DIR, help="Directory to save api and media data. Defaults to: {0}".format(DEFAULT_NASA_SAVE_DIR.name), required=False)
+    parser.add_argument('-f', '--file', dest='file', metavar='FILE_PATH', action='store', type=str, default=DEFAULT_NASA_SAVE_DIR_PATH, help="Directory to save api and media data. Defaults to: {0}".format(DEFAULT_NASA_SAVE_DIR_PATH.name), required=False)
     args = vars(parser.parse_args())
     action = args.get("action")
     api_key = args.get('api_key') or os.environ.get('NASA_API_KEY')
@@ -305,7 +305,7 @@ if __name__ == '__main__':
             print("API key needed, exiting...")
             sys.exit()
 
-        curiosity = CuriosityAPI(api_key=api_key, save_dir=DEFAULT_NASA_SAVE_DIR)
+        curiosity = CuriosityAPI(api_key=api_key, save_dir_path=DEFAULT_NASA_SAVE_DIR_PATH)
         query = input('Query by \'martian_sol\' or \'earth_date\': ').lower() or 'earth_date'
         if query not in ['martian_sol', 'earth_date', 'earth', 'sol']:
             raise BaseException("Invalid query input: {0}".format(query))

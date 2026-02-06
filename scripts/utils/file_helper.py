@@ -193,13 +193,14 @@ def get_recently_created_files(directory_path:Path, within_hrs:int=24)->list:
     assert directory_path.exists() and directory_path.is_dir()
     for file in directory_path.iterdir():
         # TODO: implement recursion of iterating directory files?
+        if not file.is_file() or file.name.startswith('.'): continue
         if is_file_recently_created(file, within_hrs):
             results.append(file)
     return results
 
 
-def is_file_recently_created(p:Path, within_hrs:int=24)->bool:
-    now = datetime.datetime.utcnow()
+def is_file_recently_created(p:Path, within_hrs:int=24, tz=datetime.timezone.utc)->bool:
+    now = datetime.datetime.now(tz)  # Make `now` timezone-aware
     created_date = get_file_creation_date(p)
     return bool(now-datetime.timedelta(hours=within_hrs) <= created_date <= now+datetime.timedelta(hours=within_hrs)) if created_date else False
 

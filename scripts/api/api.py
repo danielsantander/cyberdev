@@ -17,7 +17,7 @@ from utils.custom_logging import create_logger
 
 
 class APIBase(object):
-    def __init__(self, logger:logging.Logger=None, save_dir:Path=None, use_verbose:bool=False, **kwargs):
+    def __init__(self, logger:logging.Logger=None, save_dir_path:Path=None, use_verbose:bool=False, **kwargs):
         self._use_verbose: bool = use_verbose
 
         # dates
@@ -26,10 +26,10 @@ class APIBase(object):
         self._now_str_short = self._now.strftime(DEFAULT_DATETIME_FMT_SHORT)    # YYYYMMDD
 
         # save directory
-        if save_dir is None:
+        if save_dir_path is None:
             self._logger.debug('No save directory provided, using current directory path.')
-            save_dir = Path(DEFAULT_API_SAVE_DIRECTORY) / 'APIBaseDirectory'
-        self._save_dir = self._verify_or_create_directory(save_dir)
+            save_dir_path = Path(DEFAULT_API_SAVE_DIRECTORY) / 'APIBaseDirectory'
+        self._save_dir_path = self._verify_or_create_directory(save_dir_path)
 
         # logger
         log_level = logging.DEBUG if self._use_verbose else logging.INFO
@@ -39,7 +39,7 @@ class APIBase(object):
         #     self._logger = logging.getLogger(logger)
         else: self._logger = logging.getLogger("APIBase")
         self._logger.setLevel(log_level)
-        self._logger.debug(f"APIBase init complete -- _save_dir: {self._save_dir.absolute()}")
+        self._logger.debug(f"APIBase init complete -- _save_dir_path: {self._save_dir_path.absolute()}")
 
         # init
         self._session = self.__setup_session()

@@ -1,6 +1,7 @@
 Dockerized Applications
 
 - [Django Application](#django-application)
+- [nginx with Ubuntu24](#nginx-with-ubuntu24)
 
 ---
 
@@ -19,3 +20,9 @@ Building and running Django application:
 ```
 
 Once running, navigate to `http://0.0.0.0:8000/admin/` and log in using credentials from `dockerfiles/django/container.env`
+
+# nginx with Ubuntu24
+
+```shell
+./run.sh ubuntu
+```

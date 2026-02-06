@@ -24,21 +24,21 @@ class TestAPIBasic(TestTemplate):
         self.test_dir = self._test_dir / 'TestAPIBasic'
         args = {
             "logger": None,
-            "save_dir": self.test_dir,
+            "save_dir_path": self.test_dir,
             # "use_verbose": True
             "use_verbose": False
         }
         self.api_base = APIBase(**args)
 
     def test_save_dir(self):
-        self.assertTrue(self.api_base._save_dir.exists())
-        self.assertTrue(self.api_base._save_dir.is_dir())
-        self.assertEqual(self.api_base._save_dir.name, self.test_dir.name)
+        self.assertTrue(self.api_base._save_dir_path.exists())
+        self.assertTrue(self.api_base._save_dir_path.is_dir())
+        self.assertEqual(self.api_base._save_dir_path.name, self.test_dir.name)
 
     def test_vars(self):
         from logging import Logger, DEBUG, INFO
         from requests import Session
-        self.assertIsInstance(self.api_base._save_dir, Path)
+        self.assertIsInstance(self.api_base._save_dir_path, Path)
         self.assertIsInstance(self.api_base._now, datetime.datetime)
         self.assertIsInstance(self.api_base._now_str_long, str)
         self.assertIsInstance(self.api_base._now_str_short, str)
