@@ -279,6 +279,10 @@ Stash changes made to the working copy while having the ability to come back to 
 # list stash files
 git stash list
 
+# include date:
+git stash list --date=local
+git stash list --date=iso
+
 # show changes recorded in stash as diff
 git stash show               # show the files in stash
 git stash show -p            # show the changes in most recent stash
