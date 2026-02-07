@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+        <!-- select correct stylesheet based on poll type -->
+        {% if poll_type == 'batman' %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/batman.css') }}">
+        {% elif poll_type == 'valentine' %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/valentine.css') }}">
+        {% else %}
+            <link rel="stylesheet" href="{{ url_for('static', filename='css/polls.css') }}">
+        {% endif %}
+
+    </head>
+    <body>
+
+        <!-- display poll -->
+        <div class="poll">
+            <div class="question"></div>
+            <div class="answers"></div>
+        </div>
+
+        <!-- embed the data as a JavaScript variable or as a data-* attribute in an HTML element -->
+        <script>
+            const pollData = {{ polls | tojson }};
+        </script>
+
+        <!-- Move the script tag to the end of <body> so it executes after the DOM elements are created. -->
+        <script src="{{ url_for('static', filename='js/polls.js') }}"></script>
+    </body>
+</html>

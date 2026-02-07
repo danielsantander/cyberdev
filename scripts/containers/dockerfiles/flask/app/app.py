@@ -1,5 +1,5 @@
 import random
-from flask import Flask, Response, render_template
+from flask import Flask, render_template, url_for, request
 from typing import List
 
 APP_HOST='0.0.0.0'
@@ -10,7 +10,47 @@ app = Flask(__name__)
 
 @app.route('/')
 def hello_world():
+    # Example of generating a URL to a static file
+    static_file_url = url_for('static', filename='img/background.jpg')
     return render_template('index.html')
+
+@app.route('/polls/')
+@app.route('/polls/<poll_type>/')
+def polls(poll_type:str='batman'):
+    username = request.args.get('username', 'Guest')
+    poll_data = [
+        {
+            "question": "Favorite programming language?",
+            "answers": ["Python", "Java", "C++"],
+        },
+        {
+            "question": "Best web framework?",
+            "answers": ["Flask", "Django", "FastAPI"],
+        }
+    ]
+
+    if poll_type == 'batman':
+        poll_data = [
+            {
+                "question": "Who is your favorite Batman actor?",
+                "answers": ["Michael Keaton", "Christian Bale", "Ben Affleck", "Robert Pattinson"],
+            },
+            {
+                "question": "Which Batman movie is the best?",
+                "answers": ["Batman (1989)", "The Dark Knight (2008)", "Batman v Superman (2016)", "The Batman (2022)"],
+            }
+        ]
+    elif poll_type == 'valentine':
+        poll_data = [
+            {
+                "question": "Gifts?",
+                "answers": ["Chocolate", "Flowers", "Jewelry", "Dinner"],
+            }
+        ]
+    else: pass
+
+    return render_template('polls.html', poll_type=poll_type, polls=poll_data)
+
 
 # Example endpoint
 @app.route('/home')
