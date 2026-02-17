@@ -5,8 +5,6 @@
         <!-- select correct stylesheet based on poll type -->
         {% if poll_type == 'batman' %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/batman.css') }}">
-        {% elif poll_type == 'valentine' %}
-            <link rel="stylesheet" href="{{ url_for('static', filename='css/valentine.css') }}">
         {% else %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/polls.css') }}">
         {% endif %}

@@ -40,38 +40,8 @@ def polls(poll_type:str='batman'):
                 "answers": ["Batman (1989)", "The Dark Knight (2008)", "Batman v Superman (2016)", "The Batman (2022)"],
             }
         ]
-    elif poll_type == 'valentine':
-        poll_data = [
-            {
-                "question": "Gifts?",
-                "answers": ["Chocolate", "Flowers", "Jewelry", "Dinner"],
-            }
-        ]
-    else: pass
-
     return render_template('polls.html', poll_type=poll_type, polls=poll_data)
 
-
-# Example endpoint
-@app.route('/home')
-def home():
-    # Define the data you want to send
-    page_title = "My Awesome Website"
-    user_name = "Jane Doe"
-    fruits_list = ["Apple", "Banana", "Cherry"]
-    user_info = {
-        'age': 30,
-        'location': 'San Antonio, TX'
-    }
-
-    # Pass the data to the template as keyword arguments
-    return render_template(
-        'home.html',
-        title=page_title,
-        name=user_name,
-        fruits=fruits_list,
-        info=user_info
-    )
 
 
 if __name__ == '__main__':
