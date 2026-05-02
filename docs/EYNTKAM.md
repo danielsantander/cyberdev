@@ -128,7 +128,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [df](#df)
   - [dig](#dig)
     - [dig options](#dig-options)
-- [du -- Disk Usage](#du----disk-usage)
+  - [du -- Disk Usage](#du----disk-usage)
   - [find](#find)
     - [Find File Based on Content](#find-file-based-on-content)
     - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
@@ -2093,7 +2093,7 @@ dig {domain} +noall +answer
 dig {domain} +trace
 ```
 
-# du -- Disk Usage
+## du -- Disk Usage
 
 Estimate the amount of disk space used by files and directories.
 
