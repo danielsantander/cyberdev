@@ -128,6 +128,7 @@ EVERYTHING YOU NEED TO KNOW, AND MORE
   - [df](#df)
   - [dig](#dig)
     - [dig options](#dig-options)
+- [du -- Disk Usage](#du----disk-usage)
   - [find](#find)
     - [Find File Based on Content](#find-file-based-on-content)
     - [Search for Content with Regular Expressions](#search-for-content-with-regular-expressions)
@@ -1492,25 +1493,27 @@ nmap {SCAN_TYPE} {IP/CIDR} {PORT}
 
 ### Scan Type Options
 
-| option           |  description                                                  |
-|------------------|---------------------------------------------------------------|
-| -sL              | List Scan - simply list targets to scan                       |
-| -sP              | Ping Scan                                                     |
-| -sn              | Ping Scan - disable port scan                                 |
-| -Pn              | No ping scan - disable host discovery, often used with -sn    |
-| -sS              | TCP SYN (Stealth) Scan -- requires raw-packet privileges      |
-| -sT              | TCP Connect Scan                                              |
-| -sO              | IP protocol scan                                              |
-| -sV              | Probe open ports to determine service/version info            |
-| -O               | Enable OS detection                                           |
-| -n               | Never do DNS resolution                                       |
-| -p {port ranges} | Only scan specified ports                                     |
-| -v               | Increase verbosity level (use -vv or more for greater effect) |
+| option           |  description                                                                          |
+|------------------|---------------------------------------------------------------------------------------|
+| -sL              | List Scan - simply list targets to scan                                               |
+| -sP              | Ping Scan - w/o port scanning                                                         |
+| -sn              | Ping Scan - disable port scan                                                         |
+| -Pn              | No ping scan - disable host discovery, often used with -sn                            |
+| -sS              | TCP SYN (Stealth) Scan -- requires raw-packet privileges. Does not complete handshake |
+| -sT              | TCP Connect Scan                                                                      |
+| -sO              | IP protocol scan                                                                      |
+| -sV              | Probe open ports to determine service/version info                                    |
+| -O               | Enable OS detection                                                                   |
+| -n               | Never do DNS resolution                                                               |
+| -p {port ranges} | Only scan specified ports                                                             |
+| -v               | Increase verbosity level (use -vv or more for greater effect)                         |
 
 ### Examples
 
 ```shell
 # Host Detection -- get live hosts
+#   -n  No reverse DNS resolution
+#   -sP (modern -sn)  ping scan to discover live hosts on a network without port scanning them
 nmap -n -sP {IP/CIDR} | grep report | awk '{print $5}'
 
 # TCP scan to check if port 3306 is open (MySQL default port)
@@ -1593,7 +1596,9 @@ ssh {user}@{address}
 # login
 psql -U {USERNAME} {DATABASE}
 ```
+
 Inside PostgreSQL
+
 ```sql
 -- list user info
 \du
@@ -2086,6 +2091,20 @@ dig {domain} +noall +answer
 
 # see the entire sequence of queries
 dig {domain} +trace
+```
+
+# du -- Disk Usage
+
+Estimate the amount of disk space used by files and directories.
+
+```shell
+# Top-level sub directory size
+#   -h: human-readable
+#   -d1: depth of 1
+du -h -d1 /path
+
+# Sort by the 10 largest folders
+du -h -d1 /path | sort -hr | head -n10
 ```
 
 ## find
