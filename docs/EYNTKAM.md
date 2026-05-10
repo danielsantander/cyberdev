@@ -2104,6 +2104,8 @@ Estimate the amount of disk space used by files and directories.
 du -h -d1 /path
 
 # Sort by the 10 largest folders
+#   - sort -hr    -> Sorts by size from largest to smallest (reverse human-readable order)
+#   - head -n10   -> Display the first 10 lines of output
 du -h -d1 /path | sort -hr | head -n10
 ```
 
