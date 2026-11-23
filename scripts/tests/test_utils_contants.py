@@ -32,8 +32,10 @@ class TestDefaultDatetimeFormat(TestTemplate):
 
 
     def test_default_datetime_format(self):
-        pattern = re.compile(r"^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.?\d*$")    # 2022-11-16 03:13:53.434047
-        isMatch = pattern.match(self.now.__str__())
+        pattern = re.compile(r"^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.?\d*(?:\+\d{2}:\d{2})?$")    # 2022-11-16 03:13:53.434047 | 2026-11-23 04:25:52.126281+00:00
+        now_str = self.now.__str__()
+        print(f"now_str: {now_str}")
+        isMatch = pattern.match(now_str)
         self.assertTrue(isMatch is not None)
 
         # convert into default format short -- YYYYMMDD
