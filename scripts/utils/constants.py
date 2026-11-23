@@ -74,7 +74,7 @@ RE_IPHONE_SCREENSHOT = r'^IMG\_(?P<image_id>\d+\s?(?P<dupe>\d)?)(?P<extension>\.
 RE_IP_ADDRESS = r'^(?P<ip_address>(?:\d+\.)+\d+)(?:\:(?P<port>\d+))?(?:\/(?P<subnet_mask_cidr>\d+))?$'
 
 # YYYY-MM-DD HH:MM:SS w/ grouping of: year month, date
-RE_NASA_IMG_DATES = "^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<date>\d{1,2}).*$"
+RE_NASA_IMG_DATES = r"^(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<date>\d{1,2}).*$"
 
 # posix timestamp: "1659238453"
 RE_POSIX_TIME = r'.*(?P<date>\d{10}).*$'
