@@ -40,11 +40,11 @@ def mocked_requests_get(*args, **kwargs):
     content_type = kwargs.get('Content-type')
     params = kwargs.get('params', {})
 
-    if search_results := re.search('^https://epic.gsfc.nasa.gov/api/(?P<image_type>[^\/]+)\/?$', url): # image_type: [natural, enhanced]
+    if search_results := re.search(r'^https://epic.gsfc.nasa.gov/api/(?P<image_type>[^\/]+)\/?$', url): # image_type: [natural, enhanced]
         image_type = search_results.groupdict().get('image_type')
         return MockResponse(json_data=MOCK_IMG_DATA, status_code=200, url=url)
 
-    elif search_results := re.search('^https://epic.gsfc.nasa.gov/archive/(?P<image_type>[^\/]+)\/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<img_ext>\w{3})/(?P<img_name>[^\.]+)\.jpg', url):
+    elif search_results := re.search(r'^https://epic.gsfc.nasa.gov/archive/(?P<image_type>[^\/]+)\/(?P<year>\d{4})/(?P<month>\d{2})/(?P<day>\d{2})/(?P<img_ext>\w{3})/(?P<img_name>[^\.]+)\.jpg', url):
         image_type = search_results.groupdict().get('image_type')
         year = search_results.groupdict().get('year')
         month = search_results.groupdict().get('month')
@@ -54,7 +54,7 @@ def mocked_requests_get(*args, **kwargs):
         return MockResponse(json_data={}, status_code=200, url=url)
 
     # NASA validate api key
-    elif search_results := re.search('^https:\/\/api\.nasa\.gov\/planetary\/apod\?api_key=(?P<api_key>.*)$', url):
+    elif search_results := re.search(r'^https:\/\/api\.nasa\.gov\/planetary\/apod\?api_key=(?P<api_key>.*)$', url):
         api_key = search_results.groupdict().get('api_key')
         data = {
             "date": datetime.datetime.now(datetime.timezone.utc).strftime('%Y-%m-%d'), # "2025-04-19",
@@ -69,7 +69,7 @@ def mocked_requests_get(*args, **kwargs):
 
     # curiosity get_images()
     # https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos
-    elif search_results := re.search('https:\/\/api.nasa.gov\/mars-photos\/api\/v1\/rovers\/curiosity\/photos', url):
+    elif search_results := re.search(r'https:\/\/api.nasa.gov\/mars-photos\/api\/v1\/rovers\/curiosity\/photos', url):
         return MockResponse(json_data={"photos": []}, status_code=200, url=url)
 
     print(f"UNKNOWN URL: {url}")
