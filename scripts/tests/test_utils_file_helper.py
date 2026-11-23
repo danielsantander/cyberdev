@@ -78,7 +78,8 @@ class TestFileHelper(TestTemplate):
         self.assertTrue(new_pdf_file.exists())
 
     def test_create_pdf_with_no_args(self):
-        name = f'{datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")}.pdf'
+        # name = f'{datetime.datetime.utcnow().strftime("%Y%m%d%H%M%S")}.pdf'   # OLD
+        name = f'{datetime.datetime.now(datetime.UTC).strftime("%Y%m%d%H%M%S")}.pdf'
         new_pdf_file_2 = create_pdf()
         self.assertTrue(new_pdf_file_2.exists() and new_pdf_file_2.is_file())
         self.assertEqual(name, new_pdf_file_2.name)

@@ -13,7 +13,7 @@ def timestamp_to_date_string(timestamp:Optional[int]=None, str_format:str=DEFAUL
     """ Returns datetime string representation of given timestamp with format 'YYYYMMDDHHMMSS'.
 
     Keyword arguments:
-    timestamp -- integer value representing the timestamp to convert (default: datetime.datetime.utcnow().timestamp())
+    timestamp -- integer value representing the timestamp to convert (default: datetime.datetime.now(datetime.UTC).timestamp())
     str_format -- string of date format
     timezone -- defaults to datetime.timezone.utc
     """

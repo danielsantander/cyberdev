@@ -51,7 +51,8 @@ def jpg_to_gif(img_dir:Union[str, Path, list[Path]], gif_dir:Union[str, Path]=No
     # gif conversion
     try:
         img_path_list = sorted(img_path_list, key=lambda i: i.name) if do_sort else img_path_list
-        images = [imageio.imread(x.resolve()) for x in img_path_list if x.is_file()]
+        # images = [imageio.imread(x.resolve()) for x in img_path_list if x.is_file()]  # OLD
+        images = [imageio.v3.imread(x.resolve()) for x in img_path_list if x.is_file()]
         imageio.mimsave(gif_path, images, 'GIF', duration=duration)
     except Exception as err:
         lgr.error('unable to convert images to gif: {0}'.format(err.__str__()))

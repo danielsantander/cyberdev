@@ -16,7 +16,8 @@ from utils import constants
 class TestDefaultDatetimeFormat(TestTemplate):
     def setUp(self) -> None:
         super().setUp()
-        self.now = datetime.datetime.utcnow()
+        # self.now = datetime.datetime.utcnow() # OLD
+        self.now = datetime.datetime.now(datetime.UTC)
 
     def test_default_directories(self):
         # default save directory

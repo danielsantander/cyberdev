@@ -21,7 +21,8 @@ def create_pdf(name:Union[str, Path]="", input_text:str='Hello World!', font_nam
     from reportlab.pdfgen.canvas import Canvas # python3 -m pip install reportlab
     if isinstance(name, str):
         if name == '':
-            now = datetime.datetime.utcnow()                      # utc time
+            # now = datetime.datetime.utcnow()         # OLD
+            now = datetime.datetime.now(datetime.UTC)  # utc time
             # now_timestamp = str(now.timestamp()).split('.')[0]  # epoch time
             # name = f'{now_timestamp}.pdf'
             dateformat = now.strftime("%Y%m%d%H%M%S") # YYYMMDDHHMMSS format

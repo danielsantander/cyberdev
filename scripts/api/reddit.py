@@ -145,7 +145,8 @@ class RedditAPI(APIBase):
                 self._logger.error(f"Unable to retrieve token: {auth_data.get('error')}")
                 sys.exit()
             expires_in = float(auth_data.get('expires_in', 0))
-            expire_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
+            # expire_date = datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)  # OLD
+            expire_date = datetime.datetime.now(datetime.UTC) + datetime.timedelta(seconds=expires_in)
             self.token.expire_date = expire_date
             self.token.access_token = auth_data.get('access_token')
             self._logger.info(f"get_token retrieved token {self.token.access_token}, expires in {expires_in}")
