@@ -31,25 +31,25 @@ class TestDefaultDatetimeFormat(TestTemplate):
 
 
     def test_default_datetime_format(self):
-        pattern = re.compile("^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.?\d*$")    # 2022-11-16 03:13:53.434047
+        pattern = re.compile(r"^\d{4}-\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.?\d*$")    # 2022-11-16 03:13:53.434047
         isMatch = pattern.match(self.now.__str__())
         self.assertTrue(isMatch is not None)
 
         # convert into default format short -- YYYYMMDD
         now_str = self.now.strftime(constants.DEFAULT_DATETIME_FMT_SHORT)
-        pattern = re.compile("^\d{8}$")
+        pattern = re.compile(r"^\d{8}$")
         isMatch = pattern.match(now_str)
         self.assertTrue(isMatch is not None)
 
         # convert into default format long -- YYYYMMDDHHMMSS
         now_str = self.now.strftime(constants.DEFAULT_DATETIME_FMT_LONG)
-        pattern = re.compile("^\d{14}$")
+        pattern = re.compile(r"^\d{14}$")
         isMatch = pattern.match(now_str)
         self.assertTrue(isMatch is not None)
 
         # convert into default format -- YYYYMMDDHHMMSS
         now_str = self.now.strftime(constants.DEFAULT_DATETIME_FMT)
-        pattern = re.compile("^\d{14}$")
+        pattern = re.compile(r"^\d{14}$")
         isMatch = pattern.match(now_str)
         self.assertTrue(isMatch is not None)
 
