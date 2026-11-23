@@ -46,7 +46,7 @@ def create_logger(name:str, level:int=LOG_LEVEL, log_dir:Union[str,Path]=None, m
     """
     log_name = name[:-4] if name.lower().endswith('.log') else name
     logger = logging.getLogger(log_name)
-    logger.setLevel(level)
+    logger.setLevel(logging.DEBUG)
     log_format = logging.Formatter(format) if isinstance(format, str) else format
     if log_dir is not None:
         log_dir = log_dir if isinstance(log_dir, Path) else Path(log_dir)

@@ -251,7 +251,8 @@ def rename_path(path:Union[str, Path], new_name:Union[str, Path], overwrite:bool
     path = path if isinstance(path, Path) else Path(path)
     new_name = new_name if isinstance(new_name, Path) else Path(path.parent / str(new_name))
     try:
-        if (overwrite is False and (path.parent / new_name.name).exists()): raise FileExistsError(f'File {new_name.name} already exists.')
+        if (overwrite is False and (path.parent / new_name.name).exists()):
+            raise FileExistsError(f'File {new_name.name} already exists.')
         path = path.rename(new_name)
 
     # path file does not exist, file path not found.

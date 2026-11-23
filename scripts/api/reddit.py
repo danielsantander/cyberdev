@@ -379,8 +379,8 @@ class RedditAPI(APIBase):
             post_date_created_timestamp = int(post_data.get('created_utc', 0))
             post_date_created_str = timestamp_to_date_string(post_date_created_timestamp)
             post_hint:str = post_data.get('post_hint', '')
-            post_url_overridden_by_dest = post_data.get('url_overridden_by_dest', '')
-            post_url:str = post_data.get('url', post_url_overridden_by_dest)
+            post_url_overridden_by_dest = post_data.get('url_overridden_by_dest')
+            post_url:str = post_url_overridden_by_dest or post_data.get('url')
             post_domain:str = post_data.get('domain', '')
             post_ext = post_url.split(".")[-1]
             post_media = post_data.get('media') or {}
@@ -482,8 +482,7 @@ class RedditAPI(APIBase):
 
                 # continue processing regular video media post
                 updated_header.update({"Content-type": "video/mp4"})
-                video_extension_exception_list =  ['gif']
-                media_ext = VIDEO_EXTENSION if not post_ext or post_ext not in video_extension_exception_list else post_ext
+                media_ext = VIDEO_EXTENSION if not post_ext or post_ext not in VIDEO_EXTENSION_LIST else post_ext
                 if post_ext in ['gif']: media_src_url = post_url
                 elif post_ext=="gifv": media_src_url = post_url.replace(".gifv", ".mp4")
                 elif post_url.endswith(".mp4"): media_src_url = post_url

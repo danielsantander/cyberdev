@@ -82,13 +82,16 @@ class EPIC(NASA):
 
         self._logger.debug(f"EPIC init complete -- save_dir_path: {self.save_dir_path.absolute()}")
 
-    def get_epic_images(self, use_enhanced: bool=False, use_png: bool=False)->bool:
+    def get_epic_images(self, use_enhanced: bool=False, use_png: bool=False, date:str=None)->bool:
         sub_save_dir:Path = None # directory to save this iteration of images
         chunk_size = 256
         isSuccess = False
 
         # Get image data
         url = f"{self.api_url}enhanced/" if use_enhanced else f"{self.api_url}natural/"
+        if date:
+            self._logger.debug(f"using date: {date}")
+            url += f"date/{date}/"
         resp = self.send_request(url=url, method="GET")
         assert resp.ok and resp.status_code == 200
         self._logger.debug(f"media extraction request ({resp.status_code}) -- {resp.url}")
@@ -328,6 +331,7 @@ if __name__ == '__main__':
         epic = EPIC()
         user_resp = input('Use enhanced images (Y/N)?: ') or 'N'
         use_enhanced: bool = True if user_resp.lower() in ['y', 'yes'] else False
-        epic.get_epic_images(use_enhanced=use_enhanced) # only use_enhanced=False and use_png=False are working
+        in_date = input('Specify date [YYYYMMDD]: ')
+        epic.get_epic_images(use_enhanced=use_enhanced, date=in_date) # only use_enhanced=False and use_png=False are working
 
     sys.exit()

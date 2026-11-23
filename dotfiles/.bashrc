@@ -1,6 +1,6 @@
 # set aliases, define functions, and customize prompt
 
-check_services() {
+cyberdev--check_services() {
     if [ -f /etc/services ]; then
 
         cat /etc/services
@@ -13,7 +13,7 @@ check_services() {
     fi
 }
 
-scan_subnet() {
+cyberdev--scan_subnet() {
     # requires nmap
     if [ -z $1 ]; then
         echo "No IP address range provided, exiting.";
@@ -41,13 +41,13 @@ scan_subnet() {
     fi
 }
 
-get-ip--macos() {
+_get-ip--macos() {
     ifconfig | grep -E "inet \d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}" | awk '{print $2}';
 }
 
-get-ip() {
+cyberdev--get-ip() {
     if [ ! -e /etc/os-release ]; then
-        get-ip--macos
+        _get-ip--macos
     else
         hostname -I
     fi;
