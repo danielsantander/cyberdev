@@ -78,7 +78,7 @@ def mocked_requests_get(*args, **kwargs):
     approved_media_content_type_list = ["image/jpeg","video/mp4"]
     content_type = kwargs.get('Content-type')
 
-    if search_results := re.search('^.*user\/(?P<username>[^\/]+)\/saved\/?$',url):
+    if search_results := re.search(r'^.*user\/(?P<username>[^\/]+)\/saved\/?$',url):
         url = search_results.group()
         username = search_results.groupdict('username')
         params = kwargs.get('params', {})
@@ -92,7 +92,7 @@ def mocked_requests_get(*args, **kwargs):
         return MockResponse(json_data=MOCK_SAVED_DATA_RAW_RESP, status_code=200, url=url)
 
     # extract_media_from_url call
-    elif search_results := re.search('^.*test_process_saved_data\.(?P<extension>.*)$',url) or content_type in approved_media_content_type_list:
+    elif search_results := re.search(r'^.*test_process_saved_data\.(?P<extension>.*)$',url) or content_type in approved_media_content_type_list:
         extension = search_results.groupdict().get('extension')
         return MockResponse(json_data={}, status_code=200, url=url)
 
@@ -170,7 +170,7 @@ class TestRedditAPI(TestTemplate):
         self.assertTrue(results_file.exists() and results_file.is_file())
         self.assertNotEqual(len(files_to_exclude), 0)
         for post in post_list + data_2:
-            search = re.search('.*(t\d_[\w\d]*)\.jpeg', post)
+            search = re.search(r'.*(t\d_[\w\d]*)\.jpeg', post)
             self.assertIsNotNone(search)
             post_id = search.group(1)
             self.assertIn(post, files_to_exclude)
@@ -203,7 +203,7 @@ class TestRedditAPI(TestTemplate):
         for f in saved_data_files: f.unlink()
         self.assertEqual(len(list(self.reddit.api_data_dir_path.iterdir())), 1)
         consolidated_file = [f for f in self.reddit.api_data_dir_path.iterdir()][0]
-        search = re.search('^\d{14}--consolidated_saved_data.json$', consolidated_file.name)
+        search = re.search(r'^\d{14}--consolidated_saved_data.json$', consolidated_file.name)
         self.assertIsNotNone(search)
         self.assertEqual(search.group(), consolidated_file.name)
 
