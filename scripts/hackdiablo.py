@@ -788,7 +788,7 @@ class RPC():
             self._logger.error(f"[rpc_run] an unexpected error occurred: {e}")
         return results
 
-
+# MAIN
 if __name__ == "__main__":
     import argparse
 
@@ -844,11 +844,13 @@ if __name__ == "__main__":
         else:
             target_ip_range = hd.ip_range
 
+        # Scan includes host discovery only, no port scanning or OS detection
         if action == 'arpscan':
             arp_scan_data = hd.arp_scan(target_ip_range)
             for host in sorted(arp_scan_data, key=lambda x: ipaddress.IPv4Address(x.get('ip_address'))):
                 logger.info(f"Host: {host.get('ip_address')},\tMAC: {host.get('mac_address')}")
 
+        # Scan includes host discovery only, no port scanning or OS detection
         if action == 'hostdiscovery':
             # nmap_args = "-n -sP" # OLD VERSION
             nmap_args = "-sn"
@@ -856,12 +858,14 @@ if __name__ == "__main__":
             for host in sorted(nmap_scan_data, key=lambda x: ipaddress.IPv4Address(x.get('ip_address'))):
                 logger.info(f"Host: {host.get('hostname') or host.get('ip_address')},\tState: {host.get('state')},\tProtocols: {list(host.get('protocols', {}).keys())}")
 
+        # Scan includes host discovery, port scanning, and OS detection
         if action == 'scan':
             scan_results = hd.os_detection_scan(target_range=target_ip_range)
             for host in sorted(scan_results.values(), key=lambda x: ipaddress.IPv4Address(x.get('ip_address'))):
                 # logger.info(f"Host: {host.get('hostname') or host.get('ip_address')},\tState: {host.get('state')},\tOS Matches: {len(host.get('osmatches', []))}")
                 logger.info(f"Host: {host.get('hostname') or host.get('ip_address')},\tState: {host.get('state')},\tOS Matches ({len(host.get('osmatches', []))}): {[(x.get('name'), x.get('accuracy')) for x in host.get('osmatches', [])]}")
 
+        # Export data if requested
         if do_export:
             data_exported = hd.export_data(filename=f'{_APP_NAME}-{action}', verbose=is_verbose)
 
