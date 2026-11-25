@@ -926,15 +926,15 @@ def iterate_stuff():
     import re
     RE_VID=r"^.*--(?P<uid>[^\.]*)\.\w{3}$"
 
-    v_path = Path('/Volumes/djs/media/xxx/videos/')
-    l_path = Path('/Users/santander/Movies/omg/')
+    v_directory_path = Path('')
+    l_directory_path = Path('')
 
-    v_uid_set = set([re.match(RE_VID, x.name).group('uid') for x in v_path.iterdir() if re.match(RE_VID, x.name)])
-    l_uid_set = set([re.match(RE_VID, x.name).group('uid') for x in l_path.iterdir() if re.match(RE_VID, x.name)])
+    v_uid_set = set([re.match(RE_VID, x.name).group('uid') for x in v_directory_path.iterdir() if re.match(RE_VID, x.name)])
+    l_uid_set = set([re.match(RE_VID, x.name).group('uid') for x in l_directory_path.iterdir() if re.match(RE_VID, x.name)])
 
     all_vid_files = set()
-    all_vid_files.update(v_path.iterdir())
-    all_vid_files.update(l_path.iterdir())
+    all_vid_files.update(v_directory_path.iterdir())
+    all_vid_files.update(l_directory_path.iterdir())
 
     # Returns True if they share at least one element
     v_contains_l = not v_uid_set.isdisjoint(l_uid_set)
