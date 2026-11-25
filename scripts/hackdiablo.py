@@ -908,7 +908,10 @@ if __name__ == "__main__":
         })
         datetime_str = datetime.datetime.now(datetime.UTC).strftime('%Y%m%d%H%M%S')
         filename = f"{datetime_str}--{_APP_NAME}--current_host.json"
-        data_exported = hd.export_data(filename=filename, data=out_data, verbose=False)
+
+        # Export data if requested
+        if do_export:
+            data_exported = hd.export_data(filename=filename, data=out_data, verbose=False)
 
     # print completion time for action
     if t_0:
